@@ -136,7 +136,7 @@ jobs:
           mkdir -p "$RUNNER_TEMP/policy-reports"
           node -e '
             for (const row of JSON.parse(process.env.DERIVATIONS)) {
-              process.stdout.write([row.channel, row.sha1, row.version ?? "", row.canary === true ? "true" : "false"].join("\t") + "\n");
+              process.stdout.write([row.channel, row.sha1, row.version ?? "unknown", row.canary === true ? "true" : "false"].join("\t") + "\n");
             }
           ' > "$RUNNER_TEMP/policy-revisions.tsv"
 

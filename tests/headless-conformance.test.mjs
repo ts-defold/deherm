@@ -337,11 +337,15 @@ test("the generated harness emits one collection, game object and script per rea
   assert.ok(content.get("game.project").includes("main_collection = /conformance/index.collectionc"));
 });
 
-test("the committed plan matches the generator", async () => {
+test("the committed plan matches the generator for its pinned revision", async (t) => {
   const committed = await readFile(
     new URL("packages/bindings/generated/defold-headless-conformance-plan.json", root),
     "utf8",
   );
+  if (JSON.parse(committed).defoldRevision !== plan.defoldRevision) {
+    t.skip("the installed policy surface selects another Defold revision; its plan is generated in this job");
+    return;
+  }
   const digest = (text) => createHash("sha256").update(text).digest("hex");
   assert.equal(
     digest(committed),
@@ -350,7 +354,7 @@ test("the committed plan matches the generator", async () => {
   );
 });
 
-test("a recorded runtime report never claims more than the plan permits", async () => {
+test("a recorded runtime report never claims more than its revision's plan permits", async (t) => {
   let report;
   try {
     report = JSON.parse(
@@ -359,6 +363,10 @@ test("a recorded runtime report never claims more than the plan permits", async 
   } catch (error) {
     if (error.code === "ENOENT") return;
     throw error;
+  }
+  if (report.defoldRevision !== plan.defoldRevision) {
+    t.skip("the committed runtime report is evidence for another Defold revision");
+    return;
   }
   assert.equal(report.evidenceStage, "runtime");
   assert.equal(report.contractCount, plan.contractCount);

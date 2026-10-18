@@ -341,3 +341,11 @@ A pull request that changes the generator runs the same visible policy graph
 against its checkout, including host parity and real-engine conformance, but it
 cannot publish the website. Merging generator code changes affects future
 nightlies; publishing newly discovered Defold revisions itself is automatic.
+
+The real-engine job installs the selected revision's generated policy surface.
+Its invariant tests must run against that selected surface. A committed
+headless plan or runtime report is a fixture for its own pinned revision only:
+byte-for-byte fixture checks are skipped when the selected revision differs,
+while the selected revision still generates its own plan and must compile,
+link, and execute in the engine. A pinned report must never be compared to a
+fresh revision's plan or promoted as evidence for that revision.

@@ -163,7 +163,9 @@ async function main(argv = process.argv.slice(2)) {
     console.log(`  bob.jar     ${sizes.bob} bytes sha256 ${replacements.DEFOLD_BOB_SHA256}`);
     return;
   }
-  throw new Error("Usage: track-defold-channels.mjs {plan [--json] [--index <manifest>] | pin <sha> [--write]}");
+  throw new Error(
+    "Usage: track-defold-channels.mjs {plan [--json] [--include-alpha-canary] [--index <manifest>] | pin <sha> [--write]}",
+  );
 }
 
 if (process.argv[1] && pathToFileURL(process.argv[1]).href === import.meta.url) await main();

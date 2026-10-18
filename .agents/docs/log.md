@@ -1,5 +1,17 @@
 # Defold Hermes knowledge log
 
+## 2026-10-18 - Separate pinned conformance fixtures from selected revisions
+
+Run 39137428310 passed alpha-canary derivation and the completeness gate, but
+its engine lane stopped in unit tests before compilation. The job correctly
+installed the current alpha policy; two tests incorrectly compared that plan
+against the repository's pinned-revision plan and report. Those byte-equality
+and report-scope tests now apply only when their Defold revision matches the
+selected surface. All other headless invariants continue to run for the alpha,
+followed by selected-SDK compilation, linkage, and runtime execution. This
+change removes a false cross-revision assertion, not an engine evidence gate;
+hosted alpha execution remains unproven until a follow-up run completes.
+
 ## 2026-10-18 - Remove the headless engine's frozen Defold link recipe
 
 Run 39135055330 derived alpha `4019b8f249383f281c03463fca74b13afe4828b1`,

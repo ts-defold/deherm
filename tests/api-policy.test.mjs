@@ -315,6 +315,11 @@ test("policy workflow discovers changed channels on push and PR and reports inco
   assert.match(workflow, /if \[ "\$canary" != true \]; then generated=/u);
   assert.match(
     workflow,
+    /row\.version \?\? "unknown"/u,
+    "TSV fields must not be empty because Bash collapses adjacent tab separators",
+  );
+  assert.match(
+    workflow,
     /derivation-completeness:[\s\S]*DERIVATION_FAILURES: \$\{\{ needs\.derive\.outputs\.failed \}\}/u,
   );
   assert.match(workflow, /if \[ "\$DERIVATION_FAILURES" != 0 \]/u);
