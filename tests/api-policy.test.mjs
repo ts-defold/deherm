@@ -115,6 +115,10 @@ test("policy host parity reproduces the Linux policy projection without obsolete
   );
   assert.match(workflow, /check-policy-site-parity\.mjs --root build\/policy-site --write/u);
   assert.match(parity, /pnpm test:policy-surface-materializer/u);
+  assert.ok(
+    parity.indexOf("pnpm test:policy-surface-materializer") < parity.indexOf("name: Install the generated surface"),
+    "pinned package fixtures must be checked before the revision-selected surface replaces them",
+  );
   assert.match(parity, /build-policy-site\.mjs --out build\/policy-site --validation-only/u);
   assert.match(parity, /check-policy-site-parity\.mjs --root build\/policy-site/u);
   assert.match(parity, /--expected "\$RUNNER_TEMP\/policy-surface\/policy-site-parity\.json"/u);

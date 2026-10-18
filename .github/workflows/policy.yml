@@ -299,6 +299,8 @@ jobs:
       - run: pnpm install --frozen-lockfile --ignore-scripts
       - name: Verify policy cache lifecycle on this host
         run: pnpm test:policy-cache
+      - name: Verify package-owned materializer against its pinned fixture
+        run: pnpm test:policy-surface-materializer
       - name: Install the generated surface
         run: |
           archive="$RUNNER_TEMP/policy-surface/policy-surface.tar.gz"
@@ -307,7 +309,6 @@ jobs:
       # from that immutable policy tests the cross-host consumer projection;
       # re-downloading an unrelated pinned ref-doc is neither required nor
       # evidence about the selected revision.
-      - run: pnpm test:policy-surface-materializer
       - run: node scripts/build-policy-site.mjs --out build/policy-site --validation-only
       - run: node scripts/check-policy-site-resolution.mjs
       - run: >-

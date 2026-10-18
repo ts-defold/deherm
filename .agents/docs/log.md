@@ -1,5 +1,19 @@
 # Defold Hermes knowledge log
 
+## 2026-10-18 - Keep pinned package fixtures before selected surface install
+
+[Policy run 39167181661](https://github.com/ts-defold/deherm/actions/runs/39167181661)
+derived the alpha and passed completeness, then Linux/macOS materializer tests
+failed because host parity installed the alpha surface before running tests
+whose expected hashes belong to the package's pinned fixture. That is a test
+ordering error, not an observed alpha policy mismatch: the failure named
+`script/url-target-support.ts` with a digest that the alpha policy did not
+claim. Host parity now tests package-owned materialization first, installs
+the selected derived surface second, and only then builds and byte-compares
+the derived site. The API-policy test asserts this order so the fixture
+boundary cannot silently drift again. Hosted site-byte comparison remains
+pending a run with this correction.
+
 ## 2026-10-18 - Windows materializer test distinguishes text from transport bytes
 
 [Policy run 39166776465](https://github.com/ts-defold/deherm/actions/runs/39166776465)
