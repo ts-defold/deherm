@@ -1,5 +1,17 @@
 # Defold Hermes knowledge log
 
+## 2026-10-18 - Resume draft Bob releases through the draft-aware CLI
+
+[Policy run 39163353361](https://github.com/ts-defold/deherm/actions/runs/39163353361)
+derived the alpha and created its Bob release as a draft, then failed because
+GitHub's `releases/tags/<tag>` REST lookup returned 404 for that draft. A
+read-only `gh release view <tag> --json ...` call resolved the same draft.
+The publisher now uses the draft-aware CLI lookup and verifies the exact tag
+before accepting its metadata. Its regression fixture covers create, upload,
+publish, reuse, and resume from an incomplete draft. This addresses the
+observed release-lookup failure; hosted resumption and public-download
+verification remain pending.
+
 ## 2026-10-18 - Hosted Bob-mirror derivation exposed a sparse-checkout gap
 
 At signed main commit `7228cb1f`, [policy run 39163012858](https://github.com/ts-defold/deherm/actions/runs/39163012858)

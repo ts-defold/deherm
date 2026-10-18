@@ -96,9 +96,15 @@ async function gh(args, run) {
 
 async function releaseForTag(tag, run) {
   try {
-    return JSON.parse(await gh(["api", `repos/${repository}/releases/tags/${tag}`], run));
+    // GitHub's releases/tags REST route returns 404 for a draft, even to an
+    // authenticated writer. The release CLI resolves drafts by tag correctly.
+    const release = JSON.parse(
+      await gh(["release", "view", tag, "--repo", repository, "--json", "isDraft,assets,body,tagName"], run),
+    );
+    if (release.tagName !== tag) throw new Error(`Bob mirror lookup returned ${release.tagName}, expected ${tag}`);
+    return { draft: release.isDraft, assets: release.assets, body: release.body };
   } catch (error) {
-    if (/HTTP 404\b/u.test(`${error.stderr ?? ""}\n${error.message ?? ""}`)) return null;
+    if (/HTTP 404\b|release not found/u.test(`${error.stderr ?? ""}\n${error.message ?? ""}`)) return null;
     throw error;
   }
 }

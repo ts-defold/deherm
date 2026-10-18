@@ -29,9 +29,16 @@ test("Bob mirror publisher validates the pinned bytes, drafts, verifies, publish
   };
   const run = async (_command, args) => {
     releaseState.calls.push(args);
-    if (args[0] === "api") {
-      if (!releaseState.release) throw { stderr: "HTTP 404: Not Found" };
-      return { stdout: JSON.stringify(releaseState.release) };
+    if (args[1] === "view") {
+      if (!releaseState.release) throw { stderr: "release not found" };
+      return {
+        stdout: JSON.stringify({
+          isDraft: releaseState.release.draft,
+          assets: releaseState.release.assets,
+          body: releaseState.release.body,
+          tagName: args[2],
+        }),
+      };
     }
     if (args[1] === "create") {
       releaseState.release = { draft: true, assets: [], body: args[args.indexOf("--notes") + 1] };
@@ -88,8 +95,8 @@ test("Bob mirror publisher validates the pinned bytes, drafts, verifies, publish
     assert.equal((await publishBobMirror({ workspace, revision, run, verifyDownload })).reused, true);
     assert.equal(downloads.length, 1, "a reused mirror does not re-download Bob on every canary");
     assert.deepEqual(
-      releaseState.calls.slice(callsBeforeReuse).map((args) => args[0]),
-      ["api"],
+      releaseState.calls.slice(callsBeforeReuse).map((args) => args[1]),
+      ["view"],
     );
     releaseState.release.draft = true;
     releaseState.release.assets = releaseState.release.assets.filter((asset) => asset.name !== "bob.jar.sha256");
