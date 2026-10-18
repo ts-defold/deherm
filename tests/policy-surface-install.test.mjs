@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { execFile } from "node:child_process";
-import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, readdir, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
@@ -39,5 +39,21 @@ test("policy surface installation replaces the transported index in a separate c
     assert.equal(await readFile(path.join(destination, index), "utf8"), '{"entries":["new","revision"]}\n');
   } finally {
     await rm(temporary, { recursive: true, force: true });
+  }
+});
+
+test("policy surface CLI does not silently skip invalid commands", async () => {
+  await assert.rejects(
+    run(process.execPath, ["scripts/policy-surface.mjs", "install", "--archive", "missing-policy-surface.tar.gz"]),
+    /ENOENT|no such file|Cannot open|could not open/i,
+  );
+});
+
+test("script entry-point checks use cross-platform file URLs", async () => {
+  const scriptsRoot = path.resolve(import.meta.dirname, "../scripts");
+  for (const name of await readdir(scriptsRoot)) {
+    if (!name.endsWith(".mjs")) continue;
+    const source = await readFile(path.join(scriptsRoot, name), "utf8");
+    assert.ok(!source.includes("`file://${process.argv[1]}`"), `${name} has a Windows-incompatible entry-point check`);
   }
 });

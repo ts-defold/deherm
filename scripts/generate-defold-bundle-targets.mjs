@@ -18,7 +18,7 @@
 import { createHash } from "node:crypto";
 import { readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 import { parse } from "yaml";
 
@@ -154,7 +154,7 @@ export function allTargetNames(document) {
   return document.targets.map(({ target }) => target);
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const derived = await deriveBundleTargets();
   const serialized = `${JSON.stringify(derived, null, 2)}\n`;
   const platformPairs = await derivePlatformPairs(derived);

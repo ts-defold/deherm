@@ -1,5 +1,21 @@
 # Defold Hermes knowledge log
 
+## 2026-10-18 - Windows policy install was a silent CLI no-op
+
+[Policy run 39171654080](https://github.com/ts-defold/deherm/actions/runs/39171654080)
+showed the transported policy index held 19 revisions, while the Windows site
+still served only the one revision already in the checkout. The install step
+completed in about 0.14 seconds without the new post-install assertion firing.
+The entry-point guard in `scripts/policy-surface.mjs` compared a `file:///D:/...`
+module URL to `` `file://${process.argv[1]}` `` built from a Windows path. The
+comparison was false, so the CLI did nothing and exited successfully. Five
+other scripts had the same guard. All six now compare with `pathToFileURL`,
+and the API-policy suite invokes the CLI with an invalid archive to require a
+nonzero result; it also rejects the fragile guard form across `scripts/`.
+The focused test passes on macOS. Windows execution and full cross-host parity
+remain pending the next hosted policy run; do not infer hosted success from the
+local test.
+
 ## 2026-10-18 - Assert that Windows installed the transported policy index
 
 [Policy run 39169426524](https://github.com/ts-defold/deherm/actions/runs/39169426524)

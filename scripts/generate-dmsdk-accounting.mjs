@@ -18,7 +18,7 @@
 import assert from "node:assert/strict";
 import { readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 import { generatedTextMatches } from "../packages/compiler/src/generated-text.mjs";
 
@@ -128,4 +128,4 @@ async function main(argv = process.argv.slice(2)) {
   console.log(`Verified exact dmSDK accounting: ${shown}; ${report.declarationCount} total.`);
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) await main();
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) await main();

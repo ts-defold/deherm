@@ -3,7 +3,7 @@
 import { createHash } from "node:crypto";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 import { renderDefoldValueLayoutHeader } from "../packages/compiler/src/defold-value-layout-output-emitter.mjs";
 
@@ -348,4 +348,4 @@ export async function run(argv = process.argv.slice(2)) {
   return report;
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) await run();
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) await run();
