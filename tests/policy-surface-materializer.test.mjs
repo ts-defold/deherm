@@ -85,7 +85,9 @@ test("script binary type facts survive withdrawal of their optimized Lua route",
     path.join(repositoryRoot, "packages/sdk/src/generated/script/types.ts"),
     "utf8",
   );
-  assert.equal(realized, generatedTypes);
+  // Git may materialize tracked text with CRLF on Windows. This assertion is
+  // about the projected TypeScript content; site parity below stays byte-exact.
+  assert.equal(realized.replace(/\r\n/gu, "\n"), generatedTypes.replace(/\r\n/gu, "\n"));
   assert.match(realized, /buffer: Uint8Array \| ArrayBuffer/u);
 });
 

@@ -1,5 +1,16 @@
 # Defold Hermes knowledge log
 
+## 2026-10-18 - Windows materializer test distinguishes text from transport bytes
+
+[Policy run 39166776465](https://github.com/ts-defold/deherm/actions/runs/39166776465)
+reached the new Windows host-parity job. The package materializer test had one
+failure before the site parity comparison: it compared rendered TypeScript LF
+text with a Git-checkout generated file using CRLF. The semantic test now
+normalizes only CRLF for that comparison. The site parity digest remains
+byte-exact and will still reject an actual cross-host output difference.
+The other 30 materializer tests passed in that Windows run. Hosted parity
+after this narrow test correction is pending.
+
 ## 2026-10-18 - Host parity no longer depends on an obsolete pinned archive
 
 At commit `74f2c7a6`, [policy run 39164571547](https://github.com/ts-defold/deherm/actions/runs/39164571547)
