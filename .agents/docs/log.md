@@ -1,5 +1,23 @@
 # Defold Hermes knowledge log
 
+## 2026-10-18 - Hosted alpha policy and release gates confirmed
+
+At signed main commit `0d8303b7`, [policy run 39139352582](https://github.com/ts-defold/deherm/actions/runs/39139352582)
+completed successfully: alpha derivation, completeness, Linux/macOS/Windows
+parity, selected-SDK native and browser exact-call checks, headless Defold
+execution, website publication, and clean published-policy consumption.
+The selected alpha was `4019b8f249383f281c03463fca74b13afe4828b1`.
+Its headless engine report observed 24 contracts with 0 mismatches and 0
+engine faults; 4 were blocked and 51 unreachable under the headless fixture
+profile. This is engine evidence for those observed contracts, not a claim
+that all 928 documented routes ran in a live game context.
+[Release-readiness run 39139352630](https://github.com/ts-defold/deherm/actions/runs/39139352630)
+passed Ubuntu, macOS, and Windows, including Ubuntu's aggregate tests. Local
+`pnpm check`, focused tests, style, knowledge validation, workflow lint,
+and signed commit provenance also passed. The alpha policy is live on the
+published site; the skipped native-artifact request means this canary did not
+publish a new compiler archive.
+
 ## 2026-10-18 - Keep the fake Bob link test independent of downloads
 
 Release-readiness run 39137428312 passed its macOS and Windows lanes but failed
