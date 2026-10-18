@@ -1,5 +1,17 @@
 # Defold Hermes knowledge log
 
+## 2026-10-18 - Keep the fake Bob link test independent of downloads
+
+Release-readiness run 39137428312 passed its macOS and Windows lanes but failed
+the Ubuntu lane: the Static Hermes link test injected a fake Bob runner, yet
+left Bob resolution on the production path. A cold Ubuntu cache caused an
+attempt to fetch the pinned JAR, which returned 404 before the fake runner
+could exercise staging. The test now supplies a test-only Bob file and a
+matching test-only manifest digest; the product's exact digest check remains
+active, but this unit test no longer depends on the network or cache state.
+The focused 13-test suite passed locally. Hosted Ubuntu confirmation is still
+required; this does not validate the production Bob distribution URL.
+
 ## 2026-10-18 - Separate pinned conformance fixtures from selected revisions
 
 Run 39137428310 passed alpha-canary derivation and the completeness gate, but

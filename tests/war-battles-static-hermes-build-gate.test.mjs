@@ -360,6 +360,8 @@ test("link stage stages a temporary extension and consumes Bob output", async ()
   );
   const authoredBytes = await readFile(authoredUnit);
   const fakeJava = path.join(output, "fake-java");
+  const fakeBob = path.join(output, "fake-bob.jar");
+  const fixtureManifest = path.join(output, "manifest.json");
   const projectLockPath = path.join(root, "examples/war-battles-online/defold/deherm.lock");
   await writeFile(
     fakeJava,
@@ -370,9 +372,16 @@ exit 97
 `,
   );
   await chmod(fakeJava, 0o755);
+  const fakeBobBytes = Buffer.from("test-only Bob identity; the injected runner never executes this file\n");
+  await writeFile(fakeBob, fakeBobBytes);
+  const manifest = JSON.parse(await readFile(path.join(warBattlesProject, ".deherm/manifest.json"), "utf8"));
+  manifest.toolchain.bob.sha256 = sha256(fakeBobBytes);
+  await writeFile(fixtureManifest, `${JSON.stringify(manifest)}\n`);
   try {
     const report = await buildGate({
       output,
+      manifest: fixtureManifest,
+      bob: fakeBob,
       typedNativeSource: path.join(root, "packages/static-hermes/src/generated/script-typed-native-bridge.ts"),
       projectLock: projectLockPath,
       applicationBundle: await lockedApplicationBundle(),
@@ -396,6 +405,7 @@ exit 97
     });
     const link = report.stages.find(({ name }) => name === "link");
     assert.equal(link.status, "passed", JSON.stringify({ link, blockers: report.blockers }, null, 2));
+    assert.equal(link.bob.pinned, true);
     assert.match(report.evidenceBoundary.linkage, /^observed:/u);
     assert.match(report.stages.find(({ name }) => name === "link").command.join(" "), /fake-java/);
     assert.ok(report.stages.find(({ name }) => name === "link").output.sha256);
