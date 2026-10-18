@@ -39,6 +39,7 @@ import {
   derivedSurfaceRoots,
   enginePaths,
   fingerprintDifference,
+  materializeBobNotices,
   materializeWorkspace,
   ownedArtifactPaths,
   revisionSupportSteps,
@@ -48,6 +49,28 @@ import {
 const repositoryRoot = path.resolve(import.meta.dirname, "..");
 const pinned = "7f0f554f41f9dce1e0ddff99bf08200657d1ee05";
 const other = "0123456789abcdef0123456789abcdef01234567";
+
+test("Bob notices come from exact source-revision Git blobs, not sparse checkout contents", async () => {
+  const root = await mkdtemp(path.join(tmpdir(), "deherm-bob-notices-"));
+  const names = ["LICENSE.txt", "NOTICE", "TOOLS_LICENSES.md", "COMPLYING_WITH_LICENSES.md"];
+  const requested = [];
+  try {
+    await materializeBobNotices(root, pinned, async (command, args, options) => {
+      assert.equal(command, "git");
+      assert.deepEqual(args.slice(0, 1), ["show"]);
+      assert.equal(options.cwd, root);
+      requested.push(args[1]);
+      return { stdout: `${args[1]}\n` };
+    });
+    assert.deepEqual(
+      requested,
+      names.map((name) => `${pinned}:${name}`),
+    );
+    for (const name of names) assert.equal(await readFile(path.join(root, name), "utf8"), `${pinned}:${name}\n`);
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
+});
 
 test("the historical matrix is immutable, unique, and data-driven", async () => {
   const manifest = validateRevisionMatrix(

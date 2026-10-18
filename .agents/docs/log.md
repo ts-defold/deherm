@@ -1,5 +1,20 @@
 # Defold Hermes knowledge log
 
+## 2026-10-18 - Hosted Bob-mirror derivation exposed a sparse-checkout gap
+
+At signed main commit `7228cb1f`, [policy run 39163012858](https://github.com/ts-defold/deherm/actions/runs/39163012858)
+passed its derivation job but failed its revision-completeness gate: alpha
+`4019b8f249383f281c03463fca74b13afe4828b1` stopped at
+`upstream/defold/LICENSE.txt` missing from the sparse working tree. The file
+exists at that pinned Defold commit; checkout shape was not sound evidence
+of absence. Derivation now materializes each Bob redistribution notice with
+`git show <revision>:<path>` from the exact source commit, including the
+reuse-checkout path. A focused test verifies the revision-qualified blob
+requests even when the checkout starts empty. Local derivation tests, style,
+and OKF checks pass; hosted mirror publication is still pending a corrected
+run. This is a CI regression found by the new gate, not proof that Defold
+removed its license.
+
 ## 2026-10-18 - Mirror verified Bob bytes before upstream archives age out
 
 The installed CLI previously had one Bob download URL. A cold cache could

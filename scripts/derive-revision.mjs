@@ -144,6 +144,18 @@ export const enginePaths = Object.freeze([
   "packages",
 ]);
 
+/** Exact source-revision notices required when redistributing the pinned Bob. */
+const bobNoticeFiles = Object.freeze(["LICENSE.txt", "NOTICE", "TOOLS_LICENSES.md", "COMPLYING_WITH_LICENSES.md"]);
+
+export async function materializeBobNotices(defold, revision, runGit = run) {
+  for (const name of bobNoticeFiles) {
+    // Sparse-checkout set does not promise that root files are materialized.
+    // Read the blob by revision rather than trusting checkout shape.
+    const { stdout } = await runGit("git", ["show", `${revision}:${name}`], { cwd: defold });
+    await writeFile(path.join(defold, name), stdout);
+  }
+}
+
 /**
  * Every repository path the derivation chain can write.
  *
@@ -355,11 +367,7 @@ async function fetchEngineSlice({ workspace, revision }) {
   await run("git", ["sparse-checkout", "set", ...enginePaths], { cwd: defold });
   await run("git", ["fetch", "--depth=1", "--filter=blob:none", "origin", revision], { cwd: defold });
   await run("git", ["checkout", "--detach", revision], { cwd: defold });
-  // Cone-mode sparse checkouts include root files. The Bob mirror redistributes
-  // this revision's notices, so fail here if that Git invariant ever changes.
-  for (const name of ["LICENSE.txt", "NOTICE", "TOOLS_LICENSES.md", "COMPLYING_WITH_LICENSES.md"]) {
-    await stat(path.join(defold, name));
-  }
+  await materializeBobNotices(defold, revision);
 
   const response = await fetch(refDocUrl);
   if (!response.ok) throw new Error(`${refDocUrl}: HTTP ${response.status}`);
@@ -402,6 +410,7 @@ async function reuseEngineSlice({ workspace, revision, from }) {
     }
   }
   if (!copied) throw new Error(`Could not clone ${from}/defold into the workspace`);
+  await materializeBobNotices(target, revision);
   await copyFile(path.join(source, "ref-doc.zip"), path.join(workspace, "upstream", "ref-doc.zip"));
 
   const lock = await readFile(path.join(workspace, "upstream.lock"), "utf8");
