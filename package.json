@@ -353,7 +353,7 @@
     "check:package-revision-boundary": "node scripts/check-package-revision-boundary.mjs",
     "check:end-to-end-gate": "node --test tests/end-to-end-gate.test.mjs",
     "check:policy-surface-fixture": "node scripts/capture-policy-surface-old-pipeline.mjs",
-    "test:policy-surface-materializer": "node --test tests/policy-surface-materializer.test.mjs tests/policy-client.test.mjs tests/policy-cache-maintenance.test.mjs",
+    "test:policy-surface-materializer": "node --test tests/policy-surface-materializer.test.mjs tests/policy-site-parity.test.mjs tests/policy-client.test.mjs tests/policy-cache-maintenance.test.mjs",
     "test:policy-cache": "node --test tests/policy-client.test.mjs tests/policy-cache-maintenance.test.mjs",
     "capture:policy-surface-fixture": "node scripts/capture-policy-surface-old-pipeline.mjs --update",
     "check:types": "ttsc check && tsc -p tsconfig.defold-webtransport.json",

@@ -63,7 +63,7 @@ test("project-selected runtime variants never leak into revision policy", () => 
   assert.equal(isRevisionOutput("defold/defold_hermes/include/defold_hermes/generated_scalar_lua_ids.hpp"), true);
 });
 
-test("policy host parity materializes every authoritative generator input", async () => {
+test("policy host parity reproduces the Linux policy projection without obsolete source downloads", async () => {
   const workflow = await readFile(path.join(repositoryRoot, ".github/workflows/policy.yml"), "utf8");
   const bootstrap = await readFile(path.join(repositoryRoot, "scripts/bootstrap-upstreams.sh"), "utf8");
   const bobBootstrap = await readFile(path.join(repositoryRoot, "scripts/bootstrap-bob.sh"), "utf8");
@@ -113,9 +113,12 @@ test("policy host parity materializes every authoritative generator input", asyn
       parity.indexOf("name: Install the generated surface"),
     "host setup must finish before canonical policy bytes replace checkout files",
   );
-  assert.match(parity, /DEFOLD_REV=\/DEHERM_DERIVED_REVISION=/u);
-  assert.match(parity, /DEHERM_CARRIED_REVIEW_LEDGER=/u);
-  assert.match(parity, /bootstrap-upstreams\.sh defold ref-doc/u);
+  assert.match(workflow, /check-policy-site-parity\.mjs --root build\/policy-site --write/u);
+  assert.match(parity, /pnpm test:policy-surface-materializer/u);
+  assert.match(parity, /build-policy-site\.mjs --out build\/policy-site --validation-only/u);
+  assert.match(parity, /check-policy-site-parity\.mjs --root build\/policy-site/u);
+  assert.match(parity, /--expected "\$RUNNER_TEMP\/policy-surface\/policy-site-parity\.json"/u);
+  assert.doesNotMatch(parity, /bootstrap-upstreams\.sh|import-defold-sdk\.py/u);
   assert.match(engine, /bootstrap-upstreams\.sh defold hermes extender ref-doc defold-sdk/u);
   assert.match(engine, /key: defold-sdk-\$\{\{ steps\.defold-sdk\.outputs\.digest \}\}/u);
   assert.match(checksumHelper, /deherm_require_node[\s\S]*command -v node/u);
