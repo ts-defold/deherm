@@ -4,7 +4,7 @@ title: Resolve API ground truth from the exact Defold engine SHA
 description: Use matching generated reference artifacts and packaged public headers, then merge resolved project extensions without mixing engine versions.
 tags: [decision, api, versioning, editor, bob, dmsdk, generation]
 status: accepted
-generated: { by: codex/gpt-5, at: 2026-09-17T18:00:00-04:00 }
+generated: { by: codex/gpt-6.1-sol, at: 2026-10-18T20:10:00Z }
 sources:
   - id: defold-bob
     resource: https://github.com/defold/defold/blob/7f0f554f41f9dce1e0ddff99bf08200657d1ee05/com.dynamo.cr/com.dynamo.cr.bob/src/com/dynamo/bob/Bob.java
@@ -14,6 +14,10 @@ sources:
     resource: https://github.com/defold/defold/blob/7f0f554f41f9dce1e0ddff99bf08200657d1ee05/editor/src/clj/editor/system.clj
     title: Defold editor engine SHA
     author: team:defold
+  - id: bob-mirror-client
+    resource: ../../../packages/cli/src/dev/defold-builder.mjs
+    title: Exact-digest Bob acquisition and cache
+    author: project:deherm
 ---
 
 # Decision
@@ -120,8 +124,12 @@ written to the generation manifest.
 # Cache and output
 
 The CLI prefers matching local editor/Bob artifacts, then a content-addressed
-user cache, then the immutable Defold archive. Cached bytes are accepted only
-when their engine SHA and checksum match. Project-local output lives under
+user cache, then the immutable Defold archive. If that URL is unavailable, the
+Bob acquisition path tries déherm's per-revision GitHub release mirror. Both
+network sources are accepted only when their bytes match the policy's exact
+SHA-256; the mirror cannot select a different engine revision.[^bob-mirror-client]
+Cached bytes are accepted only when their engine SHA and checksum match.
+Project-local output lives under
 `.deherm/`; a small tracked `deherm.lock` records the selected SHA
 and generator inputs.
 

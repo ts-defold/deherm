@@ -4,7 +4,7 @@ title: Continuous policy generation, engine evidence, and publication
 description: One nightly policy workflow derives every tracked Defold revision, emits every mechanically representable API, records verification without gating publication, and publishes the accumulated policy store directly to the website.
 tags: [decision, generator, policy, ci, conformance, pages]
 status: accepted
-generated: { by: codex/gpt-6.1-sol, at: 2026-10-18T10:43:00-04:00 }
+generated: { by: codex/gpt-6.1-sol, at: 2026-10-18T20:10:00Z }
 sources:
   - id: generate-report
     resource: ./generate-report-never-gate.md
@@ -30,6 +30,14 @@ sources:
     resource: ../../../scripts/policy-surface-identity.mjs
     title: Policy surface handoff identity
     author: project:deherm
+  - id: bob-mirror
+    resource: ../../../scripts/publish-defold-bob-mirror.mjs
+    title: Content-verified Defold Bob mirror publisher
+    author: project:deherm
+  - id: defold-license
+    resource: https://github.com/defold/defold/blob/dev/LICENSE.txt
+    title: Defold License redistribution terms
+    author: team:defold
 ---
 
 # Outcome
@@ -145,6 +153,30 @@ lane therefore waits up to 45 minutes for that exact release row before pulling
 it. A bounded wait removes the publication race without accepting an older
 archive; timeout remains an infrastructure failure and is reconciled through the
 same evidence issue.
+
+Defold's intermediate Bob archives are not a durable distribution guarantee.
+The revision workspace retains the exact Bob bytes already fetched while
+pinning its SHA-256. On writable main runs, derivation publishes them to an
+immutable `defold-bob-<revision>` GitHub release before the new policy can
+advance. The publisher verifies the workspace lock digest, uploaded asset
+digests and sizes, and a license/notice set copied from that same Defold source
+revision before making the release public. An interrupted draft can be resumed;
+a published asset whose digest differs is never overwritten. PRs cannot publish
+mirror releases. A mirror failure makes the derivation job red, so a newly
+published policy does not claim a fallback that was never established.[^bob-mirror]
+After publication, the job downloads the public URL without GitHub credentials
+and checks its complete SHA-256. A release lacking that verified-download
+receipt retries the clean download on the next run; an already checked release
+reuses its asset metadata without downloading the large JAR on every canary.
+The Defold License permits redistribution subject to its terms, which is why
+the mirror carries Defold's license and tool notices alongside Bob.[^defold-license]
+
+The installed CLI tries the policy's original Defold URL first, then the
+release URL for that exact revision. Both sources must match the policy's
+Bob SHA-256 before any bytes enter the project cache. The mirror is an
+availability source, never an authority that can change a pinned toolchain.
+Older indexed revisions are not retroactively mirrored by this main-run path;
+they need a bounded backfill while their source archives remain available.
 
 The consumer smoke is deliberately after publication and resolves
 `https://ts-defold.dev/deherm`; the local relocation/tamper test is not accepted

@@ -35,6 +35,7 @@ import {
   extractBobFailureDiagnostics,
   snapshotCompiledResources,
 } from "../packages/cli/src/dev/defold-builder.mjs";
+import { bobMirrorUrl } from "../packages/cli/src/dev/bob-mirror.mjs";
 import { hostDefoldPlatform } from "../packages/cli/src/toolchains.mjs";
 
 function decodeVarint(bytes, offset) {
@@ -679,7 +680,37 @@ test("installed CLI caches only checksum-verified Bob bytes for the locked Defol
       },
       { fetch },
     ),
-    /checksum mismatch/,
+    /SHA-256 mismatch/,
+  );
+});
+
+test("installed CLI falls back to a content-verified Bob mirror on cold-cache archive failure", async () => {
+  const project = await mkdtemp(path.join(tmpdir(), "deherm-bob-mirror-"));
+  const bytes = Buffer.from("verified mirror Bob");
+  const revision = "b".repeat(40);
+  const lock = {
+    defoldRevision: revision,
+    toolchain: {
+      bob: {
+        url: `https://d.defold.com/archive/${revision}/bob/bob.jar`,
+        sha256: createHash("sha256").update(bytes).digest("hex"),
+      },
+    },
+  };
+  const requests = [];
+  const fetch = async (url) => {
+    requests.push(url);
+    return url === lock.toolchain.bob.url ? new Response(null, { status: 404 }) : new Response(bytes);
+  };
+  const installed = await ensureBob(project, lock, { fetch });
+  assert.deepEqual(requests, [lock.toolchain.bob.url, bobMirrorUrl(revision)]);
+  assert.deepEqual(await import("node:fs/promises").then(({ readFile }) => readFile(installed)), bytes);
+  await assert.rejects(
+    ensureBob(await mkdtemp(path.join(tmpdir(), "deherm-bob-unverified-")), lock, {
+      fetch: async (url) =>
+        url === lock.toolchain.bob.url ? new Response(null, { status: 404 }) : new Response("wrong Bob"),
+    }),
+    /Unable to download verified Bob.*SHA-256 mismatch/,
   );
 });
 

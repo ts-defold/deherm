@@ -355,6 +355,11 @@ async function fetchEngineSlice({ workspace, revision }) {
   await run("git", ["sparse-checkout", "set", ...enginePaths], { cwd: defold });
   await run("git", ["fetch", "--depth=1", "--filter=blob:none", "origin", revision], { cwd: defold });
   await run("git", ["checkout", "--detach", revision], { cwd: defold });
+  // Cone-mode sparse checkouts include root files. The Bob mirror redistributes
+  // this revision's notices, so fail here if that Git invariant ever changes.
+  for (const name of ["LICENSE.txt", "NOTICE", "TOOLS_LICENSES.md", "COMPLYING_WITH_LICENSES.md"]) {
+    await stat(path.join(defold, name));
+  }
 
   const response = await fetch(refDocUrl);
   if (!response.ok) throw new Error(`${refDocUrl}: HTTP ${response.status}`);
@@ -473,7 +478,11 @@ export async function deriveRevision(options) {
   // digest the repinned lock records, which is the digest the immutable archive
   // actually served for this revision rather than a recalled constant.
   onProgress(`pinning Defold ${revision}`);
-  await run(process.execPath, ["scripts/track-defold-channels.mjs", "pin", revision, "--write"], { cwd: workspace });
+  await run(
+    process.execPath,
+    ["scripts/track-defold-channels.mjs", "pin", revision, "--write", "--bob-output", "upstream/bob.jar"],
+    { cwd: workspace },
+  );
 
   onProgress(upstreamFrom ? `reusing ${upstreamFrom}` : "fetching the engine slice");
   if (upstreamFrom) await reuseEngineSlice({ workspace, revision, from: upstreamFrom });

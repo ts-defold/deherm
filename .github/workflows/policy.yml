@@ -94,7 +94,7 @@ jobs:
     needs: plan
     runs-on: ubuntu-24.04
     permissions:
-      contents: read
+      contents: write
       issues: write
     outputs:
       generated: ${{ steps.derive.outputs.generated }}
@@ -131,6 +131,8 @@ jobs:
         env:
           DERIVATIONS: ${{ needs.plan.outputs.derive }}
           CARRY_REVIEWS: ${{ (github.event_name != 'workflow_dispatch' || inputs.carry-reviews) && 'true' || 'false' }}
+          MIRROR_BOB: ${{ github.ref == 'refs/heads/main' && github.event_name != 'pull_request' }}
+          GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           mkdir -p "$RUNNER_TEMP/policy-reports"
@@ -162,6 +164,9 @@ jobs:
               node scripts/report-revision-audit.mjs --revision "$revision" || true
             } >> "$GITHUB_STEP_SUMMARY"
             if [ "$status" -eq 0 ]; then
+              if [ "$MIRROR_BOB" = true ]; then
+                node scripts/publish-defold-bob-mirror.mjs --workspace "$workspace" --revision "$revision"
+              fi
               if [ "$canary" != true ]; then generated=$((generated + 1)); fi
             else
               failed=$((failed + 1))

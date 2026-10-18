@@ -1243,11 +1243,25 @@ test("pinning a revision records the digest the archive actually served", async 
     "DEFOLD_BOB_SHA256=old",
     "HERMES_REV=keepme",
   ].join("\n");
-  const { updated, replacements } = await pinRevision(revision, { fetchImpl, lock });
+  const fixture = await mkdtemp(path.join(tmpdir(), "deherm-pinned-bob-"));
+  const bobOutput = path.join(fixture, "upstream/bob.jar");
+  const { updated, replacements } = await pinRevision(revision, { fetchImpl, lock, bobOutput });
   assert.equal(replacements.DEFOLD_REV, revision);
   assert.equal(replacements.DEFOLD_REF_DOC_SHA256, createHash("sha256").update("REFDOC").digest("hex"));
   assert.equal(replacements.DEFOLD_SDK_SHA256, createHash("sha256").update("SDK").digest("hex"));
   assert.equal(replacements.DEFOLD_BOB_SHA256, createHash("sha256").update("BOB").digest("hex"));
+  assert.equal(await readFile(bobOutput, "utf8"), "BOB");
   assert.match(updated, /^HERMES_REV=keepme$/m, "pins that are a separate decision must not move");
   await assert.rejects(pinRevision("nope", { fetchImpl, lock }), /Not a Defold revision/);
+  const dryRun = spawnSync(
+    process.execPath,
+    ["scripts/track-defold-channels.mjs", "pin", revision, "--bob-output", bobOutput],
+    {
+      cwd: repositoryRoot,
+      encoding: "utf8",
+    },
+  );
+  assert.notEqual(dryRun.status, 0);
+  assert.match(dryRun.stderr, /--bob-output requires --write/u);
+  await rm(fixture, { recursive: true, force: true });
 });

@@ -22,7 +22,7 @@
 // and "could not find out" must never look the same.
 
 import { createHash } from "node:crypto";
-import { readFile, writeFile } from "node:fs/promises";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
@@ -73,10 +73,14 @@ export async function planChannels({ site, index, indexPath, fetchImpl = fetch, 
 
 const ARCHIVE = "https://d.defold.com/archive";
 
-async function digest(url, fetchImpl) {
+async function digest(url, fetchImpl, savePath) {
   const response = await fetchImpl(url);
   if (!response.ok) throw new Error(`${url}: HTTP ${response.status}`);
   const bytes = Buffer.from(await response.arrayBuffer());
+  if (savePath) {
+    await mkdir(path.dirname(savePath), { recursive: true });
+    await writeFile(savePath, bytes);
+  }
   return { sha256: createHash("sha256").update(bytes).digest("hex"), bytes: bytes.length };
 }
 
@@ -89,7 +93,7 @@ async function digest(url, fetchImpl) {
  * separate decision. In particular, `defoldsdk.zip` must move with the source
  * revision; otherwise public-header evidence belongs to a different release.
  */
-export async function pinRevision(revision, { fetchImpl = fetch, lock } = {}) {
+export async function pinRevision(revision, { fetchImpl = fetch, lock, bobOutput } = {}) {
   if (!REVISION.test(revision)) throw new Error(`Not a Defold revision: ${revision}`);
   const current = lock ?? (await readFile(lockPath, "utf8"));
   const refDocUrl = `${ARCHIVE}/${revision}/engine/share/ref-doc.zip`;
@@ -97,7 +101,7 @@ export async function pinRevision(revision, { fetchImpl = fetch, lock } = {}) {
   const bobUrl = `${ARCHIVE}/${revision}/bob/bob.jar`;
   const refDoc = await digest(refDocUrl, fetchImpl);
   const sdk = await digest(sdkUrl, fetchImpl);
-  const bob = await digest(bobUrl, fetchImpl);
+  const bob = await digest(bobUrl, fetchImpl, bobOutput);
   const replacements = {
     DEFOLD_REV: revision,
     DEFOLD_REF_DOC_URL: refDocUrl,
@@ -155,7 +159,11 @@ async function main(argv = process.argv.slice(2)) {
   if (command === "pin") {
     const revision = rest[0];
     const write = rest.includes("--write");
-    const { updated, replacements, sizes } = await pinRevision(revision);
+    const bobOutputIndex = rest.indexOf("--bob-output");
+    const bobOutput = bobOutputIndex >= 0 ? rest[bobOutputIndex + 1] : undefined;
+    if (bobOutputIndex >= 0 && !bobOutput) throw new Error("--bob-output requires a path");
+    if (bobOutput && !write) throw new Error("--bob-output requires --write");
+    const { updated, replacements, sizes } = await pinRevision(revision, { bobOutput });
     if (write) await writeFile(lockPath, updated);
     console.log(`${write ? "Pinned" : "Would pin"} Defold ${revision}`);
     console.log(`  ref-doc.zip ${sizes.refDoc} bytes sha256 ${replacements.DEFOLD_REF_DOC_SHA256}`);
@@ -164,7 +172,7 @@ async function main(argv = process.argv.slice(2)) {
     return;
   }
   throw new Error(
-    "Usage: track-defold-channels.mjs {plan [--json] [--include-alpha-canary] [--index <manifest>] | pin <sha> [--write]}",
+    "Usage: track-defold-channels.mjs {plan [--json] [--include-alpha-canary] [--index <manifest>] | pin <sha> [--write] [--bob-output <path>]}",
   );
 }
 

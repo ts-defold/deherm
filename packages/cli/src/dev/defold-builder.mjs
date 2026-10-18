@@ -7,6 +7,7 @@ import path from "node:path";
 import { defoldSurfaceCacheHome } from "../defold-surface.mjs";
 import { ensureProjectNativeArtifact, hostDefoldPlatform } from "../toolchains.mjs";
 import { reconcileTypedNativeUpload } from "../typed-native.mjs";
+import { bobMirrorUrl } from "./bob-mirror.mjs";
 
 async function exists(file, mode) {
   try {
@@ -65,17 +66,27 @@ export async function ensureBob(projectRoot, lock, options = {}) {
     source: "bob",
     message: `downloading verified Bob for Defold ${lock.defoldRevision.slice(0, 7)}`,
   });
-  const response = await (options.fetch ?? globalThis.fetch)(metadata.url, {
-    signal: AbortSignal.timeout(options.downloadTimeoutMs ?? 120_000),
-  });
-  if (!response.ok) throw new Error(`Unable to download Bob: ${response.status} ${response.statusText}`);
-  const bytes = Buffer.from(await response.arrayBuffer());
-  const actual = sha256(bytes);
-  if (actual !== metadata.sha256)
-    throw new Error(`Downloaded Bob checksum mismatch: expected ${metadata.sha256}, got ${actual}`);
-  await writeFile(temporary, bytes, { flag: "wx" });
-  await rename(temporary, target);
-  return target;
+  const failures = [];
+  for (const url of [metadata.url, bobMirrorUrl(lock.defoldRevision)]) {
+    try {
+      const response = await (options.fetch ?? globalThis.fetch)(url, {
+        signal: AbortSignal.timeout(options.downloadTimeoutMs ?? 120_000),
+      });
+      if (!response.ok) throw new Error(`HTTP ${response.status} ${response.statusText}`);
+      const bytes = Buffer.from(await response.arrayBuffer());
+      const actual = sha256(bytes);
+      if (actual !== metadata.sha256) {
+        throw new Error(`SHA-256 mismatch: expected ${metadata.sha256}, got ${actual}`);
+      }
+      await writeFile(temporary, bytes, { flag: "wx" });
+      await rename(temporary, target);
+      return target;
+    } catch (error) {
+      await rm(temporary, { force: true });
+      failures.push(`${url}: ${error instanceof Error ? error.message : String(error)}`);
+    }
+  }
+  throw new Error(`Unable to download verified Bob for ${lock.defoldRevision}: ${failures.join("; ")}`);
 }
 
 export async function resolveJava(options = {}) {

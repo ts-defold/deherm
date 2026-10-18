@@ -1,5 +1,23 @@
 # Defold Hermes knowledge log
 
+## 2026-10-18 - Mirror verified Bob bytes before upstream archives age out
+
+The installed CLI previously had one Bob download URL. A cold cache could
+therefore fail when Defold's intermediate channel archive was unavailable,
+despite an authenticated policy naming the exact JAR digest. Revision pinning
+now retains the fetched Bob bytes in its scratch workspace. Writable main
+policy derivation publishes them as a draft `defold-bob-<revision>` GitHub
+release, checks the uploaded archive, checksum sidecar, Defold License and
+notice assets against the workspace bytes, then makes it public. Existing
+releases are reused only if their asset digests match; incomplete drafts can
+resume. The CLI tries that immutable URL only after the Defold URL fails and
+requires the same policy SHA-256. Focused tests cover cold-cache fallback,
+wrong bytes, draft recovery, immutable reuse, clean public download, and the
+workflow seam. This is
+local/fixture evidence until the first hosted mirror publish and a clean
+consumer download both succeed. Older indexed revisions beyond the current
+alpha canary still need mirror backfill.
+
 ## 2026-10-18 - Hosted alpha policy and release gates confirmed
 
 At signed main commit `0d8303b7`, [policy run 39139352582](https://github.com/ts-defold/deherm/actions/runs/39139352582)
