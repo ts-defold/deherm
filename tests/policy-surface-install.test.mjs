@@ -6,7 +6,7 @@ import path from "node:path";
 import test from "node:test";
 import { promisify } from "node:util";
 
-import { installPolicySurface, policySurfaceArchivePaths } from "../scripts/policy-surface.mjs";
+import { installPolicySurface, policySurfaceArchivePaths, resolveTarExecutable } from "../scripts/policy-surface.mjs";
 
 const run = promisify(execFile);
 const transportedFiles = new Set([
@@ -56,4 +56,10 @@ test("script entry-point checks use cross-platform file URLs", async () => {
     const source = await readFile(path.join(scriptsRoot, name), "utf8");
     assert.ok(!source.includes("`file://${process.argv[1]}`"), `${name} has a Windows-incompatible entry-point check`);
   }
+});
+
+test("Windows policy extraction uses native tar for native Node archive paths", () => {
+  assert.equal(resolveTarExecutable("win32", { SystemRoot: "C:\\Windows" }), "C:\\Windows\\System32\\tar.exe");
+  assert.equal(resolveTarExecutable("linux", {}), "tar");
+  assert.equal(resolveTarExecutable("win32", { DEHERM_TAR: "custom-tar" }), "custom-tar");
 });

@@ -10,7 +10,14 @@ import { promisify } from "node:util";
 
 const execFileAsync = promisify(execFile);
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const tarExecutable = process.env.DEHERM_TAR || "tar";
+export function resolveTarExecutable(platform = process.platform, env = process.env) {
+  if (env.DEHERM_TAR) return env.DEHERM_TAR;
+  // Git Bash's MSYS tar treats a raw D:\ archive argument from Node as a
+  // remote host. Windows' system bsdtar accepts the native absolute path.
+  return platform === "win32" ? path.win32.join(env.SystemRoot || "C:\\Windows", "System32", "tar.exe") : "tar";
+}
+
+const tarExecutable = resolveTarExecutable();
 async function runTar(arguments_, options = {}) {
   return execFileAsync(tarExecutable, arguments_, options);
 }

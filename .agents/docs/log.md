@@ -1,5 +1,17 @@
 # Defold Hermes knowledge log
 
+## 2026-10-18 - Windows installer reaches tar and rejects the MSYS path seam
+
+[Policy run 39173743198](https://github.com/ts-defold/deherm/actions/runs/39173743198)
+passed alpha derivation, completeness, and Linux/macOS site parity. Windows now
+executes the policy-surface CLI; that disproves the earlier silent-no-op path.
+It failed immediately in Git Bash's `tar -tzf` because Node passed a native
+`D:\\...` archive path and MSYS tar interpreted `D:` as a remote host. The
+installer now selects Windows' native `System32\\tar.exe`, which accepts Node's
+native path, while preserving the explicit `DEHERM_TAR` override. A platform
+selection test passes locally. Hosted Windows extraction and byte parity remain
+unproven until the next run.
+
 ## 2026-10-18 - Separate the consumer build probe from the pinned game fixture
 
 [Consumer smoke run 39171653993](https://github.com/ts-defold/deherm/actions/runs/39171653993)
