@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
+import { spawnSync } from "node:child_process";
 import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
@@ -45,6 +46,7 @@ import {
 } from "../scripts/reconcile-policy-derivation-issues.mjs";
 import { planPolicyOptimizationIssueReconciliation } from "../scripts/reconcile-policy-optimization-issues.mjs";
 import { resolveLlvmTool } from "../scripts/generate-dmsdk-symbol-evidence.mjs";
+import { exactCallCxxWarnings } from "../scripts/check-defold-revision-matrix.mjs";
 
 const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const generated = path.join(repositoryRoot, "packages", "bindings", "generated");
@@ -76,7 +78,11 @@ test("policy host parity materializes every authoritative generator input", asyn
   const engine = workflow.slice(workflow.indexOf("  engine-conformance:"), workflow.indexOf("  publish-site:"));
   const publish = workflow.slice(workflow.indexOf("  publish-site:"));
   const derive = workflow.slice(workflow.indexOf("  derive:"), workflow.indexOf("  host-parity:"));
-  assert.match(derive, /sudo apt-get install -y --no-install-recommends llvm clang/u);
+  assert.match(derive, /bash scripts\/ci\/install-policy-native-toolchain\.sh --install/u);
+  assert.match(engine, /bash scripts\/ci\/install-policy-native-toolchain\.sh --install/u);
+  const installer = await readFile(path.join(repositoryRoot, "scripts/ci/install-policy-native-toolchain.sh"), "utf8");
+  assert.match(installer, /libgl-dev/u);
+  assert.match(installer, /#include <GL\/glx\.h>/u);
   assert.match(derive, /args=\(--revision "\$revision" --workspace "\$workspace" --verify-current --adopt\)/u);
   assert.match(parity, /role: Linux canonical bytes/u);
   assert.match(parity, /role: macOS reproduces Linux/u);
@@ -142,8 +148,8 @@ test("policy host parity materializes every authoritative generator input", asyn
   assert.match(derive, /build-policy-site\.mjs --out build\/policy-site --validation-only/u);
   assert.ok(policySurfaceArchivePaths.includes("packages/toolchains/defold-bundle-targets.json"));
   assert.ok(policySurfaceArchivePaths.includes("packages/toolchains/defold-platform-pairs.json"));
-  assert.match(derive, /apt-get install -y --no-install-recommends llvm/u);
-  assert.match(derive, /command -v llvm-nm/u);
+  assert.match(derive, /scripts\/ci\/install-policy-native-toolchain\.sh --install/u);
+  assert.match(installer, /command -v "\$executable"/u);
   assert.match(derive, /reconcile-policy-derivation-issues\.mjs/u);
   assert.match(derive, /reconcile-policy-optimization-issues\.mjs/u);
   assert.match(derive, /needs\.plan\.outputs\.any == 'true'/u);
@@ -251,6 +257,12 @@ test("policy derivation failures collapse by generator stage and stale per-revis
   ].join("\n");
   assert.equal(stageFromLog(realSummary), "scripts/generate-dmsdk-symbol-evidence.mjs");
   assert.equal(blockerFromLog(realSummary), "llvm-nm could not read one archive");
+  const missingSystemHeader = [
+    "Error: compile universal-ready production calls failed in /tmp/revision",
+    "tests/fixtures/generated_dmsdk_universal_ready_provider.cpp:3:10: fatal error: 'GL/glx.h' file not found",
+  ].join("\n");
+  assert.equal(stageFromLog(missingSystemHeader), "compile-universal-ready-production-calls");
+  assert.match(blockerFromLog(missingSystemHeader), /GL\/glx\.h.*file not found/u);
 
   const actions = planPolicyDerivationIssueReconciliation({
     existingIssues: [
@@ -290,6 +302,34 @@ test("policy derivation failures collapse by generator stage and stale per-revis
     false,
   );
   assert.match(actions.find(({ kind }) => kind === "edit").body, /2 tracked revision\(s\)/u);
+});
+
+test("policy workflow discovers changed channels on push and PR and reports incomplete derivation", async () => {
+  const workflow = await readFile(path.join(repositoryRoot, ".github/workflows/policy.yml"), "utf8");
+  const plan = workflow.slice(workflow.indexOf("\n  plan:\n"), workflow.indexOf("\n  derive:\n"));
+  assert.match(plan, /else\s+derive="\$\(node scripts\/track-defold-channels\.mjs plan --json/u);
+  assert.doesNotMatch(plan, /github\.event_name.*schedule.*github\.event_name.*workflow_dispatch/u);
+  assert.match(
+    workflow,
+    /derivation-completeness:[\s\S]*DERIVATION_FAILURES: \$\{\{ needs\.derive\.outputs\.failed \}\}/u,
+  );
+  assert.match(workflow, /if \[ "\$DERIVATION_FAILURES" != 0 \]/u);
+});
+
+test("exact-call C++ warnings retain signature errors while allowing upstream deprecation metadata", () => {
+  const source = "[[deprecated]] int oldApi(int value) { return value; }\nint probe() { return oldApi(1); }\n";
+  const accepted = spawnSync("clang++", ["-x", "c++", "-std=c++17", ...exactCallCxxWarnings, "-fsyntax-only", "-"], {
+    input: source,
+    encoding: "utf8",
+  });
+  assert.equal(accepted.status, 0, accepted.stderr);
+  assert.match(accepted.stderr, /deprecated/u);
+  const rejected = spawnSync("clang++", ["-x", "c++", "-std=c++17", ...exactCallCxxWarnings, "-fsyntax-only", "-"], {
+    input: source.replace("oldApi(1)", "oldApi()"),
+    encoding: "utf8",
+  });
+  assert.notEqual(rejected.status, 0);
+  assert.match(rejected.stderr, /no matching function|too few arguments|requires (?:1|single) argument/u);
 });
 
 test("policy optimization withdrawals group by recipe family without blocking publication", () => {

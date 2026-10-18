@@ -68,10 +68,8 @@ jobs:
             derive='[]'
           elif [ "${{ github.event_name }}" = workflow_dispatch ] && [ -n "$REQUESTED_REVISION" ]; then
             derive="$(node -e 'process.stdout.write(JSON.stringify([{channel:"manual",sha1:process.env.REQUESTED_REVISION,version:null}]))')"
-          elif [ "${{ github.event_name }}" = schedule ] || [ "${{ github.event_name }}" = workflow_dispatch ]; then
-            derive="$(node scripts/track-defold-channels.mjs plan --json --index build/published-policy-site/v1/index/manifest.json | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>process.stdout.write(JSON.stringify(JSON.parse(s).derive)))')"
           else
-            derive='[]'
+            derive="$(node scripts/track-defold-channels.mjs plan --json --index build/published-policy-site/v1/index/manifest.json | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>process.stdout.write(JSON.stringify(JSON.parse(s).derive)))')"
           fi
           echo "derive=$derive" >> "$GITHUB_OUTPUT"
           if [ "$derive" = '[]' ]; then
@@ -111,13 +109,8 @@ jobs:
         with: { python-version: '3.13' }
       - run: pnpm install --frozen-lockfile --ignore-scripts
 
-      - name: Install archive inspection and exact-call compiler
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends llvm clang
-          command -v llvm-nm
-          command -v llvm-cxxfilt
-          llvm-nm --version
+      - name: Install and preflight policy native toolchain
+        run: bash scripts/ci/install-policy-native-toolchain.sh --install
 
       - name: Hydrate the accumulated published store
         run: node scripts/hydrate-policy-site.mjs --from build/published-policy-site
@@ -243,6 +236,29 @@ jobs:
           --ref "${{ github.ref_name }}" -f policy_run_id="${{ github.run_id }}"
           -f policy_source_sha="${{ github.sha }}"
 
+  derivation-completeness:
+    name: Every discovered revision derived
+    needs: [plan, derive]
+    if: always()
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Report missing revision policies without hiding usable ones
+        env:
+          PLAN_RESULT: ${{ needs.plan.result }}
+          DERIVE_RESULT: ${{ needs.derive.result }}
+          DERIVATION_FAILURES: ${{ needs.derive.outputs.failed }}
+        run: |
+          set -euo pipefail
+          if [ "$PLAN_RESULT" != success ] || [ "$DERIVE_RESULT" != success ]; then
+            echo "Policy planning or derivation infrastructure failed: plan=$PLAN_RESULT derive=$DERIVE_RESULT" >&2
+            exit 1
+          fi
+          if [ "$DERIVATION_FAILURES" != 0 ]; then
+            echo "$DERIVATION_FAILURES discovered Defold revision(s) could not be derived; see per-revision logs and issues." >&2
+            exit 1
+          fi
+          echo 'Every discovered Defold revision has a policy.'
+
   host-parity:
     name: ${{ matrix.role }}
     needs: derive
@@ -331,7 +347,8 @@ jobs:
         with: { node-version: '22', cache: 'pnpm' }
       - uses: actions/setup-java@v5
         with: { distribution: temurin, java-version: '25' }
-      - run: sudo apt-get update && sudo apt-get install -y --no-install-recommends cmake ninja-build clang lld libgl-dev
+      - name: Install and preflight policy native toolchain
+        run: bash scripts/ci/install-policy-native-toolchain.sh --install
       - run: pnpm install --frozen-lockfile --ignore-scripts
       - id: defold-sdk
         run: sed -n 's/^DEFOLD_SDK_SHA256=/digest=/p' upstream.lock >> "$GITHUB_OUTPUT"

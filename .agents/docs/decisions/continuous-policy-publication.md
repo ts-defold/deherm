@@ -4,7 +4,7 @@ title: Continuous policy generation, engine evidence, and publication
 description: One nightly policy workflow derives every tracked Defold revision, emits every mechanically representable API, records verification without gating publication, and publishes the accumulated policy store directly to the website.
 tags: [decision, generator, policy, ci, conformance, pages]
 status: accepted
-generated: { by: codex/gpt-6.1-sol, at: 2026-10-16T12:41:00-04:00 }
+generated: { by: codex/gpt-6.1-sol, at: 2026-10-18T10:12:00-04:00 }
 sources:
   - id: generate-report
     resource: ./generate-report-never-gate.md
@@ -57,6 +57,37 @@ Defold is authoritative for the API present at a revision:
   whether Defold's documented API is allowed to exist.
 
 # Nightly graph
+
+## Reliability plan for rolling Defold revisions
+
+The revision-discovery path is the same on push, pull request, schedule, and
+ordinary manual dispatch. Only an explicit revision replaces discovery and an
+artifact-only refresh skips it. This makes an unindexed channel revision visible
+to code-review CI, rather than waiting for the next nightly. An indexed revision
+is reused by content identity; changing generator code alone does not claim a
+fresh-revision proof until an unindexed revision is actually derived.
+
+The Linux derivation and engine jobs install the same policy-native toolchain.
+Their installer preflights the executables and syntax-compiles a translation
+unit including GLX, because the generated dmSDK exact-call provider may include
+`GL/glx.h`. The exact-call compile keeps signature and other warning errors
+fatal, but an upstream deprecation annotation is carried as metadata and may
+warn without vetoing the route. Regression tests compile a deprecated call and
+a wrong-arity call under the actual flags.
+
+Derivation continues through all discovered revisions, retains usable prior
+policies, and publishes that coherent accumulated store. A separate required
+`derivation-completeness` job reports any missing planned revision as red; the
+published consumer independently checks the planned SHA list. A failure issue
+must identify the exact stage and compiler diagnostic rather than an opaque
+`unknown-derivation-stage`. These signals do not manufacture a shared policy
+or hide an otherwise usable older revision.
+
+This plan does not promise that arbitrary future C++ source changes will parse
+without generator work. It does make missing CI prerequisites, deprecated API
+annotations, and schedule-only discovery permanent regression cases. Hosted
+fresh-revision derivation remains the acceptance test for a newly observed
+Defold SHA; local static tests alone are not that evidence.
 
 ```text
 discover stable / beta / alpha revisions

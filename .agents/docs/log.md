@@ -1,5 +1,19 @@
 # Defold Hermes knowledge log
 
+## 2026-10-18 - Make policy revision failures actionable before the nightly
+
+The latest scheduled alpha derivations failed in the generated dmSDK exact-call
+probe because the derive job lacked `GL/glx.h`; engine conformance already
+installed `libgl-dev`. The two Linux jobs now share an installer and GLX
+compile preflight. Push and pull-request policy runs now discover unindexed
+stable/beta/alpha revisions, and a dedicated completeness job reports missing
+planned revisions without withholding previously usable policies. The probe
+permits upstream deprecation warnings while preserving signature errors, and
+failure issue parsing records the compiler diagnostic. Focused regression tests
+cover the workflow wiring, missing-header classification, and real compiler
+warning behavior. Hosted execution of a fresh alpha revision is still required
+before claiming the scheduled lane repaired; this entry does not claim it.
+
 ## 2026-10-16 - Prove each new revision before adoption
 
 The scheduled policy workflow could previously return green after a discovered

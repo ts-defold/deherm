@@ -28,11 +28,16 @@ function parseArguments(argv) {
 export function stageFromLog(log) {
   const summary = /blocked by generator at (scripts\/[A-Za-z0-9_./-]+\.mjs)\b/gu.exec(log);
   if (summary) return summary[1];
+  if (/compile universal-ready production calls failed/u.test(log)) return "compile-universal-ready-production-calls";
   const stages = [...log.matchAll(/\b(scripts\/[A-Za-z0-9_./-]+\.mjs) failed:/gu)];
   return stages.at(-1)?.[1] ?? "unknown-derivation-stage";
 }
 
 export function blockerFromLog(log) {
+  const compiler = [...log.matchAll(/^.*(?:fatal error:|error:).+$/gmu)]
+    .map((match) => match[0].trim())
+    .filter((line) => !line.startsWith("Error:"));
+  if (compiler.length) return compiler.at(-1);
   const errors = [...log.matchAll(/^Error:\s+(.+)$/gmu)].map((match) => match[1].trim());
   return errors.at(-1) ?? log.trim().split(/\r?\n/u).filter(Boolean).at(-1) ?? "No error message was captured.";
 }

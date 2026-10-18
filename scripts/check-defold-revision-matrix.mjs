@@ -30,6 +30,15 @@ const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url))
 const defaultManifest = path.join(repositoryRoot, "packages", "bindings", "probes", "defold-revision-matrix.json");
 const DIGEST = /^[0-9a-f]{64}$/u;
 const REVISION = /^[0-9a-f]{40}$/u;
+// An upstream deprecation annotation is API metadata, not a broken exact-call
+// signature. Keep all other warnings fatal in the generated production probe.
+export const exactCallCxxWarnings = Object.freeze([
+  "-Wall",
+  "-Wextra",
+  "-Werror",
+  "-Wno-error=deprecated-declarations",
+  "-pedantic",
+]);
 
 function sha256(bytes) {
   return createHash("sha256").update(bytes).digest("hex");
@@ -284,10 +293,7 @@ async function compileExactCallTwins(workspace, revision, output) {
   await writeFile(readyHarness, `extern "C" int ${driver}(void);\nint main(){return ${driver}();}\n`);
   await executeCommand(workspace, "compile universal-ready production calls", cxx, [
     "-std=c++17",
-    "-Wall",
-    "-Wextra",
-    "-Werror",
-    "-pedantic",
+    ...exactCallCxxWarnings,
     ...includeArgs,
     "-c",
     "tests/fixtures/generated_dmsdk_universal_ready_provider.cpp",
@@ -296,10 +302,7 @@ async function compileExactCallTwins(workspace, revision, output) {
   ]);
   await executeCommand(workspace, "link universal-ready exact-call twin", cxx, [
     "-std=c++17",
-    "-Wall",
-    "-Wextra",
-    "-Werror",
-    "-pedantic",
+    ...exactCallCxxWarnings,
     ...includeArgs,
     "defold/defold_hermes/src/generated_dmsdk_universal.cpp",
     "tests/fixtures/generated_dmsdk_universal_ready_verification.cpp",
@@ -310,10 +313,7 @@ async function compileExactCallTwins(workspace, revision, output) {
   await executeCommand(workspace, "execute universal-ready exact-call twin", readyExecutable, []);
   await executeCommand(workspace, "compile specialized dmSDK exact-call twin", cxx, [
     "-std=c++17",
-    "-Wall",
-    "-Wextra",
-    "-Werror",
-    "-pedantic",
+    ...exactCallCxxWarnings,
     ...includeArgs,
     "-c",
     "tests/fixtures/generated_dmsdk_adapter_exact_verification.cpp",
@@ -322,10 +322,7 @@ async function compileExactCallTwins(workspace, revision, output) {
   ]);
   await executeCommand(workspace, "compile Lua exact-call twin", cxx, [
     "-std=c++17",
-    "-Wall",
-    "-Wextra",
-    "-Werror",
-    "-pedantic",
+    ...exactCallCxxWarnings,
     ...includeArgs,
     `-I${path.join(workspace, "tests", "fixtures")}`,
     `-I${path.join(workspace, "upstream", "defold", "engine", "lua", "src")}`,
