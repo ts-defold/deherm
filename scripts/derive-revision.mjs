@@ -53,6 +53,7 @@ import {
   readFile,
   readdir,
   readlink,
+  rename,
   rm,
   stat,
   symlink,
@@ -152,7 +153,16 @@ export async function materializeBobNotices(defold, revision, runGit = run) {
     // Sparse-checkout set does not promise that root files are materialized.
     // Read the blob by revision rather than trusting checkout shape.
     const { stdout } = await runGit("git", ["show", `${revision}:${name}`], { cwd: defold });
-    await writeFile(path.join(defold, name), stdout);
+    // A reused Linux slice can be a hard-link copy. Replace the destination
+    // inode rather than writing through a link into the source slice.
+    const destination = path.join(defold, name);
+    const temporary = `${destination}.deherm-notice-new`;
+    try {
+      await writeFile(temporary, stdout);
+      await rename(temporary, destination);
+    } finally {
+      await rm(temporary, { force: true });
+    }
   }
 }
 

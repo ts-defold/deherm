@@ -10,7 +10,8 @@ exists at that pinned Defold commit; checkout shape was not sound evidence
 of absence. Derivation now materializes each Bob redistribution notice with
 `git show <revision>:<path>` from the exact source commit, including the
 reuse-checkout path. A focused test verifies the revision-qualified blob
-requests even when the checkout starts empty. Local derivation tests, style,
+requests even when the checkout starts empty and that replacing a hard-linked
+notice cannot mutate its source slice. Local derivation tests, style,
 and OKF checks pass; hosted mirror publication is still pending a corrected
 run. This is a CI regression found by the new gate, not proof that Defold
 removed its license.

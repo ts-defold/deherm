@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
-import { mkdtemp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
+import { link, mkdtemp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { execFileSync } from "node:child_process";
 import { tmpdir } from "node:os";
 import path from "node:path";
@@ -55,6 +55,9 @@ test("Bob notices come from exact source-revision Git blobs, not sparse checkout
   const names = ["LICENSE.txt", "NOTICE", "TOOLS_LICENSES.md", "COMPLYING_WITH_LICENSES.md"];
   const requested = [];
   try {
+    const source = path.join(root, "source-notice");
+    await writeFile(source, "pinned source stays unchanged\n");
+    await link(source, path.join(root, "LICENSE.txt"));
     await materializeBobNotices(root, pinned, async (command, args, options) => {
       assert.equal(command, "git");
       assert.deepEqual(args.slice(0, 1), ["show"]);
@@ -67,6 +70,7 @@ test("Bob notices come from exact source-revision Git blobs, not sparse checkout
       names.map((name) => `${pinned}:${name}`),
     );
     for (const name of names) assert.equal(await readFile(path.join(root, name), "utf8"), `${pinned}:${name}\n`);
+    assert.equal(await readFile(source, "utf8"), "pinned source stays unchanged\n");
   } finally {
     await rm(root, { recursive: true, force: true });
   }
