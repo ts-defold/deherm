@@ -59,7 +59,13 @@ function plan({ mode = "defold", server = "", targets = "[]", consumerTargets } 
 
 test("reusable workflow has an explicit immutable action ref and runner-owned local Extender", () => {
   assert.equal(workflow.on.workflow_call.inputs["action-ref"].required, true);
+  assert.equal(workflow.on.workflow_call.inputs["defold-sdk"].default, "");
   assert.equal(workflow.on.workflow_call.inputs["application-mode"].default, "dynamic");
+  const planGeneration = workflow.jobs.plan.steps.find((step) =>
+    step.name?.startsWith("Install caller project dependencies"),
+  );
+  assert.match(planGeneration.run, /revision_args=\(\)/);
+  assert.match(planGeneration.run, /generate --project "\$project_dir" "\$\{revision_args\[@\]\}"/);
   assert.match(
     workflow.jobs.nonapple.steps.find((step) => step.name === "Start pinned local Docker Extender").run,
     /docker compose/,
@@ -72,6 +78,15 @@ test("reusable workflow has an explicit immutable action ref and runner-owned lo
   for (const job of [workflow.jobs.nonapple, workflow.jobs.apple]) {
     assert.match(job.steps.find((step) => step.name === "Install caller project dependencies").run, /pnpm install/);
     assert.ok(!job.steps.some((step) => step.name === "Generate caller project"));
+    const revisionGeneration = job.steps.find(
+      (step) => step.name === "Regenerate caller project for exact Defold revision",
+    );
+    assert.equal(revisionGeneration.if, "inputs.defold-sdk != ''");
+    assert.match(revisionGeneration.run, /--defold-sdk "\$DEHERM_BUILD_REVISION"/);
+    assert.match(
+      job.steps.find((step) => step.name === "Install caller project dependencies").run,
+      /DEHERM_ACTION_CLI=/,
+    );
     const build = job.steps.find((step) => step.id === "build");
     assert.equal(build.uses, "./.deherm-action");
     assert.match(build.with["build-server"], /inputs\.mode == 'local'/);
@@ -96,10 +111,53 @@ test("reusable workflow has an explicit immutable action ref and runner-owned lo
 test("War Battles dogfood invokes the public workflow at its own commit", () => {
   assert.equal(smoke.jobs["war-battles"].uses, "./.github/workflows/deherm-build.yml");
   assert.equal(smoke.jobs["war-battles"].with["action-ref"], "${{ github.sha }}");
+  assert.equal(smoke.jobs["war-battles"].with["defold-sdk"], "4019b8f249383f281c03463fca74b13afe4828b1");
   assert.equal(smoke.jobs["war-battles"].with.project, "examples/war-battles-online/defold");
   assert.equal(smoke.jobs["war-battles"].with.entry, "main/player.script.ts");
   assert.ok(smoke.on.push.paths.includes("action.yml"));
   assert.ok(smoke.on.push.paths.includes("packages/cli/src/ci-bundle.mjs"));
+});
+
+test("exact revision override reaches every build job and rejects malformed revisions", () => {
+  const temporary = fs.mkdtempSync(path.join(os.tmpdir(), "deherm-workflow-revision-"));
+  try {
+    const cli = path.join(temporary, "cli.mjs");
+    const recorded = path.join(temporary, "args.json");
+    fs.writeFileSync(
+      cli,
+      'import fs from "node:fs"; fs.writeFileSync(process.env.RECORDED_ARGS, JSON.stringify(process.argv.slice(2)));\n',
+    );
+    for (const job of [workflow.jobs.nonapple, workflow.jobs.apple]) {
+      const step = job.steps.find((item) => item.name === "Regenerate caller project for exact Defold revision");
+      const environment = {
+        ...process.env,
+        DEHERM_ACTION_CLI: cli,
+        DEHERM_ACTION_PROJECT_DIR: temporary,
+        DEHERM_BUILD_REVISION: "4019b8f249383f281c03463fca74b13afe4828b1",
+        RECORDED_ARGS: recorded,
+      };
+      const valid = spawnSync("bash", ["-e", "-c", step.run], { encoding: "utf8", env: environment });
+      assert.equal(valid.status, 0, valid.stderr);
+      assert.deepEqual(JSON.parse(fs.readFileSync(recorded, "utf8")), [
+        "generate",
+        "--project",
+        temporary,
+        "--defold-sdk",
+        environment.DEHERM_BUILD_REVISION,
+        "--json",
+      ]);
+      fs.rmSync(recorded);
+      const invalid = spawnSync("bash", ["-e", "-c", step.run], {
+        encoding: "utf8",
+        env: { ...environment, DEHERM_BUILD_REVISION: "latest" },
+      });
+      assert.notEqual(invalid.status, 0);
+      assert.match(invalid.stderr, /exact 40-character SHA/);
+      assert.ok(!fs.existsSync(recorded));
+    }
+  } finally {
+    fs.rmSync(temporary, { recursive: true, force: true });
+  }
 });
 
 test("workflow archive preserves a runnable bundle's executable bit", { skip: process.platform === "win32" }, () => {

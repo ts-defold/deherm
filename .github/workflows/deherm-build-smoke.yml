@@ -38,6 +38,9 @@ jobs:
     uses: ./.github/workflows/deherm-build.yml
     with:
       action-ref: ${{ github.sha }}
+      # This revision has a digest-verified Bob mirror. War Battles' checked-in
+      # engine fixture stays pinned separately for its native evidence tests.
+      defold-sdk: 4019b8f249383f281c03463fca74b13afe4828b1
       mode: ${{ inputs.mode || 'defold' }}
       targets: ${{ inputs.targets || '["wasm-web","x86_64-linux"]' }}
       project: examples/war-battles-online/defold

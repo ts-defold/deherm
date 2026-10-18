@@ -10,6 +10,11 @@ on:
         description: Immutable déherm commit SHA or release tag containing this workflow and action
         required: true
         type: string
+      defold-sdk:
+        description: Optional exact Defold engine SHA; regenerate the caller project for this revision before building
+        required: false
+        default: ''
+        type: string
       mode:
         description: defold (hosted), local (Extender on this runner), or external (user-provided Extender)
         required: false
@@ -76,6 +81,7 @@ jobs:
       - name: Install caller project dependencies and generate its resolved policy
         env:
           DEHERM_PROJECT: ${{ inputs.project }}
+          DEHERM_BUILD_REVISION: ${{ inputs.defold-sdk }}
         run: |
           set -euo pipefail
           project_dir="$(realpath "project/$DEHERM_PROJECT")"
@@ -100,7 +106,12 @@ jobs:
             fi
             cli_dir="$(dirname "$cli_dir")"
           done
-          node "$cli_dir/node_modules/@ts-defold/deherm/bin/deherm.mjs" generate --project "$project_dir" --json
+          revision_args=()
+          if [ -n "$DEHERM_BUILD_REVISION" ]; then
+            [[ "$DEHERM_BUILD_REVISION" =~ ^[0-9a-f]{40}$ ]] || { echo 'defold-sdk must be an exact 40-character SHA' >&2; exit 2; }
+            revision_args=(--defold-sdk "$DEHERM_BUILD_REVISION")
+          fi
+          node "$cli_dir/node_modules/@ts-defold/deherm/bin/deherm.mjs" generate --project "$project_dir" "${revision_args[@]}" --json
       - id: matrix
         name: Validate build mode and derive the target matrix
         env:
@@ -213,6 +224,16 @@ jobs:
             fi
             cli_dir="$(dirname "$cli_dir")"
           done
+          echo "DEHERM_ACTION_CLI=$cli_dir/node_modules/@ts-defold/deherm/bin/deherm.mjs" >> "$GITHUB_ENV"
+          echo "DEHERM_ACTION_PROJECT_DIR=$project_dir" >> "$GITHUB_ENV"
+      - name: Regenerate caller project for exact Defold revision
+        if: inputs.defold-sdk != ''
+        env:
+          DEHERM_BUILD_REVISION: ${{ inputs.defold-sdk }}
+        run: |
+          set -euo pipefail
+          [[ "$DEHERM_BUILD_REVISION" =~ ^[0-9a-f]{40}$ ]] || { echo 'defold-sdk must be an exact 40-character SHA' >&2; exit 2; }
+          node "$DEHERM_ACTION_CLI" generate --project "$DEHERM_ACTION_PROJECT_DIR" --defold-sdk "$DEHERM_BUILD_REVISION" --json
       - name: Stage pinned Hermes headers for source-workspace dogfood
         if: github.repository == 'ts-defold/deherm' && matrix.entry.group != 'web'
         run: |
@@ -348,6 +369,16 @@ jobs:
             fi
             cli_dir="$(dirname "$cli_dir")"
           done
+          echo "DEHERM_ACTION_CLI=$cli_dir/node_modules/@ts-defold/deherm/bin/deherm.mjs" >> "$GITHUB_ENV"
+          echo "DEHERM_ACTION_PROJECT_DIR=$project_dir" >> "$GITHUB_ENV"
+      - name: Regenerate caller project for exact Defold revision
+        if: inputs.defold-sdk != ''
+        env:
+          DEHERM_BUILD_REVISION: ${{ inputs.defold-sdk }}
+        run: |
+          set -euo pipefail
+          [[ "$DEHERM_BUILD_REVISION" =~ ^[0-9a-f]{40}$ ]] || { echo 'defold-sdk must be an exact 40-character SHA' >&2; exit 2; }
+          node "$DEHERM_ACTION_CLI" generate --project "$DEHERM_ACTION_PROJECT_DIR" --defold-sdk "$DEHERM_BUILD_REVISION" --json
       - name: Stage pinned Hermes headers for source-workspace dogfood
         if: github.repository == 'ts-defold/deherm'
         run: |

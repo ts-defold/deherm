@@ -117,6 +117,9 @@ jobs:
 `mode: defold` uses Bob's ordinary hosted Extender selection and needs no
 server URL. `mode: local` starts Extender on each GitHub runner: Docker for
 non-Apple targets and standalone Extender with Xcode on an Apple runner.
+To test or build against a specific published Defold revision without changing
+the checked-in project, pass `defold-sdk: <40-character-engine-sha>`; the
+workflow regenerates the project from that revision's policy in each job.
 `mode: external` sends the native-extension build to the Extender URL supplied
 as `build-server`. The local and external modes are different: local performs
 the native compile on the GitHub runner, while external uses infrastructure

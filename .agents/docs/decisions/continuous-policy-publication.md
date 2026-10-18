@@ -191,6 +191,13 @@ Bob SHA-256 before any bytes enter the project cache. The mirror is an
 availability source, never an authority that can change a pinned toolchain.
 Older indexed revisions are not retroactively mirrored by this main-run path;
 they need a bounded backfill while their source archives remain available.
+The War Battles Action smoke keeps its checked-in `7f0f554` game/evidence
+fixture intact but passes an exact, published and mirrored Defold SHA to the
+reusable workflow. That workflow regenerates from the selected policy in its
+plan and each target job before building. This is a fixed consumer regression
+probe, not the moving alpha canary; the policy graph above owns current-channel
+coverage. A revision override is opt-in for other consumers and cannot silently
+change their project pins.
 
 The consumer smoke is deliberately after publication and resolves
 `https://ts-defold.dev/deherm`; the local relocation/tamper test is not accepted

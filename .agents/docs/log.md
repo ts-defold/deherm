@@ -1,5 +1,20 @@
 # Defold Hermes knowledge log
 
+## 2026-10-18 - Separate the consumer build probe from the pinned game fixture
+
+[Consumer smoke run 39171653993](https://github.com/ts-defold/deherm/actions/runs/39171653993)
+failed in both targets while obtaining Bob for the checked-in War Battles
+`7f0f554` fixture: Defold's intermediate archive and the then-absent mirror
+both returned HTTP 404. The game's Static Hermes reachability evidence also
+requires that exact revision, so advancing the checked-in lock alone would
+invalidate a distinct evidence contract. The reusable build workflow now has
+an optional exact `defold-sdk` input. When supplied it regenerates the caller
+surface in the plan and every target checkout; ordinary callers retain their
+project pin. The smoke selects `4019b8f`, whose Bob mirror release has all six
+required assets and is public. Unit tests execute both target-job override
+steps with an exact and a malformed revision. The 4019 policy resolved and
+materialized locally, but this smoke build has not yet passed in hosted CI.
+
 ## 2026-10-18 - Windows policy install was a silent CLI no-op
 
 [Policy run 39171654080](https://github.com/ts-defold/deherm/actions/runs/39171654080)
