@@ -49,7 +49,7 @@ export async function readChannel(channel, { template, fetchImpl = fetch }) {
  * reported as already covered, because the interesting property of this system
  * is how often the answer is "nothing".
  */
-export async function planChannels({ site, index, indexPath, fetchImpl = fetch } = {}) {
+export async function planChannels({ site, index, indexPath, fetchImpl = fetch, includeAlphaCanary = false } = {}) {
   const config = site ?? (await readSiteConfig());
   const shipped = index ?? JSON.parse(await readFile(indexPath ?? shippedIndexPath, "utf8"));
   const indexed = new Map(shipped.entries.map((entry) => [entry.defoldRevision, entry]));
@@ -63,6 +63,10 @@ export async function planChannels({ site, index, indexPath, fetchImpl = fetch }
     const entry = indexed.get(observation.sha1);
     if (entry) covered.push({ ...observation, policyRoot: entry.policyRoot });
     else if (!derive.some((row) => row.sha1 === observation.sha1)) derive.push(observation);
+  }
+  if (includeAlphaCanary) {
+    const alpha = observations.find((row) => row.channel === "alpha");
+    if (alpha && !derive.some((row) => row.sha1 === alpha.sha1)) derive.push({ ...alpha, canary: true });
   }
   return { observations, covered, derive };
 }
@@ -116,18 +120,26 @@ async function main(argv = process.argv.slice(2)) {
   const [command, ...rest] = argv;
   if (command === "plan" || command === undefined) {
     const json = rest.includes("--json");
+    const includeAlphaCanary = rest.includes("--include-alpha-canary");
     const indexFlag = rest.indexOf("--index");
     const indexPath = indexFlag === -1 ? undefined : rest[indexFlag + 1];
     if (indexFlag !== -1 && !indexPath) throw new Error("--index requires a path");
-    const known = new Set(["--json", "--index", indexPath].filter(Boolean));
+    const known = new Set(["--json", "--include-alpha-canary", "--index", indexPath].filter(Boolean));
     const unknown = rest.filter((argument) => !known.has(argument));
     if (unknown.length) throw new Error(`Unknown plan argument: ${unknown[0]}`);
-    const plan = await planChannels({ indexPath });
+    const plan = await planChannels({ indexPath, includeAlphaCanary });
     if (json) {
       // `derive` is what a matrix fans out over. An empty list is the steady
       // state and means this run publishes nothing at all.
       console.log(
-        JSON.stringify({ derive: plan.derive.map(({ channel, sha1, version }) => ({ channel, sha1, version })) }),
+        JSON.stringify({
+          derive: plan.derive.map(({ channel, sha1, version, canary }) => ({
+            channel,
+            sha1,
+            version,
+            canary: canary === true,
+          })),
+        }),
       );
       return;
     }

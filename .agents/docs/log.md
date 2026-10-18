@@ -1,5 +1,24 @@
 # Defold Hermes knowledge log
 
+## 2026-10-18 - Remove the headless engine's frozen Defold link recipe
+
+Run 39135055330 derived alpha `4019b8f249383f281c03463fca74b13afe4828b1`,
+passed exact-call compilation, host parity on Linux/macOS/Windows, publication,
+and the clean published-policy consumer. The separate real-engine lane then
+failed at link: the manually copied headless library/symbol list omitted new
+font/LZ4 dependencies and retained `ResourceTypeTTF` from an older SDK. The
+headless driver now projects its libraries and exported symbols from that
+revision's SDK Extender recipe and headless variant, with only the stable
+null-backend harness substitutions in package code. Tests mutate the SDK
+recipe to prove added libraries and removed symbols change the projection.
+Push and PR runs rederive the indexed alpha as a canary so a later harness
+change cannot silently fall back to testing only the pinned checkout revision;
+canaries do not trigger native-artifact publication.
+Local compilation/linkage against the pinned SDK passed, followed by the real
+headless engine run: 30 observed contracts, 0 mismatches, 0 engine faults, 4
+blocked, 52 unreachable of 86. That is pinned-revision runtime evidence; the
+fresh-alpha hosted engine lane must rerun before claiming its runtime success.
+
 ## 2026-10-18 - Make policy revision failures actionable before the nightly
 
 The latest scheduled alpha derivations failed in the generated dmSDK exact-call

@@ -307,8 +307,12 @@ test("policy derivation failures collapse by generator stage and stale per-revis
 test("policy workflow discovers changed channels on push and PR and reports incomplete derivation", async () => {
   const workflow = await readFile(path.join(repositoryRoot, ".github/workflows/policy.yml"), "utf8");
   const plan = workflow.slice(workflow.indexOf("\n  plan:\n"), workflow.indexOf("\n  derive:\n"));
-  assert.match(plan, /else\s+derive="\$\(node scripts\/track-defold-channels\.mjs plan --json/u);
+  assert.match(plan, /else\s+canary=\(\)/u);
+  assert.match(plan, /github\.event_name \}\}" = push.*github\.event_name \}\}" = pull_request/u);
+  assert.match(plan, /canary=\(--include-alpha-canary\)/u);
+  assert.match(plan, /derive="\$\(node scripts\/track-defold-channels\.mjs plan --json/u);
   assert.doesNotMatch(plan, /github\.event_name.*schedule.*github\.event_name.*workflow_dispatch/u);
+  assert.match(workflow, /if \[ "\$canary" != true \]; then generated=/u);
   assert.match(
     workflow,
     /derivation-completeness:[\s\S]*DERIVATION_FAILURES: \$\{\{ needs\.derive\.outputs\.failed \}\}/u,
@@ -1154,6 +1158,33 @@ test("a channel whose sha is already indexed derives nothing", async () => {
     plan.derive.map((row) => row.sha1),
     [fresh],
   );
+});
+
+test("push canary rederives an indexed alpha without counting it as a new policy", async () => {
+  const { planChannels } = await import("../scripts/track-defold-channels.mjs");
+  const stable = "a".repeat(40);
+  const alpha = "b".repeat(40);
+  const site = { channels: ["stable", "alpha"], channelInfoUrl: "https://example.test/{channel}/info.json" };
+  const index = { entries: [{ defoldRevision: stable }, { defoldRevision: alpha }] };
+  const fetchImpl = async (url) => ({
+    ok: true,
+    json: async () => ({ sha1: url.includes("alpha") ? alpha : stable, version: "1.14.1" }),
+  });
+  const nightly = await planChannels({ site, index, fetchImpl });
+  assert.deepEqual(nightly.derive, []);
+  const push = await planChannels({ site, index, fetchImpl, includeAlphaCanary: true });
+  assert.deepEqual(
+    push.derive.map(({ channel, sha1, canary }) => ({ channel, sha1, canary })),
+    [{ channel: "alpha", sha1: alpha, canary: true }],
+  );
+  const fresh = await planChannels({
+    site,
+    index: { entries: [{ defoldRevision: stable }] },
+    fetchImpl,
+    includeAlphaCanary: true,
+  });
+  assert.equal(fresh.derive.length, 1);
+  assert.equal(fresh.derive[0].canary, undefined);
 });
 
 test("an unreachable channel is an error, never an empty plan", async () => {

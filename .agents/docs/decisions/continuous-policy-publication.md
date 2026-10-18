@@ -4,7 +4,7 @@ title: Continuous policy generation, engine evidence, and publication
 description: One nightly policy workflow derives every tracked Defold revision, emits every mechanically representable API, records verification without gating publication, and publishes the accumulated policy store directly to the website.
 tags: [decision, generator, policy, ci, conformance, pages]
 status: accepted
-generated: { by: codex/gpt-6.1-sol, at: 2026-10-18T10:12:00-04:00 }
+generated: { by: codex/gpt-6.1-sol, at: 2026-10-18T10:43:00-04:00 }
 sources:
   - id: generate-report
     resource: ./generate-report-never-gate.md
@@ -63,9 +63,12 @@ Defold is authoritative for the API present at a revision:
 The revision-discovery path is the same on push, pull request, schedule, and
 ordinary manual dispatch. Only an explicit revision replaces discovery and an
 artifact-only refresh skips it. This makes an unindexed channel revision visible
-to code-review CI, rather than waiting for the next nightly. An indexed revision
-is reused by content identity; changing generator code alone does not claim a
-fresh-revision proof until an unindexed revision is actually derived.
+to code-review CI, rather than waiting for the next nightly. Push and pull
+request also rederive the latest indexed alpha as a canary. It is marked as a
+re-probe, not a newly generated revision: it cannot dispatch a new native
+artifact build by itself. This keeps the current-release parser, exact-call,
+and headless-link path exercised after generator or harness edits even when
+the website already holds that Defold SHA.
 
 The Linux derivation and engine jobs install the same policy-native toolchain.
 Their installer preflights the executables and syntax-compiles a translation
@@ -74,6 +77,16 @@ unit including GLX, because the generated dmSDK exact-call provider may include
 fatal, but an upstream deprecation annotation is carried as metadata and may
 warn without vetoing the route. Regression tests compile a deprecated call and
 a wrong-arity call under the actual flags.
+
+The real-engine headless driver must not freeze `engineLibs` or
+`dmExportedSymbols` at an earlier Defold revision. At CMake configure time it
+reads the selected SDK's `extender/build.yml` and `headless.appmanifest`, applies
+the harness's null-backend substitutions, and emits its private CMake library
+list and C++ symbol unit into the build directory. A missing referenced archive
+remains a link-configuration failure; a source-added library or removed symbol
+changes the next projection automatically. A mutation test covers those
+add/remove cases, and the pinned SDK driver must compile and link. This is
+runtime-harness configuration, not package policy or generated API surface.
 
 Derivation continues through all discovered revisions, retains usable prior
 policies, and publishes that coherent accumulated store. A separate required

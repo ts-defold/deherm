@@ -69,7 +69,11 @@ jobs:
           elif [ "${{ github.event_name }}" = workflow_dispatch ] && [ -n "$REQUESTED_REVISION" ]; then
             derive="$(node -e 'process.stdout.write(JSON.stringify([{channel:"manual",sha1:process.env.REQUESTED_REVISION,version:null}]))')"
           else
-            derive="$(node scripts/track-defold-channels.mjs plan --json --index build/published-policy-site/v1/index/manifest.json | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>process.stdout.write(JSON.stringify(JSON.parse(s).derive)))')"
+            canary=()
+            if [ "${{ github.event_name }}" = push ] || [ "${{ github.event_name }}" = pull_request ]; then
+              canary=(--include-alpha-canary)
+            fi
+            derive="$(node scripts/track-defold-channels.mjs plan --json --index build/published-policy-site/v1/index/manifest.json "${canary[@]}" | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>process.stdout.write(JSON.stringify(JSON.parse(s).derive)))')"
           fi
           echo "derive=$derive" >> "$GITHUB_OUTPUT"
           if [ "$derive" = '[]' ]; then
@@ -132,13 +136,13 @@ jobs:
           mkdir -p "$RUNNER_TEMP/policy-reports"
           node -e '
             for (const row of JSON.parse(process.env.DERIVATIONS)) {
-              process.stdout.write([row.channel, row.sha1, row.version ?? ""].join("\t") + "\n");
+              process.stdout.write([row.channel, row.sha1, row.version ?? "", row.canary === true ? "true" : "false"].join("\t") + "\n");
             }
           ' > "$RUNNER_TEMP/policy-revisions.tsv"
 
           generated=0
           failed=0
-          while IFS=$'\t' read -r channel revision version; do
+          while IFS=$'\t' read -r channel revision version canary; do
             [ -n "$revision" ] || continue
             workspace="$RUNNER_TEMP/derive-$revision"
             audit="$RUNNER_TEMP/policy-reports/$revision.audit.ndjson"
@@ -158,7 +162,7 @@ jobs:
               node scripts/report-revision-audit.mjs --revision "$revision" || true
             } >> "$GITHUB_STEP_SUMMARY"
             if [ "$status" -eq 0 ]; then
-              generated=$((generated + 1))
+              if [ "$canary" != true ]; then generated=$((generated + 1)); fi
             else
               failed=$((failed + 1))
               printf '%s\t%s\t%s\n' "$channel" "$revision" "$version" >> "$RUNNER_TEMP/policy-reports/failures.tsv"
@@ -380,6 +384,8 @@ jobs:
         env:
           DEHERM_REQUIRE_PACKAGED_HERMES: '1'
         run: pnpm check:exact-call-materializers
+      - name: Verify the selected SDK headless link projection
+        run: pnpm test:headless-conformance
       - name: Configure the native exact-call targets
         run: pnpm configure:native
       - name: Compile and run generated Lua/script exact-call twins

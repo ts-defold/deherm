@@ -975,6 +975,34 @@ if(DEHERM_DEFOLD_SDK_PLATFORM
    AND EXISTS "${DEHERM_HEADLESS_SDK_LIB_DIR}/libengine.a"
    AND EXISTS "${DEHERM_PACKAGED_HERMES_ARCHIVE}")
 
+  # The Defold SDK owns the engine archive and exported-symbol lists. Recompute
+  # the headless projection from that revision's Extender recipe, so a new
+  # Defold release does not require another hand-edited CMake library list.
+  if(APPLE)
+    set(DEHERM_HEADLESS_EXTENDER_PLATFORM osx)
+  else()
+    set(DEHERM_HEADLESS_EXTENDER_PLATFORM linux)
+  endif()
+  set(DEHERM_HEADLESS_BUILD_YML "${DEHERM_DEFOLD_SDK_DIR}/extender/build.yml")
+  set(DEHERM_HEADLESS_MANIFEST "${DEHERM_DEFOLD_SDK_DIR}/extender/variants/headless.appmanifest")
+  set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
+    "${DEHERM_HEADLESS_BUILD_YML}" "${DEHERM_HEADLESS_MANIFEST}"
+    "${CMAKE_CURRENT_SOURCE_DIR}/scripts/generate-headless-sdk-link.mjs")
+  find_program(DEHERM_NODE_EXECUTABLE node REQUIRED)
+  set(DEHERM_HEADLESS_LINK_CMAKE "${CMAKE_CURRENT_BINARY_DIR}/headless-sdk-link.cmake")
+  set(DEHERM_HEADLESS_SYMBOLS_CPP "${CMAKE_CURRENT_BINARY_DIR}/headless-sdk-symbols.cpp")
+  execute_process(
+    COMMAND "${DEHERM_NODE_EXECUTABLE}"
+      "${CMAKE_CURRENT_SOURCE_DIR}/scripts/generate-headless-sdk-link.mjs"
+      "${DEHERM_DEFOLD_SDK_DIR}" "${DEHERM_HEADLESS_EXTENDER_PLATFORM}"
+      "${DEHERM_HEADLESS_LINK_CMAKE}" "${DEHERM_HEADLESS_SYMBOLS_CPP}"
+    RESULT_VARIABLE DEHERM_HEADLESS_LINK_STATUS
+    ERROR_VARIABLE DEHERM_HEADLESS_LINK_ERROR)
+  if(NOT DEHERM_HEADLESS_LINK_STATUS EQUAL 0)
+    message(FATAL_ERROR "Could not derive headless SDK link recipe: ${DEHERM_HEADLESS_LINK_ERROR}")
+  endif()
+  include("${DEHERM_HEADLESS_LINK_CMAKE}")
+
   # Every source the Extender would compile for the extension, so the driver
   # exercises the same translation units the packaged engine does.
   file(GLOB DEHERM_EXTENSION_SOURCES
@@ -984,7 +1012,7 @@ if(DEHERM_DEFOLD_SDK_PLATFORM
 
   add_executable(defold-hermes-headless-conformance-driver
     native/headless_conformance_driver.cpp
-    native/headless_conformance_exported_symbols.cpp
+    "${DEHERM_HEADLESS_SYMBOLS_CPP}"
     ${DEHERM_EXTENSION_SOURCES}
   )
   target_compile_features(defold-hermes-headless-conformance-driver PRIVATE cxx_std_17)
@@ -1017,30 +1045,6 @@ if(DEHERM_DEFOLD_SDK_PLATFORM
     upstream/hermes/public
   )
 
-  # Library order mirrors `engineLibs` in defoldsdk/extender/build.yml for the
-  # osx platform, with the substitutions declared by
-  # defoldsdk/extender/variants/headless.appmanifest:
-  #   excludeLibs: record, vpx, sound, tremolo, graphics, hid, platform
-  #   libs:        record_null, sound_null, graphics_null, hid_null, platform_null
-  set(DEHERM_HEADLESS_ENGINE_LIBS
-    engine engine_service_null zip profile_null profilerext_null
-    record_null
-    gameobject ddf font font_richtext font_render resource
-    gamesys gamesys_gui gamesys_particle gamesys_model gamesys_rig
-    script_box2d_defold script_bullet3d
-    graphics_null graphics_transcoder_basisu basis_transcoder
-    physics BulletDynamics BulletCollision
-    platform_null
-    LinearMath box2d_defold render script luajit-5.1 extension
-    hid_null input particle rig dlib image gui crashext
-    sound_null
-    liveupdate decoder_wav decoder_ogg
-  )
-  if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
-    # Linux's own Extender build declares this archive; Apple obtains the same
-    # TLS facilities from its platform frameworks and does not link it.
-    list(INSERT DEHERM_HEADLESS_ENGINE_LIBS 2 dmbedtls)
-  endif()
   set(DEHERM_HEADLESS_LINK_LIBS "")
   foreach(library IN LISTS DEHERM_HEADLESS_ENGINE_LIBS)
     if(EXISTS "${DEHERM_HEADLESS_SDK_LIB_DIR}/lib${library}.a")

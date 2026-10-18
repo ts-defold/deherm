@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
+import YAML from "yaml";
 
 import {
   FIXTURE_PROFILES,
@@ -16,6 +17,7 @@ import {
   loadHeadlessConformanceInputs,
 } from "../scripts/lib/headless-conformance-plan.mjs";
 import { harnessFiles } from "../scripts/generate-headless-conformance.mjs";
+import { deriveHeadlessSdkLinkPlan, renderHeadlessSdkLink } from "../scripts/generate-headless-sdk-link.mjs";
 
 const root = new URL("../", import.meta.url);
 const documents = await loadHeadlessConformanceInputs(root);
@@ -26,6 +28,41 @@ test("the headless driver owns every C and C++ extension translation unit", asyn
   const sourceGlob = /file\(GLOB DEHERM_EXTENSION_SOURCES([\s\S]*?)\)/u.exec(cmake)?.[1] ?? "";
   assert.match(sourceGlob, /defold_hermes\/src\/\*\.c"/u);
   assert.match(sourceGlob, /defold_hermes\/src\/\*\.cpp"/u);
+});
+
+test("headless linkage follows the selected SDK recipe instead of a frozen engine list", async () => {
+  const lock = await readFile(new URL("upstream.lock", root), "utf8");
+  const revision = /^DEFOLD_REV=([0-9a-f]{40})$/mu.exec(lock)?.[1];
+  assert.ok(revision);
+  const sdk = new URL(`upstream/extender/server/app/sdk/${revision}/defoldsdk/extender/`, root);
+  const build = YAML.parse(await readFile(new URL("build.yml", sdk), "utf8"));
+  const variant = YAML.parse(await readFile(new URL("variants/headless.appmanifest", sdk), "utf8"));
+  for (const platform of ["linux", "osx"]) {
+    const baseline = deriveHeadlessSdkLinkPlan(build, variant, platform);
+    assert.ok(baseline.libraries.includes("engine_service_null"));
+    assert.ok(baseline.libraries.includes("graphics_null"));
+    assert.ok(baseline.libraries.includes("platform_null"));
+    assert.ok(!baseline.libraries.includes("profiler_remotery"));
+    assert.ok(!baseline.libraries.includes("MoltenVK"));
+    assert.ok(!baseline.symbols.includes("ProfilerRemotery"));
+
+    const changed = structuredClone(build);
+    changed.platforms[platform].context.engineLibs.push("font_gen", "lz4");
+    changed.context.symbols = changed.context.symbols.filter((symbol) => symbol !== "ResourceTypeTTF");
+    changed.context.symbols.push("ResourceTypeNewFont");
+    const projected = deriveHeadlessSdkLinkPlan(changed, variant, platform);
+    assert.ok(projected.libraries.includes("font_gen"));
+    assert.ok(projected.libraries.includes("lz4"));
+    assert.ok(!projected.symbols.includes("ResourceTypeTTF"));
+    assert.ok(projected.symbols.includes("ResourceTypeNewFont"));
+    const rendered = renderHeadlessSdkLink(projected);
+    assert.match(rendered.cmake, /font_gen[\s\S]*lz4/u);
+    assert.match(rendered.cpp, /ResourceTypeNewFont\(\)/u);
+    assert.doesNotMatch(rendered.cpp, /ResourceTypeTTF/u);
+  }
+  const cmake = await readFile(new URL("CMakeLists.txt", root), "utf8");
+  assert.match(cmake, /scripts\/generate-headless-sdk-link\.mjs/u);
+  assert.doesNotMatch(cmake, /set\(DEHERM_HEADLESS_ENGINE_LIBS/u);
 });
 
 test("every script contract is accounted for exactly once", () => {
