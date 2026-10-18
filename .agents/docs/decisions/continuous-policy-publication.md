@@ -4,7 +4,7 @@ title: Continuous policy generation, engine evidence, and publication
 description: One nightly policy workflow derives every tracked Defold revision, emits every mechanically representable API, records verification without gating publication, and publishes the accumulated policy store directly to the website.
 tags: [decision, generator, policy, ci, conformance, pages]
 status: accepted
-generated: { by: codex/gpt-6.1-sol, at: 2026-10-18T21:00:00Z }
+generated: { by: codex/gpt-6.1-sol, at: 2026-10-18T22:10:00Z }
 sources:
   - id: generate-report
     resource: ./generate-report-never-gate.md
@@ -29,6 +29,10 @@ sources:
   - id: surface-identity
     resource: ../../../scripts/policy-surface-identity.mjs
     title: Policy surface handoff identity
+    author: project:deherm
+  - id: surface-install
+    resource: ../../../scripts/policy-surface.mjs
+    title: Policy surface archive installation
     author: project:deherm
   - id: bob-mirror
     resource: ../../../scripts/publish-defold-bob-mirror.mjs
@@ -223,6 +227,11 @@ identity before extracting the target list. An advanced `main` therefore
 cannot silently pair an older policy surface with newer artifact recipe code.
 The archive identity protects the handoff, not the authenticity of public
 release assets; those retain their independent integrity-sidecar checks.
+Each host extracts the archive from its checkout as the process working
+directory and then compares the installed policy index with the archive's own
+index bytes. Merely finding pre-existing generated directories is not an
+installation proof, particularly on Windows where a tar `-C` path can be
+interpreted differently from a process cwd.
 Local mutation and mismatch tests cover this contract. Its first GitHub CI
 execution remains separate evidence.[^policy-workflow][^native-workflow][^surface-identity]
 

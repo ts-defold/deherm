@@ -1,5 +1,20 @@
 # Defold Hermes knowledge log
 
+## 2026-10-18 - Assert that Windows installed the transported policy index
+
+[Policy run 39169426524](https://github.com/ts-defold/deherm/actions/runs/39169426524)
+passed alpha derivation and Linux/macOS site-byte parity. Windows produced
+only 113 site files and one revision; the Linux baseline had 771 files and
+19 revisions. The uploaded `policy-surface.tar.gz` was inspected directly:
+its transported `defold-policy-index.json` lists all 19 revisions. Thus the
+gap is after artifact creation and before Windows site build, not a missing
+Linux policy. Extraction previously passed a native Windows checkout path to
+tar's `-C`; it now runs tar with that directory as the process cwd and verifies
+that the installed index bytes exactly match the archive before parity proceeds.
+A disposable-checkout test reproduces replacement of a stale one-revision
+index by a two-revision archive. This is a reasoned repair for the observed
+handoff gap, not yet hosted proof that Windows extraction is fixed.
+
 ## 2026-10-18 - Keep pinned package fixtures before selected surface install
 
 [Policy run 39167181661](https://github.com/ts-defold/deherm/actions/runs/39167181661)

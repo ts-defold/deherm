@@ -3,7 +3,7 @@
 // One authority for the revision-derived files exchanged between policy jobs.
 
 import { execFile } from "node:child_process";
-import { lstat, mkdir, readdir, rm, stat } from "node:fs/promises";
+import { lstat, mkdir, readFile, readdir, rm, stat } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { promisify } from "node:util";
@@ -121,13 +121,22 @@ export async function packPolicySurface(archive) {
   });
 }
 
-export async function installPolicySurface(archive) {
+async function assertInstalledPolicyIndex(archive, destinationRoot) {
+  const relative = "packages/bindings/generated/defold-policy-index.json";
+  const { stdout } = await runTar(["-xOzf", archive, relative], { maxBuffer: 4 * 1024 * 1024 });
+  const installed = await readFile(path.join(destinationRoot, relative), "utf8");
+  if (installed !== stdout) throw new Error(`Policy surface install did not replace ${relative} with archive bytes`);
+}
+
+export async function installPolicySurface(archive, destinationRoot = root) {
   await listArchive(archive);
-  for (const entry of replacementRoots) await rm(path.join(root, entry), { recursive: true, force: true });
-  await runTar(["-xzf", archive, "-C", root], {
+  for (const entry of replacementRoots) await rm(path.join(destinationRoot, entry), { recursive: true, force: true });
+  await runTar(["-xzf", archive], {
+    cwd: destinationRoot,
     maxBuffer: 64 * 1024 * 1024,
   });
-  for (const entry of policySurfaceArchivePaths) await assertNoInstalledSymlinks(path.join(root, entry));
+  for (const entry of policySurfaceArchivePaths) await assertNoInstalledSymlinks(path.join(destinationRoot, entry));
+  await assertInstalledPolicyIndex(archive, destinationRoot);
 }
 
 export async function extractPolicySurfacePath(archive, selectedPath) {
@@ -138,7 +147,8 @@ export async function extractPolicySurfacePath(archive, selectedPath) {
   if (!entries.some((entry) => entry === selectedPath || entry.startsWith(`${selectedPath}/`))) {
     throw new Error(`Policy surface archive does not contain ${selectedPath}`);
   }
-  await runTar(["-xzf", archive, "-C", root, selectedPath], {
+  await runTar(["-xzf", archive, selectedPath], {
+    cwd: root,
     maxBuffer: 64 * 1024 * 1024,
   });
   await assertNoInstalledSymlinks(path.join(root, selectedPath));
