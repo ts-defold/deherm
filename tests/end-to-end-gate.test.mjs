@@ -241,7 +241,7 @@ test("both consumer jobs authenticate GitHub release metadata reads", async () =
   const workflow = await readFile(new URL("../.github/workflows/end-to-end.yml", import.meta.url), "utf8");
   const local = workflow.slice(workflow.indexOf("  local:"), workflow.indexOf("  extension-headers:"));
   const bob = workflow.slice(workflow.indexOf("  bob:"));
-  const jobToken = /runs-on: ubuntu-24\.04\n\s+env:\n\s+GH_TOKEN: \$\{\{ github\.token \}\}/u;
+  const jobToken = /^    env:\n      GH_TOKEN: \$\{\{ github\.token \}\}/mu;
   assert.match(local, jobToken);
   assert.match(bob, jobToken);
 });
