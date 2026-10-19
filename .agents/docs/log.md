@@ -1,5 +1,17 @@
 # Defold Hermes knowledge log
 
+## 2026-10-19 - Preserve queued source validation during artifact callbacks
+
+[Push run 39269768409](https://github.com/ts-defold/deherm/actions/runs/39269768409)
+was canceled while pending when artifact-refresh run 39269809365 entered the
+same concurrency group. Disabling cancellation of active runs does not retain
+multiple pending runs. The policy workflow now uses GitHub's documented
+`queue: max` mode to preserve the serialized source-validation and refresh
+queue. The workflow contract test passes. Local actionlint 1.7.12 does not yet
+recognize this GitHub property; hosted parser acceptance remains the decisive
+validation for the new syntax. The previous full aggregate check and the
+fixture/authentication focused checks passed before this workflow-only change.
+
 ## 2026-10-19 - Recover pinned fixture inputs and authenticate consumer planning
 
 The old Bob mirror backfill completed and its public download passed SHA-256

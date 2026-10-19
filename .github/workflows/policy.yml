@@ -31,13 +31,10 @@ permissions:
   contents: read
 
 concurrency:
-  # v2 retires the pre-artifact-binding graph. A run created from the old graph
-  # cannot publish because its derive-stage site build lacks the now-required
-  # artifact input; separating the migration epoch avoids making its unrelated
-  # channel derivations block the first corrected refresh. All v2 writers remain
-  # serialized with one another.
+  # Source validations and artifact refreshes share one writer queue. Retain
+  # every pending run so callbacks cannot replace a push's source validation.
   group: policy-v2-${{ github.ref }}
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+  queue: max
 
 jobs:
   plan:

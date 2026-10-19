@@ -4,7 +4,7 @@ title: Continuous policy generation, engine evidence, and publication
 description: One nightly policy workflow derives every tracked Defold revision, emits every mechanically representable API, records verification without gating publication, and publishes the accumulated policy store directly to the website.
 tags: [decision, generator, policy, ci, conformance, pages]
 status: accepted
-generated: { by: codex/gpt-6, at: 2026-10-19T14:23:25Z }
+generated: { by: codex/gpt-6, at: 2026-10-19T14:33:21Z }
 sources:
   - id: generate-report
     resource: ./generate-report-never-gate.md
@@ -58,6 +58,10 @@ sources:
     resource: ../../../scripts/publish-defold-fixture-mirror.mjs
     title: Immutable pinned fixture mirror publisher
     author: project:deherm
+  - id: github-queue
+    resource: https://docs.github.com/en/actions/how-tos/write-workflows/choose-when-workflows-run/control-workflow-concurrency
+    title: Queueing multiple pending GitHub Actions runs
+    author: team:github
   - id: defold-license
     resource: https://github.com/defold/defold/blob/dev/LICENSE.txt
     title: Defold License redistribution terms
@@ -262,6 +266,13 @@ the accumulated store but deliberately derives no channel revision: release
 availability changed, Defold source did not. Nightly and ordinary manual runs
 retain channel discovery. This keeps an artifact retry proportional to the
 mutable mapping it advances instead of repeating three source derivations.
+
+All policy writers use one concurrency group with `queue: max` and no
+cancellation. GitHub's default single pending slot allows a later artifact
+callback to cancel a pending push validation; `cancel-in-progress: false`
+alone does not prevent that. The queued mode retains pending source and
+mapping runs in order while continuing to allow only one active writer.
+GitHub supports up to 100 queued runs per group.[^github-queue]
 
 The policy plan runs the package-owned release preflight before derivation. The
 derived policy-surface artifact carries a separate identity document naming

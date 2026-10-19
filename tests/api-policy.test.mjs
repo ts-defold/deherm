@@ -313,6 +313,7 @@ test("policy derivation failures collapse by generator stage and stale per-revis
 
 test("policy workflow discovers changed channels on push and PR and reports incomplete derivation", async () => {
   const workflow = await readFile(path.join(repositoryRoot, ".github/workflows/policy.yml"), "utf8");
+  assert.match(workflow, /group: policy-v2-\$\{\{ github.ref \}\}\s+queue: max/u);
   const plan = workflow.slice(workflow.indexOf("\n  plan:\n"), workflow.indexOf("\n  derive:\n"));
   assert.match(plan, /else\s+canary=\(\)/u);
   assert.match(plan, /github\.event_name \}\}" = push.*github\.event_name \}\}" = pull_request/u);
