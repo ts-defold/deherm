@@ -40,6 +40,11 @@ on:
     branches: [main]
   workflow_dispatch:
     inputs:
+      defold-channel:
+        description: Current Defold channel to resolve once for the complete consumer matrix
+        default: stable
+        type: choice
+        options: [stable, beta, alpha]
       build-server:
         description: Defold build service override; blank selects production for stable and staging otherwise
         required: false
@@ -64,6 +69,7 @@ jobs:
       GH_TOKEN: ${{ github.token }}
     outputs:
       targets: ${{ steps.plan.outputs.targets }}
+      revision: ${{ steps.plan.outputs.revision }}
     steps:
       - uses: actions/checkout@v7
       - uses: pnpm/action-setup@v6
@@ -83,13 +89,14 @@ jobs:
       - id: plan
         run: |
           set -euo pipefail
-          node scripts/check-end-to-end.mjs --plan --json > plan.json
+          node scripts/check-end-to-end.mjs --channel "${{ inputs.defold-channel || 'stable' }}" --plan --json > plan.json
           node -e '
             const plan = require("./plan.json");
             const exercised = plan.targets.filter((row) => row.disposition === "exercise").map((row) => row.target);
             require("node:fs").appendFileSync(process.env.GITHUB_OUTPUT, `targets=${JSON.stringify(exercised)}\n`);
+            require("node:fs").appendFileSync(process.env.GITHUB_OUTPUT, `revision=${plan.defoldRevision}\n`);
           ' >> "$GITHUB_OUTPUT"
-          node scripts/check-end-to-end.mjs --plan >> "$GITHUB_STEP_SUMMARY"
+          node scripts/check-end-to-end.mjs --defold-sdk "$(node -p 'require("./plan.json").defoldRevision')" --plan >> "$GITHUB_STEP_SUMMARY"
 
       # A push may be the same push that rotates a content-addressed host-tool
       # fingerprint. native-artifacts publishes those immutable rows in a
@@ -152,7 +159,7 @@ jobs:
           if [ "${{ github.event_name }}" != push ]; then
             stages+=(--stage target-archives)
           fi
-          node scripts/check-end-to-end.mjs "${stages[@]}"
+          node scripts/check-end-to-end.mjs --defold-sdk "${{ steps.plan.outputs.revision }}" "${stages[@]}"
 
   # The npm package's prepack contract stages the public Hermes and JSI headers
   # from the pinned Hermes revision. They are deliberately not committed: the
@@ -204,7 +211,6 @@ jobs:
       - uses: actions/setup-java@v5
         with: { distribution: temurin, java-version: '25' }
       - run: pnpm install --frozen-lockfile --ignore-scripts
-      - run: ./scripts/bootstrap-bob.sh
       - uses: actions/download-artifact@v7
         with:
           name: pinned-hermes-public-headers
@@ -212,11 +218,12 @@ jobs:
 
       - name: Build for ${{ matrix.target }}
         env:
-          DEFOLD_HERMES_BUILD_SERVER: ${{ inputs.build-server }}
+          DEFOLD_HERMES_BUILD_SERVER: ${{ inputs.build-server || ((inputs.defold-channel == 'alpha' || inputs.defold-channel == 'beta') && 'https://build-stage.defold.com' || 'https://build.defold.com') }}
         run: |
           node scripts/check-end-to-end.mjs \
+            --defold-sdk "${{ needs.local.outputs.revision }}" \
             --target "${{ matrix.target }}" \
-            --stage policy --stage target-archives --stage scaffold --stage generate --stage bob
+            --stage policy --stage scaffold --stage generate --stage target-archives --stage bob
 
       - name: Print Extender failure log
         if: failure()

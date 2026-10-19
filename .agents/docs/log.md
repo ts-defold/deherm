@@ -1,5 +1,21 @@
 # Defold Hermes knowledge log
 
+## 2026-10-19 - Separate hosted consumer builds from historical SDK fixtures
+
+Policy refresh 39269809365 passed derivation, host parity, publication, deployed
+consumer checks, and real-engine conformance. Release readiness 39270251553
+passed Linux, macOS, and Windows. Full Bob run 39274342444 then exposed a
+different dependency: five workers rejected fixture SDK `7f0f554` as nonexistent,
+while six targets passed. The consumer matrix now resolves current stable once
+and carries its exact SHA through every job; it installs native artifacts from
+the generated project's policy and builds through `deherm bundle`, including
+project-locked Bob. The contributor fixture lock is unchanged. Focused gate
+tests pass, and current stable `a81dbb0` resolved, scaffolded, generated and
+typechecked locally through the published policy. Its `wasm-web` bundle also
+completed through the normal CLI and production Extender. The replacement
+hosted multi-platform matrix is not yet verified; do not conflate that one
+successful target with its result.
+
 ## 2026-10-19 - Preserve queued source validation during artifact callbacks
 
 [Push run 39269768409](https://github.com/ts-defold/deherm/actions/runs/39269768409)

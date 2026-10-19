@@ -4,8 +4,12 @@ title: Continuous policy generation, engine evidence, and publication
 description: One nightly policy workflow derives every tracked Defold revision, emits every mechanically representable API, records verification without gating publication, and publishes the accumulated policy store directly to the website.
 tags: [decision, generator, policy, ci, conformance, pages]
 status: accepted
-generated: { by: codex/gpt-6, at: 2026-10-19T14:33:21Z }
+generated: { by: codex/gpt-6, at: 2026-10-19T15:12:50Z }
 sources:
+  - resource: ../../../scripts/check-end-to-end.mjs
+    title: Project-locked consumer build gate
+  - resource: ../../../.github/workflows/end-to-end.yml
+    title: Current-channel consumer matrix
   - id: generate-report
     resource: ./generate-report-never-gate.md
     title: Generate, report, open issues - a generator never refuses
@@ -95,6 +99,17 @@ Defold is authoritative for the API present at a revision:
 # Nightly graph
 
 ## Reliability plan for rolling Defold revisions
+
+The full consumer matrix resolves the current stable channel once in its
+planning job (manual runs can select beta or alpha), then shares that exact SHA
+with scaffold, generation, artifact installation, and every Bob job. It uses
+the ordinary `deherm bundle` command and the generated project's authenticated
+lock, not repository-pinned Bob or native archives. Contributor fixtures remain
+pinned independently: a valid historical SDK does not imply that Defold's
+hosted Extender still retains it. Five targets in run 39274342444 rejected the
+old fixture SHA as nonexistent while other workers still built it from cache.
+Regression tests require one channel resolution, exact-SHA propagation, and
+project-owned build inputs; a successful local plan is not a hosted build.
 
 The revision-discovery path is the same on push, pull request, schedule, and
 ordinary manual dispatch. Only an explicit revision replaces discovery and an

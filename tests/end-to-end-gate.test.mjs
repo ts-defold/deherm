@@ -8,9 +8,35 @@ import {
   publishedNativeArtifactState,
   readLedger,
   scaffoldArguments,
+  selectDefoldRevision,
   shouldRetryHostedExtenderFailure,
   stageNames,
 } from "../scripts/check-end-to-end.mjs";
+
+test("rolling consumer revision is resolved once and exact revisions never consult the channel", async () => {
+  const revision = "a".repeat(40);
+  const calls = [];
+  const resolve = async (channel) => {
+    calls.push(channel);
+    return { revision };
+  };
+  assert.equal(await selectDefoldRevision({ channel: "stable" }, resolve), revision);
+  assert.equal(await selectDefoldRevision({ revision }, resolve), revision);
+  assert.deepEqual(calls, ["stable"]);
+  await assert.rejects(selectDefoldRevision({ revision: "latest" }, resolve), /exact Defold revision/u);
+  await assert.rejects(selectDefoldRevision({ revision, channel: "stable" }, resolve), /not both/u);
+});
+
+test("consumer matrix shares the selected channel SHA and uses project-locked build inputs", async () => {
+  const workflow = await readFile(new URL("../.github/workflows/end-to-end.yml", import.meta.url), "utf8");
+  const gate = await readFile(new URL("../scripts/check-end-to-end.mjs", import.meta.url), "utf8");
+  assert.match(workflow, /--channel "\$\{\{ inputs.defold-channel \|\| 'stable' \}\}"/u);
+  assert.match(workflow, /--defold-sdk "\$\{\{ needs.local.outputs.revision \}\}"/u);
+  assert.doesNotMatch(workflow, /bootstrap-bob\.sh/u);
+  assert.doesNotMatch(gate, /manage-native-artifacts\.mjs|await run\(path.join\(root, "scripts", "bob.sh"\)/u);
+  assert.match(gate, /await node\(\s*"bin\/deherm.mjs",\s*\[\s*"bundle"/u);
+  assert.match(gate, /assertProjectNativeArtifact\(projectRoot, row.target/u);
+});
 
 test("published native mapping distinguishes a pending build from a malformed release", () => {
   assert.equal(
@@ -258,7 +284,7 @@ test("pushes run the available cheap consumer half while artifact-dispatched run
   assert.match(workflow, /extension-headers:[\s\S]*if: github\.event_name != 'push'/u);
   assert.match(workflow, /bob:[\s\S]*if: github\.event_name != 'push'/u);
   const bob = workflow.slice(workflow.indexOf("  bob:"));
-  assert.match(bob, /--stage policy --stage target-archives --stage scaffold --stage generate --stage bob/u);
+  assert.match(bob, /--stage policy --stage scaffold --stage generate --stage target-archives --stage bob/u);
   const dispatch = nativeWorkflow.slice(nativeWorkflow.indexOf("Verify every fingerprinted row is published"));
   assert.match(
     dispatch,

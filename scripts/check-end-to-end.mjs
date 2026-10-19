@@ -101,7 +101,21 @@ export const defaultBuildServer = buildServerForDefoldRef(pinnedDefoldRef);
  */
 export const scratchProject = "build/end-to-end/project";
 
-export const stageNames = Object.freeze(["policy", "host-tools", "target-archives", "scaffold", "generate", "bob"]);
+export const stageNames = Object.freeze(["policy", "host-tools", "scaffold", "generate", "target-archives", "bob"]);
+
+// Resolve a rolling channel once in the planning job, then pass the exact SHA
+// to every consumer job. The contributor fixture revision is not a guarantee
+// that Defold's hosted Extender still retains that historical SDK.
+export async function selectDefoldRevision({ revision, channel }, resolveChannel) {
+  if (revision && channel) throw new Error("Choose --defold-sdk or --channel, not both");
+  if (channel) {
+    const resolve =
+      resolveChannel ?? (await import("../packages/cli/src/policy-client.mjs")).resolveDefoldChannelRevision;
+    return (await resolve(channel)).revision;
+  }
+  if (revision && !/^[a-f0-9]{40}$/u.test(revision)) throw new Error("--defold-sdk requires an exact Defold revision");
+  return revision ?? (await readLedger()).defoldRevision;
+}
 
 // Extender build-worker connection failures are neither extension diagnostics
 // nor successful compiles. Retry only observed transport failures, and only
@@ -273,22 +287,18 @@ const stages = {
     const wanted = context.rows.filter(
       (row) => row.disposition === "exercise" && row.archiveStage.disposition === "exercise",
     );
-    // `--partial` installs what the release actually carries and reports the
-    // rest, which is what lets one incomplete release be a named per-target
-    // failure below instead of one opaque error for the whole matrix.
-    await node("scripts/manage-native-artifacts.mjs", ["pull", "--partial"]).catch((error) => {
-      throw new Error(`could not pull the published target archives: ${error.message}`);
-    });
-    const { stdout } = await node("scripts/manage-native-artifacts.mjs", ["verify", "--json"]);
-    const report = JSON.parse(stdout);
-    const byTarget = new Map(report.targets.map((row) => [row.target, row]));
+    const { ensureProjectNativeArtifact, assertProjectNativeArtifact } =
+      await import("../packages/cli/src/toolchains.mjs");
     const failures = [];
     for (const row of wanted) {
-      const observed = byTarget.get(row.target);
-      if (!observed) failures.push(`${row.target}: the artifact matrix reported no row`);
-      else if (observed.invalid) failures.push(`${row.target}: ${observed.detail}`);
-      else if (observed.status !== "vendored") failures.push(`${row.target}: ${observed.status} (${observed.detail})`);
-      else context.targetResult(row.target, "target-archives", { detail: observed.detail });
+      try {
+        const projectRoot = path.resolve(root, context.project);
+        await ensureProjectNativeArtifact(projectRoot, row.target, { variant: "debug" });
+        const observed = await assertProjectNativeArtifact(projectRoot, row.target, { variant: "debug" });
+        context.targetResult(row.target, "target-archives", { detail: observed.file });
+      } catch (error) {
+        failures.push(`${row.target}: ${error.message}`);
+      }
     }
     if (failures.length) throw new Error(failures.join("\n"));
     return { detail: `${wanted.length} target archive(s) installed and digest-verified` };
@@ -319,17 +329,27 @@ const stages = {
       for (let attempt = 1; attempt <= 3; attempt += 1) {
         const priorLog = await readFile(extenderLogPath, "utf8").catch(() => "");
         try {
-          await run(path.join(root, "scripts", "bob.sh"), ["build"], {
-            cwd: root,
-            maxBuffer: 256 * 1024 * 1024,
-            env: {
-              ...process.env,
-              DEFOLD_HERMES_PLATFORM: row.target,
-              DEFOLD_HERMES_PROJECT: context.project,
-              DEFOLD_HERMES_BUILD_SERVER: context.buildServer,
-              DEFOLD_HERMES_ALLOW_REMOTE_BUILD: "1",
+          // Use the customer build command: compiler, target libraries and Bob
+          // all come from this project's authenticated policy and lock.
+          await node(
+            "bin/deherm.mjs",
+            [
+              "bundle",
+              "--project",
+              projectRoot,
+              "--target",
+              row.target,
+              "--variant",
+              "debug",
+              "--application-mode",
+              "dynamic",
+              "--build-server",
+              context.buildServer,
+            ],
+            {
+              maxBuffer: 256 * 1024 * 1024,
             },
-          });
+          );
           context.targetResult(row.target, "bob", { detail: `built against ${context.buildServer}` });
           break;
         } catch (error) {
@@ -391,6 +411,8 @@ export async function main(argv) {
   let plan = false;
   let project = scratchProject;
   let projectWasGiven = false;
+  let revision;
+  let channel;
   let buildServer = process.env.DEFOLD_HERMES_BUILD_SERVER || defaultBuildServer;
   for (let index = 0; index < argv.length; index += 1) {
     const value = argv[index];
@@ -399,7 +421,9 @@ export async function main(argv) {
     else if (value === "--project") {
       project = argv[++index];
       projectWasGiven = true;
-    } else if (value === "--build-server") buildServer = argv[++index];
+    } else if (value === "--defold-sdk") revision = argv[++index];
+    else if (value === "--channel") channel = argv[++index];
+    else if (value === "--build-server") buildServer = argv[++index];
     else if (value === "--stage") requested.push(argv[++index]);
     else if (value === "--target") only.push(argv[++index]);
     else throw new Error(`Unknown argument ${value}`);
@@ -410,7 +434,11 @@ export async function main(argv) {
   }
   const selected = requested.length ? requested : stageNames;
 
-  const { rows: everyRow, problems, defoldRevision } = await readLedger();
+  const { rows: everyRow, problems } = await readLedger();
+  const defoldRevision = await selectDefoldRevision({ revision, channel });
+  if (channel && !argv.includes("--build-server") && !process.env.DEFOLD_HERMES_BUILD_SERVER) {
+    buildServer = buildServerForDefoldRef(channel);
+  }
   // `--target` narrows which rows the per-target stages act on. It never hides a
   // row: the ledger printed below is still the whole declared matrix, so a run
   // that covers one target says so instead of looking complete.
