@@ -7,6 +7,8 @@ import test from "node:test";
 
 import { bobMirrorUrl } from "../packages/cli/src/dev/bob-mirror.mjs";
 import { ensureRepositoryBob } from "../scripts/ensure-repository-bob.mjs";
+import { ensureDefoldFixture } from "../scripts/ensure-defold-fixture.mjs";
+import { publishDefoldFixtureMirror } from "../scripts/publish-defold-fixture-mirror.mjs";
 import {
   expectedBobFromLock,
   missingBobReleaseAssets,
@@ -17,6 +19,87 @@ import {
 
 const sha256 = (bytes) => createHash("sha256").update(bytes).digest("hex");
 const revision = "c".repeat(40);
+
+test("pinned test inputs reuse verified caches and recover from retired upstream archives", async (t) => {
+  const workspace = await mkdtemp(path.join(tmpdir(), "deherm-test-inputs-"));
+  t.after(() => rm(workspace, { recursive: true, force: true }));
+  await mkdir(path.join(workspace, "upstream/defold"), { recursive: true });
+  const inputs = [
+    { kind: "ref-doc", asset: "ref-doc.zip", pin: "DEFOLD_REF_DOC", bytes: Buffer.from("reference docs") },
+    { kind: "defold-sdk", asset: "defoldsdk.zip", pin: "DEFOLD_SDK", bytes: Buffer.from("engine SDK") },
+  ];
+  await writeFile(
+    path.join(workspace, "upstream.lock"),
+    `DEFOLD_REV=${revision}\n` +
+      inputs
+        .map(
+          (input) =>
+            `${input.pin}_URL=https://example.invalid/${input.asset}\n${input.pin}_SHA256=${sha256(input.bytes)}\n`,
+        )
+        .join(""),
+  );
+  const requests = [];
+  const fetch = async (url) => {
+    requests.push(url);
+    const input = inputs.find((item) => url.endsWith(`/${item.asset}`));
+    return url.startsWith("https://example.invalid") ? new Response(null, { status: 404 }) : new Response(input.bytes);
+  };
+  for (const input of inputs) {
+    const file = await ensureDefoldFixture(input.kind, workspace, fetch);
+    assert.deepEqual(await readFile(file), input.bytes);
+    await ensureDefoldFixture(input.kind, workspace, async () => {
+      throw new Error("warm cache fetched");
+    });
+    assert.ok(
+      requests.includes(
+        `https://github.com/ts-defold/deherm/releases/download/defold-fixtures-${revision}/${input.asset}`,
+      ),
+    );
+  }
+  assert.equal(requests.length, 4);
+  const assets = [];
+  for (const input of inputs) {
+    assets.push({
+      name: input.asset,
+      digest: `sha256:${sha256(input.bytes)}`,
+      size: input.bytes.length,
+      state: "uploaded",
+    });
+    const sidecar = `${sha256(input.bytes)}  ${input.asset}\n`;
+    assets.push({
+      name: `${input.asset}.sha256`,
+      digest: `sha256:${sha256(sidecar)}`,
+      size: Buffer.byteLength(sidecar),
+      state: "uploaded",
+    });
+  }
+  for (const name of ["LICENSE.txt", "NOTICE", "TOOLS_LICENSES.md", "COMPLYING_WITH_LICENSES.md"]) {
+    await writeFile(path.join(workspace, "upstream/defold", name), name);
+    assets.push({ name, digest: `sha256:${sha256(name)}`, size: Buffer.byteLength(name), state: "uploaded" });
+  }
+  const downloads = [];
+  const published = await publishDefoldFixtureMirror({
+    workspace,
+    run: async (_command, args) => ({
+      stdout:
+        args[1] === "view" ? JSON.stringify({ tagName: `defold-fixtures-${revision}`, isDraft: false, assets }) : "",
+    }),
+    verifyDownload: async (url, digest) => downloads.push({ url, digest }),
+  });
+  assert.equal(published.reused, true);
+  assert.deepEqual(
+    downloads.map((item) => item.digest),
+    inputs.map((input) => sha256(input.bytes)),
+  );
+  const file = path.join(workspace, "upstream/ref-doc.zip");
+  await writeFile(file, "corrupt");
+  await assert.rejects(
+    ensureDefoldFixture("ref-doc", workspace, async () => new Response("wrong")),
+    /SHA-256 mismatch/,
+  );
+  await assert.rejects(stat(`${file}.download-${process.pid}`), { code: "ENOENT" });
+  await assert.rejects(publishDefoldFixtureMirror({ workspace }), /input digest mismatch/);
+});
 
 test("repository Bob bootstrap uses the same verified mirror and cache as the installed CLI", async (t) => {
   const workspace = await mkdtemp(path.join(tmpdir(), "deherm-repository-bob-"));

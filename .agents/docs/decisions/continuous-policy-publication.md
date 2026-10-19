@@ -4,7 +4,7 @@ title: Continuous policy generation, engine evidence, and publication
 description: One nightly policy workflow derives every tracked Defold revision, emits every mechanically representable API, records verification without gating publication, and publishes the accumulated policy store directly to the website.
 tags: [decision, generator, policy, ci, conformance, pages]
 status: accepted
-generated: { by: codex/gpt-6, at: 2026-10-19T14:06:37Z }
+generated: { by: codex/gpt-6, at: 2026-10-19T14:23:25Z }
 sources:
   - id: generate-report
     resource: ./generate-report-never-gate.md
@@ -49,6 +49,14 @@ sources:
   - id: repository-bob
     resource: ../../../scripts/ensure-repository-bob.mjs
     title: Repository bootstrap using the installed CLI's verified Bob resolver
+    author: project:deherm
+  - id: fixture-inputs
+    resource: ../../../scripts/ensure-defold-fixture.mjs
+    title: Verified pinned contributor fixture inputs
+    author: project:deherm
+  - id: fixture-publisher
+    resource: ../../../scripts/publish-defold-fixture-mirror.mjs
+    title: Immutable pinned fixture mirror publisher
     author: project:deherm
   - id: defold-license
     resource: https://github.com/defold/defold/blob/dev/LICENSE.txt
@@ -211,6 +219,16 @@ path. Both a selected policy and a pinned fixture therefore retain the same
 mirror behavior.[^repository-bob]
 Older indexed revisions are not retroactively mirrored by this main-run path;
 they need a bounded backfill while their source archives remain available.
+The contributor baseline also pins `ref-doc.zip` and `defoldsdk.zip`. These are
+test inputs rather than consumer dependencies. Their bootstrap validates warm
+cache bytes, then tries the pinned Defold URL and an exact-revision
+`defold-fixtures-<revision>` mirror, accepting only the lock's SHA-256. Downloads
+stream to a temporary file before replacement. Fixture mirrors use the same
+immutable draft/upload/public-download verification contract as Bob and carry
+the same source-revision licenses. An intentional baseline update can publish
+these archives with `scripts/publish-defold-fixture-mirror.mjs`; ordinary
+nightlies do not mirror every SDK archive.[^fixture-inputs][^fixture-publisher]
+
 The War Battles Action smoke keeps its checked-in `7f0f554` game/evidence
 fixture intact but passes an exact, published and mirrored Defold SHA to the
 reusable workflow. That workflow regenerates from the selected policy in its

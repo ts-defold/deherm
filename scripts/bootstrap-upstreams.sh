@@ -69,14 +69,7 @@ if wants hermes; then checkout_revision hermes "$HERMES_URL" "$HERMES_REV"; fi
 if wants extender; then checkout_revision extender "$EXTENDER_URL" "$EXTENDER_REV"; fi
 
 if wants ref-doc; then
-  ref_doc="$repo_root/upstream/ref-doc.zip"
-  mkdir -p "$repo_root/upstream"
-  curl -fL "$DEFOLD_REF_DOC_URL" -o "$ref_doc"
-  actual_sha="$(deherm_sha256_file "$ref_doc")"
-  if [[ "$actual_sha" != "$DEFOLD_REF_DOC_SHA256" ]]; then
-    echo "ref-doc.zip checksum mismatch: expected $DEFOLD_REF_DOC_SHA256, got $actual_sha" >&2
-    exit 1
-  fi
+  node "$repo_root/scripts/ensure-defold-fixture.mjs" ref-doc
 fi
 
 # Defold's published SDK is the authoritative set of headers and prebuilt
@@ -90,23 +83,7 @@ if wants defold-sdk; then
   sdk_root="$sdk_parent/defoldsdk"
   sdk_sentinel="$sdk_root/.deherm-sdk-sha256"
   sdk_manifest="$sdk_root/.deherm-sdk-extraction-manifest.json"
-  valid_sdk_archive=false
-  if [[ -f "$sdk_archive" ]]; then
-    actual_sha="$(deherm_sha256_file "$sdk_archive")"
-    [[ "$actual_sha" == "$DEFOLD_SDK_SHA256" ]] && valid_sdk_archive=true
-  fi
-  if [[ "$valid_sdk_archive" != true ]]; then
-    temporary="$sdk_archive.download"
-    trap 'rm -f "$temporary"' EXIT
-    curl -fL --retry 3 --retry-delay 2 "$DEFOLD_SDK_URL" -o "$temporary"
-    actual_sha="$(deherm_sha256_file "$temporary")"
-    if [[ "$actual_sha" != "$DEFOLD_SDK_SHA256" ]]; then
-      echo "defoldsdk.zip checksum mismatch: expected $DEFOLD_SDK_SHA256, got $actual_sha" >&2
-      exit 1
-    fi
-    mv "$temporary" "$sdk_archive"
-    trap - EXIT
-  fi
+  node "$repo_root/scripts/ensure-defold-fixture.mjs" defold-sdk
   valid_sdk_extraction=false
   if [[ -f "$sdk_sentinel" ]] && [[ "$(cat "$sdk_sentinel")" == "$DEFOLD_SDK_SHA256" ]] &&
      [[ -f "$sdk_manifest" ]] && [[ -f "$sdk_root/lib/x86_64-linux/libengine.a" ]] &&

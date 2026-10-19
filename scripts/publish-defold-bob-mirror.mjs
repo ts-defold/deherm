@@ -71,7 +71,7 @@ export function expectedBobFromLock(lock, revision) {
 export function missingBobReleaseAssets(release, expectedAssets) {
   const assets = new Map();
   for (const asset of release?.assets ?? []) {
-    if (assets.has(asset.name)) throw new Error(`Bob mirror release has duplicate ${asset.name} assets`);
+    if (assets.has(asset.name)) throw new Error(`Defold mirror release has duplicate ${asset.name} assets`);
     assets.set(asset.name, asset);
   }
   const missing = [];
@@ -79,14 +79,14 @@ export function missingBobReleaseAssets(release, expectedAssets) {
     const asset = assets.get(name);
     if (!asset) missing.push(name);
     else if (asset.digest !== `sha256:${digest}` || asset.size !== size || asset.state !== "uploaded")
-      throw new Error(`Bob mirror release has invalid ${name} asset`);
+      throw new Error(`Defold mirror release has invalid ${name} asset`);
   }
   return missing;
 }
 
 export function verifyBobReleaseAssets(release, expectedAssets) {
   const missing = missingBobReleaseAssets(release, expectedAssets);
-  if (missing.length) throw new Error(`Bob mirror release is missing ${missing.join(", ")}`);
+  if (missing.length) throw new Error(`Defold mirror release is missing ${missing.join(", ")}`);
 }
 
 async function gh(args, run) {
@@ -115,7 +115,7 @@ async function waitForRelease(tag, run) {
     if (release) return release;
     if (attempt < 7) await sleep(1000);
   }
-  throw new Error(`Bob mirror ${tag} was created but is not readable`);
+  throw new Error(`Defold mirror ${tag} was created but is not readable`);
 }
 
 async function waitForReleaseAssets(tag, run, expectedAssets) {
@@ -124,16 +124,19 @@ async function waitForReleaseAssets(tag, run, expectedAssets) {
     if (release && missingBobReleaseAssets(release, expectedAssets).length === 0) return release;
     if (attempt < 7) await sleep(1000);
   }
-  throw new Error(`Bob mirror ${tag} did not expose every uploaded asset`);
+  throw new Error(`Defold mirror ${tag} did not expose every uploaded asset`);
 }
 
-export async function publishBobMirror({
-  workspace,
-  revision,
-  target,
-  run = execFileAsync,
-  verifyDownload = verifyBobMirrorDownload,
-}) {
+export async function defoldLicenseAssets(workspace) {
+  return Promise.all(
+    licenseFiles.map(async (name) => {
+      const file = path.join(workspace, "upstream/defold", name);
+      return { name, file, digest: await fileSha256(file), size: (await stat(file)).size };
+    }),
+  );
+}
+
+export async function publishBobMirror({ workspace, revision, target, run, verifyDownload }) {
   const tag = bobMirrorTag(revision);
   const lock = await readFile(path.join(workspace, "upstream.lock"), "utf8");
   const expectedDigest = expectedBobFromLock(lock, revision);
@@ -147,30 +150,55 @@ export async function publishBobMirror({
   const sidecarDigest = createHash("sha256").update(sidecar).digest("hex");
   const expectedAssets = [
     { name: "bob.jar", file: bob, digest: expectedDigest, size: bobSize },
-    { name: "bob.jar.sha256", digest: sidecarDigest, size: Buffer.byteLength(sidecar) },
+    { name: "bob.jar.sha256", content: sidecar, digest: sidecarDigest, size: Buffer.byteLength(sidecar) },
   ];
-  for (const name of licenseFiles) {
-    const file = path.join(workspace, "upstream/defold", name);
-    expectedAssets.push({ name, file, digest: await fileSha256(file), size: (await stat(file)).size });
-  }
+  expectedAssets.push(...(await defoldLicenseAssets(workspace)));
+  return publishDefoldMirror({
+    tag,
+    target,
+    expectedAssets,
+    run,
+    verifyDownload,
+    title: `Defold Bob ${revision.slice(0, 12)}`,
+    notes: releaseNotes(revision, expectedDigest, false),
+    verifiedNotes: releaseNotes(revision, expectedDigest, true),
+    downloads: [{ url: bobMirrorUrl(revision), digest: expectedDigest }],
+  });
+}
+
+/** One immutable draft/upload/verify/publication contract for Defold mirrors. */
+export async function publishDefoldMirror({
+  tag,
+  target,
+  expectedAssets,
+  title,
+  notes,
+  verifiedNotes,
+  downloads,
+  run = execFileAsync,
+  verifyDownload = verifyBobMirrorDownload,
+}) {
+  const verifyDownloads = async () => {
+    for (const { url, digest } of downloads) await verifyPublicDownload(url, digest, verifyDownload);
+  };
+  const url = downloads[0].url;
   let release = await releaseForTag(tag, run);
   if (release && !release.draft) {
     verifyBobReleaseAssets(release, expectedAssets);
-    if (!release.body?.includes(`Verified public download SHA-256: ${expectedDigest}`)) {
-      await verifyPublicDownload(bobMirrorUrl(revision), expectedDigest, verifyDownload);
-      await gh(
-        ["release", "edit", tag, "--repo", repository, "--notes", releaseNotes(revision, expectedDigest, true)],
-        run,
-      );
+    if (release.body !== verifiedNotes) {
+      await verifyDownloads();
+      await gh(["release", "edit", tag, "--repo", repository, "--notes", verifiedNotes], run);
     }
-    return { tag, url: bobMirrorUrl(revision), reused: true };
+    return { tag, url, reused: true };
   }
-  if (!release && !target) throw new Error("A target commit is required to publish a Bob mirror");
-  const temporary = await mkdtemp(path.join(tmpdir(), "deherm-bob-mirror-"));
+  if (!release && !target) throw new Error("A target commit is required to publish a Defold mirror");
+  const temporary = await mkdtemp(path.join(tmpdir(), "deherm-defold-mirror-"));
   try {
-    const sidecarPath = path.join(temporary, "bob.jar.sha256");
-    await writeFile(sidecarPath, sidecar);
-    expectedAssets[1].file = sidecarPath;
+    for (const asset of expectedAssets) {
+      if (asset.content === undefined) continue;
+      asset.file = path.join(temporary, asset.name);
+      await writeFile(asset.file, asset.content);
+    }
     if (!release) {
       await gh(
         [
@@ -182,9 +210,9 @@ export async function publishBobMirror({
           "--target",
           target,
           "--title",
-          `Defold Bob ${revision.slice(0, 12)}`,
+          title,
           "--notes",
-          releaseNotes(revision, expectedDigest, false),
+          notes,
           "--draft",
           "--latest=false",
         ],
@@ -192,7 +220,7 @@ export async function publishBobMirror({
       );
       release = await waitForRelease(tag, run);
     }
-    if (!release?.draft) throw new Error(`Bob mirror ${tag} is not a draft`);
+    if (!release?.draft) throw new Error(`Defold mirror ${tag} is not a draft`);
     const missing = missingBobReleaseAssets(release, expectedAssets);
     if (missing.length) {
       const paths = missing.map((name) => expectedAssets.find((asset) => asset.name === name).file);
@@ -202,14 +230,11 @@ export async function publishBobMirror({
     verifyBobReleaseAssets(release, expectedAssets);
     await gh(["release", "edit", tag, "--repo", repository, "--draft=false"], run);
     release = await releaseForTag(tag, run);
-    if (release?.draft) throw new Error(`Bob mirror ${tag} remained a draft after publication`);
+    if (release?.draft) throw new Error(`Defold mirror ${tag} remained a draft after publication`);
     verifyBobReleaseAssets(release, expectedAssets);
-    await verifyPublicDownload(bobMirrorUrl(revision), expectedDigest, verifyDownload);
-    await gh(
-      ["release", "edit", tag, "--repo", repository, "--notes", releaseNotes(revision, expectedDigest, true)],
-      run,
-    );
-    return { tag, url: bobMirrorUrl(revision), reused: false };
+    await verifyDownloads();
+    await gh(["release", "edit", tag, "--repo", repository, "--notes", verifiedNotes], run);
+    return { tag, url, reused: false };
   } finally {
     await rm(temporary, { recursive: true, force: true });
   }

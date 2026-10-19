@@ -1,5 +1,27 @@
 # Defold Hermes knowledge log
 
+## 2026-10-19 - Recover pinned fixture inputs and authenticate consumer planning
+
+The old Bob mirror backfill completed and its public download passed SHA-256
+verification. [Run 39267376648](https://github.com/ts-defold/deherm/actions/runs/39267376648)
+then exposed a retired pinned `ref-doc.zip` URL in the aggregate fixture setup;
+its cached local docs and SDK archives both match `upstream.lock`. Bootstrap now
+validates warm inputs and can stream verified downloads from exact-revision
+fixture mirrors. That publisher reuses the Bob mirror's draft, asset-integrity,
+resume, and public-download contract. Both fixture archives are now public and
+their complete downloads passed the pinned hashes. This adds no source archive
+requirement to consumer policy realization.
+An isolated cold-cache run through the real Bob and docs resolvers observed
+HTTP 404 at both original Defold URLs, HTTP 200 at both mirror URLs, and passed
+their pinned hashes before installing either file.
+
+[Consumer smoke 39267376623](https://github.com/ts-defold/deherm/actions/runs/39267376623)
+failed during project planning with GitHub release-metadata HTTP 403. The
+reusable workflow now supplies its read-only GitHub token to generation as well
+as bundle execution. Focused fixture/cache/corruption tests and workflow lint
+pass, and the full `pnpm check` passes. Hosted results remain pending this
+follow-up.
+
 ## 2026-10-19 - Canonical checkout bytes and one verified Bob resolver
 
 [Run 39174902443](https://github.com/ts-defold/deherm/actions/runs/39174902443)

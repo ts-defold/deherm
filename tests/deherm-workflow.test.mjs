@@ -59,6 +59,7 @@ function plan({ mode = "defold", server = "", targets = "[]", consumerTargets } 
 
 test("reusable workflow has an explicit immutable action ref and runner-owned local Extender", () => {
   assert.equal(workflow.on.workflow_call.inputs["action-ref"].required, true);
+  assert.equal(workflow.env.GH_TOKEN, "${{ github.token }}");
   assert.equal(workflow.on.workflow_call.inputs["defold-sdk"].default, "");
   assert.equal(workflow.on.workflow_call.inputs["application-mode"].default, "dynamic");
   const planGeneration = workflow.jobs.plan.steps.find((step) =>
