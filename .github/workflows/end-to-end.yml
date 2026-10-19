@@ -196,7 +196,9 @@ jobs:
     needs: [local, extension-headers]
     if: github.event_name != 'push'
     name: bob ${{ matrix.target }}
-    runs-on: ubuntu-24.04
+    # Apple's final bundle tools (lipo and simulator ad-hoc codesign) are
+    # macOS-only even when Extender performed the compile remotely.
+    runs-on: ${{ (endsWith(matrix.target, '-ios') || endsWith(matrix.target, '-osx')) && 'macos-15' || 'ubuntu-24.04' }}
     env:
       GH_TOKEN: ${{ github.token }}
     strategy:

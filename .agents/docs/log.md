@@ -15,6 +15,9 @@ typechecked locally through the published policy. Its `wasm-web` bundle also
 completed through the normal CLI and production Extender. The replacement
 hosted multi-platform matrix is not yet verified; do not conflate that one
 successful target with its result.
+Apple bundle jobs use macOS runners for Bob's `lipo` and simulator ad-hoc
+`codesign`; the other targets remain on Linux. Remote compilation does not
+replace these local platform bundling tools.
 
 ## 2026-10-19 - Preserve queued source validation during artifact callbacks
 

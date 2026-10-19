@@ -33,6 +33,7 @@ test("consumer matrix shares the selected channel SHA and uses project-locked bu
   assert.match(workflow, /--channel "\$\{\{ inputs.defold-channel \|\| 'stable' \}\}"/u);
   assert.match(workflow, /--defold-sdk "\$\{\{ needs.local.outputs.revision \}\}"/u);
   assert.doesNotMatch(workflow, /bootstrap-bob\.sh/u);
+  assert.match(workflow, /endsWith\(matrix.target, '-ios'\).*endsWith\(matrix.target, '-osx'\).*'macos-15'/u);
   assert.doesNotMatch(gate, /manage-native-artifacts\.mjs|await run\(path.join\(root, "scripts", "bob.sh"\)/u);
   assert.match(gate, /await node\(\s*"bin\/deherm.mjs",\s*\[\s*"bundle"/u);
   assert.match(gate, /assertProjectNativeArtifact\(projectRoot, row.target/u);
