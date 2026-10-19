@@ -12,9 +12,13 @@ the generated project's policy and builds through `deherm bundle`, including
 project-locked Bob. The contributor fixture lock is unchanged. Focused gate
 tests pass, and current stable `a81dbb0` resolved, scaffolded, generated and
 typechecked locally through the published policy. Its `wasm-web` bundle also
-completed through the normal CLI and production Extender. The replacement
-hosted multi-platform matrix is not yet verified; do not conflate that one
-successful target with its result.
+completed through the normal CLI and production Extender. Linux target archive
+installation and digest verification passed locally. The full local `pnpm
+check` passed. Replacement hosted run
+[39276254615](https://github.com/ts-defold/deherm/actions/runs/39276254615)
+passed consumer preparation and all eleven exercised Bob bundle targets,
+including web, every Android architecture, Apple, Linux, and Windows. This is
+compile/link/bundle evidence, not an interactive gameplay or device-run claim.
 Apple bundle jobs use macOS runners for Bob's `lipo` and simulator ad-hoc
 `codesign`; the other targets remain on Linux. Remote compilation does not
 replace these local platform bundling tools.

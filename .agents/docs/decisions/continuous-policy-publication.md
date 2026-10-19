@@ -4,7 +4,7 @@ title: Continuous policy generation, engine evidence, and publication
 description: One nightly policy workflow derives every tracked Defold revision, emits every mechanically representable API, records verification without gating publication, and publishes the accumulated policy store directly to the website.
 tags: [decision, generator, policy, ci, conformance, pages]
 status: accepted
-generated: { by: codex/gpt-6, at: 2026-10-19T15:12:50Z }
+generated: { by: codex/gpt-6, at: 2026-10-19T15:22:07Z }
 sources:
   - resource: ../../../scripts/check-end-to-end.mjs
     title: Project-locked consumer build gate
@@ -110,6 +110,9 @@ hosted Extender still retains it. Five targets in run 39274342444 rejected the
 old fixture SHA as nonexistent while other workers still built it from cache.
 Regression tests require one channel resolution, exact-SHA propagation, and
 project-owned build inputs; a successful local plan is not a hosted build.
+The replacement run 39276254615 passed every exercised compile/link/bundle
+target against current stable, and local `pnpm check` passed. This does not
+claim an interactive run on every device.
 
 The revision-discovery path is the same on push, pull request, schedule, and
 ordinary manual dispatch. Only an explicit revision replaces discovery and an
