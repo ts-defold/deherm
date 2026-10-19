@@ -4,7 +4,7 @@ title: Continuous policy generation, engine evidence, and publication
 description: One nightly policy workflow derives every tracked Defold revision, emits every mechanically representable API, records verification without gating publication, and publishes the accumulated policy store directly to the website.
 tags: [decision, generator, policy, ci, conformance, pages]
 status: accepted
-generated: { by: codex/gpt-6.1-sol, at: 2026-10-18T22:10:00Z }
+generated: { by: codex/gpt-6, at: 2026-10-19T14:06:37Z }
 sources:
   - id: generate-report
     resource: ./generate-report-never-gate.md
@@ -41,6 +41,14 @@ sources:
   - id: site-parity
     resource: ../../../scripts/check-policy-site-parity.mjs
     title: Cross-host policy-site byte parity
+    author: project:deherm
+  - id: checkout-bytes
+    resource: ../../../.gitattributes
+    title: Canonical checkout newlines
+    author: project:deherm
+  - id: repository-bob
+    resource: ../../../scripts/ensure-repository-bob.mjs
+    title: Repository bootstrap using the installed CLI's verified Bob resolver
     author: project:deherm
   - id: defold-license
     resource: https://github.com/defold/defold/blob/dev/LICENSE.txt
@@ -153,6 +161,14 @@ updates issues, but does not withhold a coherent policy. The workflow never
 waits for a review PR. Pull requests remain useful for generator code changes,
 not as a checkpoint for mechanically derived engine revisions.
 
+Git checkouts use LF for text on every host. Artifact release fingerprints hash
+the actual recipe bytes; allowing Windows `autocrlf` to rewrite those inputs
+would manufacture different release tags for the same repository revision.
+The newline policy fixes the input boundary without weakening byte integrity.
+A temporary Git checkout test enables `autocrlf`, reproduces the divergent
+fingerprints without attributes, then verifies all family and target-recipe
+fingerprints under the repository attributes.[^checkout-bytes]
+
 The engine step is allowed to continue long enough to upload reports and update
 issues after a failure, but an infrastructure, compile, link, or harness failure
 still makes the engine job red at its final enforcement step. An unexecuted or
@@ -189,6 +205,10 @@ The installed CLI tries the policy's original Defold URL first, then the
 release URL for that exact revision. Both sources must match the policy's
 Bob SHA-256 before any bytes enter the project cache. The mirror is an
 availability source, never an authority that can change a pinned toolchain.
+Repository and CI bootstrap call that same resolver, storing its verified JAR
+in `build/tooling/bob.jar`; they must not maintain a separate source-only curl
+path. Both a selected policy and a pinned fixture therefore retain the same
+mirror behavior.[^repository-bob]
 Older indexed revisions are not retroactively mirrored by this main-run path;
 they need a bounded backfill while their source archives remain available.
 The War Battles Action smoke keeps its checked-in `7f0f554` game/evidence
@@ -239,8 +259,8 @@ directory and then compares the installed policy index with the archive's own
 index bytes. Merely finding pre-existing generated directories is not an
 installation proof, particularly on Windows where a tar `-C` path can be
 interpreted differently from a process cwd.
-Local mutation and mismatch tests cover this contract. Its first GitHub CI
-execution remains separate evidence.[^policy-workflow][^native-workflow][^surface-identity]
+Local mutation and mismatch tests cover this contract. Installation and final
+site-byte parity remain separate checks.[^policy-workflow][^native-workflow][^surface-identity]
 
 The derivation job also builds a disposable site to exercise the site emitter
 before host-parity and publication. That build uses `--validation-only`: its

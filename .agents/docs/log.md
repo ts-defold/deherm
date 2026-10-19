@@ -1,5 +1,26 @@
 # Defold Hermes knowledge log
 
+## 2026-10-19 - Canonical checkout bytes and one verified Bob resolver
+
+[Run 39174902443](https://github.com/ts-defold/deherm/actions/runs/39174902443)
+proved Windows installs and resolves all 19 revisions and 771 site files. Its
+site digest differed because Windows changed artifact-recipe text to CRLF.
+A temporary Git checkout with `autocrlf=true` reproduced the observed Windows
+Linux tag `libs-linux-a24d3bb65c53`; canonical LF gives
+`libs-linux-ee0720bc4a9c`. `.gitattributes` now preserves canonical text bytes,
+and the checkout regression verifies every artifact family and target recipe.
+
+The same run's release-readiness and consumer build smoke passed, including
+both web and Linux War Battles builds. Later policy engine and all-target Bob
+runs failed in the repository's separate source-only `bootstrap-bob.sh` after
+Defold retired those Bob URLs. Bootstrap now uses the installed CLI's verified
+mirror resolver and existing `build/tooling` cache. Focused tests cover a cold
+404 fallback, warm reuse, and corruption rejection. The locally cached pinned
+`7f0f554` Bob has SHA-256
+`8a8a8c4ebc725279d8ddae17c4eb3d72d6db90a498302960ca341e61fa489cb8`;
+its mirror backfill is in progress. New hosted parity and Bob results remain
+pending these changes.
+
 ## 2026-10-18 - Windows installer reaches tar and rejects the MSYS path seam
 
 [Policy run 39173743198](https://github.com/ts-defold/deherm/actions/runs/39173743198)

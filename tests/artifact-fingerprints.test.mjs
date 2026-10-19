@@ -7,10 +7,12 @@
 // checkout. Nothing in this file writes inside the repository.
 
 import assert from "node:assert/strict";
-import { cp, mkdir, mkdtemp, readFile, rm, symlink, writeFile } from "node:fs/promises";
+import { execFile } from "node:child_process";
+import { cp, mkdir, mkdtemp, readFile, readdir, rm, symlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
+import { promisify } from "node:util";
 
 import { releaseAssetUrlTemplate } from "../packages/cli/src/release-assets.mjs";
 import { RELEASE_INTEGRITY_KIND, sha256 } from "../packages/cli/src/release-integrity.mjs";
@@ -37,6 +39,54 @@ import {
 
 const lockPath = path.join(repositoryRoot, "upstream.lock");
 const bundleTargetsRelative = "packages/toolchains/defold-bundle-targets.json";
+const run = promisify(execFile);
+
+test("Git checkout preserves every release fingerprint when autocrlf is enabled", async (t) => {
+  const temporary = await mkdtemp(path.join(tmpdir(), "deherm-checkout-fingerprint-"));
+  t.after(() => rm(temporary, { recursive: true, force: true }));
+  const source = path.join(temporary, "source");
+  await mkdir(source);
+  const inputs = new Set([
+    "upstream.lock",
+    bundleTargetsRelative,
+    "packages/toolchains/host-compilers.json",
+    "packages/toolchains/native-artifacts.json",
+  ]);
+  for (const family of Object.values(artifactFamilies)) {
+    for (const file of family.files) inputs.add(file);
+    for (const { file } of family.json) inputs.add(file);
+    for (const tree of family.trees ?? []) {
+      for (const file of await readdir(path.join(repositoryRoot, tree.directory), { recursive: true })) {
+        if (tree.suffixes.some((suffix) => file.endsWith(suffix)))
+          inputs.add(`${tree.directory}/${file.replaceAll("\\", "/")}`);
+      }
+    }
+  }
+  for (const file of inputs) {
+    await mkdir(path.dirname(path.join(source, file)), { recursive: true });
+    await cp(path.join(repositoryRoot, file), path.join(source, file));
+  }
+  const git = (args) => run("git", ["-c", "core.autocrlf=true", ...args], { cwd: source });
+  await git(["init", "--quiet"]);
+  await git(["add", "."]);
+  const ungoverned = path.join(temporary, "autocrlf");
+  await git(["checkout-index", "--all", `--prefix=${ungoverned.replaceAll("\\", "/")}/`]);
+  assert.notEqual(await fingerprintFamily("hermes-host", { root: ungoverned }), await fingerprintFamily("hermes-host"));
+  t.diagnostic(
+    `CRLF Linux recipe: ${(await nativeArtifactRelease("linux", { root: ungoverned })).tag}; canonical: ${(await nativeArtifactRelease("linux")).tag}`,
+  );
+  await cp(path.join(repositoryRoot, ".gitattributes"), path.join(source, ".gitattributes"));
+  await git(["add", ".gitattributes"]);
+  const governed = path.join(temporary, "canonical");
+  await git(["checkout-index", "--all", `--prefix=${governed.replaceAll("\\", "/")}/`]);
+  assert.deepEqual(await fingerprintAll(governed), await fingerprintAll(repositoryRoot));
+  for (const recipe of Object.keys(nativeArtifactRecipes)) {
+    assert.equal(
+      await fingerprintNativeArtifactRecipe(recipe, { root: governed }),
+      await fingerprintNativeArtifactRecipe(recipe),
+    );
+  }
+});
 
 /**
  * A checkout-shaped tree whose `upstream.lock` and bundle-target list are this

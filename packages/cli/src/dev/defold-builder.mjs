@@ -51,7 +51,8 @@ export async function ensureBob(projectRoot, lock, options = {}) {
   if (!metadata.url.startsWith("https://") || !/^[a-f0-9]{64}$/.test(metadata.sha256)) {
     throw new Error("deherm.lock contains invalid Bob toolchain metadata");
   }
-  const directory = path.join(projectRoot, ".deherm", "cache", "toolchains", lock.defoldRevision);
+  const directory =
+    options.cacheDirectory ?? path.join(projectRoot, ".deherm", "cache", "toolchains", lock.defoldRevision);
   const target = path.join(directory, "bob.jar");
   if (await exists(target)) {
     const current = sha256(await readFile(target));

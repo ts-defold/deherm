@@ -6,6 +6,7 @@ import path from "node:path";
 import test from "node:test";
 
 import { bobMirrorUrl } from "../packages/cli/src/dev/bob-mirror.mjs";
+import { ensureRepositoryBob } from "../scripts/ensure-repository-bob.mjs";
 import {
   expectedBobFromLock,
   missingBobReleaseAssets,
@@ -16,6 +17,34 @@ import {
 
 const sha256 = (bytes) => createHash("sha256").update(bytes).digest("hex");
 const revision = "c".repeat(40);
+
+test("repository Bob bootstrap uses the same verified mirror and cache as the installed CLI", async (t) => {
+  const workspace = await mkdtemp(path.join(tmpdir(), "deherm-repository-bob-"));
+  t.after(() => rm(workspace, { recursive: true, force: true }));
+  const bytes = Buffer.from("pinned repository Bob");
+  const url = `https://d.defold.com/archive/${revision}/bob/bob.jar`;
+  await writeFile(
+    path.join(workspace, "upstream.lock"),
+    `DEFOLD_REV=${revision}\nDEFOLD_BOB_URL=${url}\nDEFOLD_BOB_SHA256=${sha256(bytes)}\n`,
+  );
+  const requests = [];
+  const fetch = async (candidate) => {
+    requests.push(candidate);
+    return candidate === url ? new Response(null, { status: 404 }) : new Response(bytes);
+  };
+  const target = await ensureRepositoryBob(workspace, { fetch });
+  assert.equal(target, path.join(workspace, "build/tooling/bob.jar"));
+  assert.deepEqual(requests, [url, bobMirrorUrl(revision)]);
+  assert.deepEqual(await readFile(target), bytes);
+  await ensureRepositoryBob(workspace, { fetch });
+  assert.equal(requests.length, 2, "verified cached Bob must not require the expired source");
+  await writeFile(target, "corrupted");
+  await assert.rejects(
+    ensureRepositoryBob(workspace, { fetch: async () => new Response("wrong") }),
+    /SHA-256 mismatch/,
+  );
+  await assert.rejects(stat(target), { code: "ENOENT" });
+});
 
 test("Bob mirror publisher validates the pinned bytes, drafts, verifies, publishes, and reuses", async () => {
   const workspace = await mkdtemp(path.join(tmpdir(), "deherm-bob-publish-test-"));
