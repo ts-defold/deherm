@@ -1,5 +1,14 @@
 # Defold Hermes knowledge log
 
+## 2026-10-20 - Schedule policy discovery after the alpha release window
+
+Policy discovery is scheduled daily at 12:00 UTC (08:00 EDT, 07:00 EST), as
+requested. On October 20 discovery read the channels at 10:05:37 UTC, while
+Defold's alpha channel metadata was updated at 10:06:58 UTC. The successful
+run therefore published the preceding alpha rather than failing to derive
+the new one. The workflow contract test now checks the intended schedule.
+This is a scheduled start time, not a guarantee against hosted-runner delays.
+
 ## 2026-10-19 - Separate hosted consumer builds from historical SDK fixtures
 
 Policy refresh 39269809365 passed derivation, host parity, publication, deployed

@@ -9,7 +9,8 @@ name: policy
 
 on:
   schedule:
-    - cron: '17 5 * * *'
+    # 08:00 EDT (fixed UTC-4); 07:00 EST in winter. Hosted runs may queue.
+    - cron: '0 12 * * *'
   push:
     branches: [main]
   pull_request:
