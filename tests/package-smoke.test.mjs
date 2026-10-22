@@ -285,6 +285,7 @@ test("packed npm artifact loads its CLI and one-shot dev compiler", async (t) =>
     "packages/cli/src/ci-bundle.mjs",
     "packages/cli/src/lsp/server.mjs",
     "packages/cli/src/lsp/resource-semantics.mjs",
+    "packages/cli/src/dev/debug-source-scopes.mjs",
     "packages/sdk/src/host.ts",
     "packages/compiler/src/dmsdk-universal-jsi-exact-runner.mjs",
     "packages/compiler/src/dmsdk-universal-static-frame.mjs",

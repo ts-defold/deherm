@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { EventEmitter } from "node:events";
 import path from "node:path";
 import { PassThrough } from "node:stream";
 import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
@@ -24,15 +25,15 @@ async function waitFor(predicate, description, timeoutMilliseconds = 2_000) {
   }
 }
 
-async function sourceMapFixture(t) {
+async function sourceMapFixture(
+  t,
+  input = ["export function tick(): number {", "  const answer: number = 42;", "  return answer;", "}", ""].join("\n"),
+) {
   const root = await mkdtemp(path.join(tmpdir(), "deherm-dap-"));
   t.after(() => rm(root, { recursive: true, force: true }));
   const source = path.join(root, "game.script.ts");
   const generated = path.join(root, ".deherm", "dev", "app.js");
   const map = `${generated}.map`;
-  const input = ["export function tick(): number {", "  const answer: number = 42;", "  return answer;", "}", ""].join(
-    "\n",
-  );
   const result = await transform(input, {
     loader: "ts",
     sourcefile: source,
@@ -191,9 +192,12 @@ test("DAP adapter maps breakpoints, stack, scopes, variables, evaluate, and relo
     initialized.body.exceptionBreakpointFilters.map(({ filter }) => filter),
     ["uncaught", "all"],
   );
-  adapter.afterResponse(request(1, "initialize"));
+  adapter.afterResponse(request(1, "initialize"), initialized);
+  assert.equal(events.length, 0, "configuration must not start before the inspector is attached");
+  const attached = await adapter.handle(request(2, "attach"));
+  assert.equal(attached.success, true);
+  adapter.afterResponse(request(2, "attach"), attached);
   assert.equal(events.at(-1).event, "initialized");
-  assert.equal((await adapter.handle(request(2, "attach"))).success, true);
 
   const set = await adapter.handle(
     request(3, "setBreakpoints", {
@@ -252,8 +256,198 @@ test("DAP adapter maps breakpoints, stack, scopes, variables, evaluate, and relo
   assert.equal(variables.body.variables[0].value, "42");
   const evaluated = await adapter.handle(request(7, "evaluate", { frameId, expression: "answer" }));
   assert.equal(evaluated.body.result, "42");
+  await writeFile(fixture.source, `${await readFile(fixture.source, "utf8")}\n// edited after bundle\n`);
+  const breakpointCalls = calls.filter(({ method }) => method === "Debugger.setBreakpointByUrl").length;
+  const stale = await adapter.handle(
+    request(71, "setBreakpoints", {
+      source: { path: fixture.source },
+      breakpoints: [{ line: 2, column: 3 }],
+    }),
+  );
+  assert.equal(stale.body.breakpoints[0].verified, false);
+  assert.match(stale.body.breakpoints[0].message, /differs from the running bundle/u);
+  assert.equal(
+    calls.filter(({ method }) => method === "Debugger.setBreakpointByUrl").length,
+    breakpointCalls,
+    "a stale authored location must not bind to an older generated instruction",
+  );
+  const unsaved = await adapter.handle(
+    request(72, "setBreakpoints", {
+      source: { path: fixture.source },
+      sourceModified: true,
+      breakpoints: [{ line: 2, column: 3 }],
+    }),
+  );
+  assert.equal(unsaved.body.breakpoints[0].verified, false);
+  assert.match(unsaved.body.breakpoints[0].message, /editor buffer is unsaved/u);
   assert.equal((await adapter.handle(request(8, "disconnect"))).success, true);
   assert.equal(calls.at(-1).method, "Debugger.resume", "disconnect resumes a paused game before detaching");
+});
+
+test("authored arguments, locals, and module scopes precede this/global and stale references fail closed", async (t) => {
+  const fixture = await sourceMapFixture(
+    t,
+    [
+      "const UP = '#up';",
+      "export function onInput(self: object, actionId: string, action: object): boolean {",
+      "  const direction = actionId === UP ? 0 : 1;",
+      "  return direction === 0;",
+      "}",
+      "",
+    ].join("\n"),
+  );
+  const listeners = new Map();
+  const client = {
+    onEvent(name, listener) {
+      listeners.set(name, listener);
+    },
+    async send(method, params) {
+      if (method === "Debugger.evaluateOnCallFrame") {
+        if (params.expression === "actionId") return { result: { type: "string", value: "#left" } };
+        if (params.expression === "action") return { result: { type: "object", objectId: "action-1" } };
+        if (params.expression === "self") return { result: { type: "object", objectId: "self-1" } };
+        if (params.expression === "direction") return { result: { type: "number", value: 0 } };
+        if (params.expression === "UP") return { result: { type: "string", value: "#up" } };
+        if (params.expression === "onInput") return { result: { type: "function", objectId: "function-1" } };
+      }
+      return {};
+    },
+    async close() {},
+  };
+  const adapter = await createDapAdapter({
+    projectRoot: fixture.root,
+    discoverInspectorTarget: async () => ({
+      session: {
+        projectRoot: fixture.root,
+        bundleUrl: "deherm:///deherm/app.dehermc",
+        sourceMapFile: fixture.map,
+      },
+      target: { webSocketDebuggerUrl: "ws://127.0.0.1:9001/devtools/page/deherm" },
+    }),
+    connectCdp: async () => client,
+  });
+  assert.equal((await adapter.handle(request(1, "attach"))).success, true);
+  listeners.get("Debugger.scriptParsed")({ scriptId: "script-1", url: "deherm:///deherm/app.dehermc" });
+  const map = new DebugSourceMap(fixture.map);
+  await map.refresh();
+  const generated = map.generated(fixture.source, 4, 3);
+  await listeners.get("Debugger.paused")({
+    reason: "breakpoint",
+    callFrames: [
+      {
+        callFrameId: "on-input-1",
+        functionName: "onInput",
+        location: { scriptId: "script-1", lineNumber: generated.line - 1, columnNumber: generated.column },
+        scopeChain: [{ type: "global", object: { objectId: "global-1" } }],
+        this: { objectId: "this-1", type: "object" },
+      },
+    ],
+  });
+  const scopes = await adapter.handle(request(2, "scopes", { frameId: 1 }));
+  assert.deepEqual(
+    scopes.body.scopes.map(({ name }) => name),
+    ["Arguments", "Locals", "Module", "this", "global"],
+  );
+  const reference = scopes.body.scopes[0].variablesReference;
+  const values = await adapter.handle(request(3, "variables", { variablesReference: reference }));
+  assert.deepEqual(
+    values.body.variables.map(({ name }) => name),
+    ["self", "actionId", "action"],
+  );
+  assert.equal(values.body.variables[1].value, '"#left"');
+  const locals = await adapter.handle(
+    request(31, "variables", { variablesReference: scopes.body.scopes[1].variablesReference }),
+  );
+  assert.deepEqual(
+    locals.body.variables.map(({ name }) => name),
+    ["direction"],
+  );
+  const module = await adapter.handle(
+    request(32, "variables", { variablesReference: scopes.body.scopes[2].variablesReference }),
+  );
+  assert.deepEqual(
+    module.body.variables.map(({ name }) => name),
+    ["UP", "onInput"],
+  );
+  listeners.get("Debugger.resumed")();
+  assert.equal((await adapter.handle(request(4, "variables", { variablesReference: reference }))).success, false);
+});
+
+test("DAP launch owns only its fresh dev process and stops it on disconnect", async (t) => {
+  const fixture = await sourceMapFixture(t);
+  const child = new EventEmitter();
+  child.pid = 4242;
+  child.exitCode = null;
+  child.signalCode = null;
+  child.stdout = new EventEmitter();
+  child.stderr = new EventEmitter();
+  child.kill = (signal) => {
+    child.signalCode = signal;
+    child.emit("exit", null, signal);
+    return true;
+  };
+  const spawned = [];
+  let reads = 0;
+  const session = {
+    sessionId: "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+    pid: child.pid,
+    projectRoot: fixture.root,
+    bundleUrl: "deherm:///deherm/app.dehermc",
+    sourceMapFile: fixture.map,
+    websocketUrl: "ws://127.0.0.1:9001/devtools/page/deherm",
+  };
+  const adapter = await createDapAdapter({
+    projectRoot: fixture.root,
+    cliPath: path.join(fixture.root, "bin", "deherm.mjs"),
+    spawnDev: (...args) => {
+      spawned.push(args);
+      return child;
+    },
+    readInspectorSession: async () => (++reads === 1 ? { sessionId: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa" } : session),
+    discoverInspectorTarget: async () => ({ session, target: { webSocketDebuggerUrl: session.websocketUrl } }),
+    connectCdp: async () => ({
+      onEvent() {},
+      async send() {
+        return {};
+      },
+      async close() {},
+    }),
+  });
+  const missing = await adapter.handle(request(1, "launch"));
+  assert.equal(missing.success, false);
+  assert.match(missing.message, /requires an authored TypeScript 'entry'/u);
+  assert.equal((await adapter.handle(request(2, "launch", { entry: "main/snake.script.ts" }))).success, true);
+  assert.deepEqual(spawned[0][1].slice(1, 7), [
+    "dev",
+    "--project",
+    fixture.root,
+    "--entry",
+    "main/snake.script.ts",
+    "--headless",
+  ]);
+  assert.equal((await adapter.handle(request(3, "disconnect"))).success, true);
+  assert.equal(child.signalCode, "SIGTERM");
+});
+
+test("DAP launch reports a failed spawn without waiting for an exit that cannot occur", async (t) => {
+  const fixture = await sourceMapFixture(t);
+  const child = new EventEmitter();
+  child.exitCode = null;
+  child.signalCode = null;
+  child.kill = () => assert.fail("a process without a PID must not be killed");
+  const adapter = await createDapAdapter({
+    projectRoot: fixture.root,
+    cliPath: path.join(fixture.root, "bin", "deherm.mjs"),
+    readInspectorSession: async () => null,
+    spawnDev: () => {
+      queueMicrotask(() => child.emit("error", new Error("spawn denied")));
+      return child;
+    },
+  });
+  const result = await adapter.handle(request(1, "launch", { entry: "main/snake.script.ts" }));
+  assert.equal(result.success, false);
+  assert.match(result.message, /spawn denied/u);
+  await adapter.close();
 });
 
 test("browser DAP breakpoints cover the initial bundle and numbered HMR generations", async (t) => {

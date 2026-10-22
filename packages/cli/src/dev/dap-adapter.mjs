@@ -1,11 +1,13 @@
 import path from "node:path";
-import { access } from "node:fs/promises";
+import { spawn } from "node:child_process";
+import { access, readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 
 import { connectCdp } from "./browser-host.mjs";
+import { authoredFrameScopes } from "./debug-source-scopes.mjs";
 import { DebugSourceMap } from "./debug-source-map.mjs";
 import { createDapTransport } from "./dap-protocol.mjs";
-import { defaultInspectorSessionFile, discoverInspectorTarget } from "./inspector-session.mjs";
+import { defaultInspectorSessionFile, discoverInspectorTarget, readInspectorSession } from "./inspector-session.mjs";
 
 function remoteValue(remote) {
   if (!remote) return "undefined";
@@ -18,7 +20,8 @@ function remoteValue(remote) {
 
 function scopeHint(type) {
   if (type === "global") return "globals";
-  if (type === "local" || type === "closure" || type === "catch") return "locals";
+  if (type === "local" || type === "closure" || type === "catch" || type === "script" || type === "module")
+    return "locals";
   return "registers";
 }
 
@@ -44,8 +47,12 @@ export async function createDapAdapter(options = {}) {
   const emit = options.emit ?? (() => {});
   const connect = options.connectCdp ?? connectCdp;
   const discover = options.discoverInspectorTarget ?? discoverInspectorTarget;
+  const spawnDev = options.spawnDev ?? spawn;
+  const readSession = options.readInspectorSession ?? readInspectorSession;
   let sequence = 1;
   let client;
+  let ownedDev;
+  let disconnecting = false;
   let session;
   let sourceMap;
   let paused = [];
@@ -57,9 +64,11 @@ export async function createDapAdapter(options = {}) {
   let pauseQueue = Promise.resolve();
   const frameById = new Map();
   const objectByReference = new Map();
+  const sourceScopeByReference = new Map();
   const breakpointSources = new Map();
   const cdpBreakpoints = new Map();
   const scripts = new Map();
+  const warnedScopeFrames = new Set();
   let newestBundleScriptId;
 
   const message = (value) => emit({ seq: (sequence += 1), ...value });
@@ -140,6 +149,8 @@ export async function createDapAdapter(options = {}) {
     pauseDetails = null;
     frameById.clear();
     objectByReference.clear();
+    sourceScopeByReference.clear();
+    warnedScopeFrames.clear();
     nextFrameId = 1;
     nextVariableReference = 1;
   };
@@ -151,7 +162,32 @@ export async function createDapAdapter(options = {}) {
     record.cdpIds = [];
     await refreshMap();
     const results = [];
+    const authoredSnapshot = sourceMap?.content(record.source);
+    const diskSource = await readFile(record.source, "utf8");
+    const sourceMatchesBundle = authoredSnapshot == null || authoredSnapshot === diskSource;
     for (const spec of record.breakpoints) {
+      if (record.sourceModified) {
+        results.push({
+          id: spec.id,
+          verified: false,
+          source: dapSource(record.source),
+          line: spec.line,
+          column: spec.column ?? 1,
+          message: "The editor buffer is unsaved; save and rebuild before binding this breakpoint",
+        });
+        continue;
+      }
+      if (!sourceMatchesBundle) {
+        results.push({
+          id: spec.id,
+          verified: false,
+          source: dapSource(record.source),
+          line: spec.line,
+          column: spec.column ?? 1,
+          message: "Authored source differs from the running bundle; rebuild or wait for HMR",
+        });
+        continue;
+      }
       const generated = sourceMap?.trace
         ? sourceMap.generated(record.source, spec.line, Math.max(0, (spec.column ?? 1) - 1))
         : null;
@@ -295,6 +331,121 @@ export async function createDapAdapter(options = {}) {
     await client.send("Debugger.setBreakpointsActive", { active: true }, { timeoutMs: 10_000 });
   };
 
+  const stopOwnedDev = async () => {
+    const child = ownedDev;
+    ownedDev = undefined;
+    // A failed spawn has no PID and emits error/close, not exit. Waiting for
+    // its exit event would hang error reporting and adapter shutdown.
+    if (!child?.pid || child.exitCode !== null || child.signalCode !== null) return;
+    const exited = new Promise((resolve) => child.once("exit", resolve));
+    child.kill("SIGTERM");
+    let timeout;
+    try {
+      await Promise.race([exited, new Promise((resolve) => (timeout = setTimeout(resolve, 10_000)))]);
+    } finally {
+      clearTimeout(timeout);
+    }
+    if (child.exitCode === null && child.signalCode === null) {
+      child.kill("SIGKILL");
+      await exited;
+    }
+  };
+
+  const launch = async (args = {}) => {
+    if (ownedDev) throw new Error("This debug adapter already owns a running déherm dev session");
+    if (typeof args.entry !== "string" || !args.entry.trim()) {
+      throw new Error("Launch requires an authored TypeScript 'entry' path");
+    }
+    const descriptor = args.inspectorSession ? path.resolve(projectRoot, args.inspectorSession) : sessionFile;
+    const previous = await readSession(descriptor).catch(() => null);
+    const cli = options.cliPath ?? process.argv[1];
+    if (!cli) throw new Error("Cannot locate the déherm CLI used to launch this debug adapter");
+    const child = spawnDev(
+      process.execPath,
+      [
+        path.resolve(cli),
+        "dev",
+        "--project",
+        projectRoot,
+        "--entry",
+        args.entry,
+        "--headless",
+        ...(args.inspectorSession ? ["--inspector-session", descriptor] : []),
+      ],
+      { cwd: projectRoot, env: process.env, stdio: ["ignore", "pipe", "pipe"] },
+    );
+    ownedDev = child;
+    let launchError;
+    child.on("error", (error) => {
+      launchError = error;
+    });
+    for (const [stream, category] of [
+      [child.stdout, "stdout"],
+      [child.stderr, "stderr"],
+    ]) {
+      stream?.on("data", (chunk) => event("output", { category, output: String(chunk).slice(0, 16_384) }));
+    }
+    try {
+      const deadline = Date.now() + (options.launchTimeoutMs ?? 300_000);
+      for (;;) {
+        if (launchError) throw launchError;
+        if (child.exitCode !== null || child.signalCode !== null) {
+          throw new Error(`déherm dev exited before its inspector was ready (${child.exitCode ?? child.signalCode})`);
+        }
+        const current = await readSession(descriptor).catch(() => null);
+        if (current && current.pid === child.pid && current.sessionId !== previous?.sessionId) break;
+        if (Date.now() >= deadline) throw new Error("Timed out waiting for the launched game's inspector session");
+        await new Promise((resolve) => setTimeout(resolve, 100));
+      }
+      // The bridge publishes its descriptor before Bob has built and launched
+      // the engine. Its authenticated state endpoint knows when the target is
+      // actually connected; waiting here avoids repeatedly occupying the one
+      // CDP frontend slot while the build is still in flight.
+      const readySession = await readSession(descriptor);
+      if (readySession.stateUrl && readySession.authToken) {
+        for (;;) {
+          if (child.exitCode !== null || child.signalCode !== null) {
+            throw new Error("déherm dev exited before Hermes connected");
+          }
+          if (Date.now() >= deadline) throw new Error("Timed out waiting for the launched Hermes runtime");
+          const ready = await fetch(readySession.stateUrl, {
+            headers: { authorization: `Bearer ${readySession.authToken}` },
+            signal: AbortSignal.timeout(2_000),
+          })
+            .then(async (response) => {
+              if (!response.ok) return false;
+              const state = await response.json();
+              return state.targets?.some((target) => target.status === "connected") === true;
+            })
+            .catch(() => false);
+          if (ready) break;
+          await new Promise((resolve) => setTimeout(resolve, 250));
+        }
+      }
+      for (;;) {
+        try {
+          await attach(args);
+          break;
+        } catch (error) {
+          const message = error instanceof Error ? error.message : String(error);
+          if (
+            !/runtime is not connected|not reachable|ECONNREFUSED|inspector discovery did not return/iu.test(message)
+          ) {
+            throw error;
+          }
+          if (child.exitCode !== null || child.signalCode !== null) {
+            throw new Error(`déherm dev exited while waiting for Hermes: ${message}`);
+          }
+          if (Date.now() >= deadline) throw new Error(`Timed out waiting for Hermes: ${message}`);
+          await new Promise((resolve) => setTimeout(resolve, 500));
+        }
+      }
+    } catch (error) {
+      await stopOwnedDev();
+      throw error;
+    }
+  };
+
   return {
     async handle(request) {
       try {
@@ -315,8 +466,10 @@ export async function createDapAdapter(options = {}) {
               ],
             });
           case "attach":
-          case "launch":
             await attach(request.arguments);
+            return response(request);
+          case "launch":
+            await launch(request.arguments);
             return response(request);
           case "configurationDone":
             return response(request);
@@ -331,6 +484,7 @@ export async function createDapAdapter(options = {}) {
             const source = path.resolve(requestedSource);
             await access(source);
             const record = breakpointSources.get(source) ?? { source, cdpIds: [], breakpoints: [] };
+            record.sourceModified = request.arguments?.sourceModified === true;
             record.breakpoints = (request.arguments?.breakpoints ?? []).map((breakpoint) => {
               const id = nextBreakpointId;
               nextBreakpointId += 1;
@@ -372,16 +526,80 @@ export async function createDapAdapter(options = {}) {
               variablesReference: referenceFor(scope.object),
               expensive: scope.type === "global",
             }));
-            if (callFrame.this)
-              scopes.push({
+            const mapped = mapGeneratedLocation(
+              scripts.get(callFrame.location.scriptId),
+              callFrame.location.lineNumber,
+              callFrame.location.columnNumber,
+            );
+            const sourcePath = mapped.source?.path;
+            const sourceText = sourcePath ? sourceMap?.content(sourcePath) : null;
+            const authored = await authoredFrameScopes({
+              sourcePath,
+              sourceText,
+              line: mapped.line,
+              column: mapped.column,
+            }).catch(() => null);
+            if (!authored && sourcePath?.endsWith(".ts") && !warnedScopeFrames.has(callFrame.callFrameId)) {
+              warnedScopeFrames.add(callFrame.callFrameId);
+              event("output", {
+                category: "console",
+                output: `déherm: authored local/module scopes unavailable for ${sourcePath}:${mapped.line}; the source snapshot no longer matches this bundle or could not be parsed. Hermes-reported scopes remain visible.\n`,
+              });
+            }
+            if (authored) {
+              const nativeTypes = new Set((callFrame.scopeChain ?? []).map(({ type }) => type));
+              const missingLocal = !nativeTypes.has("local");
+              const missingModule = !nativeTypes.has("script") && !nativeTypes.has("module");
+              const groups = [
+                ["Arguments", "arguments", authored.arguments, missingLocal],
+                ["Locals", "locals", authored.locals, missingLocal],
+                ["Module", "locals", authored.module, missingModule],
+              ];
+              for (const [name, presentationHint, bindings, missing] of groups.toReversed()) {
+                if (!missing || bindings.length === 0) continue;
+                const reference = nextVariableReference++;
+                sourceScopeByReference.set(reference, { callFrameId: callFrame.callFrameId, bindings });
+                scopes.unshift({ name, presentationHint, variablesReference: reference, expensive: false });
+              }
+            }
+            if (callFrame.this) {
+              const thisScope = {
                 name: "this",
                 presentationHint: "locals",
                 variablesReference: referenceFor(callFrame.this),
                 expensive: false,
-              });
+              };
+              const globalIndex = scopes.findIndex(({ presentationHint }) => presentationHint === "globals");
+              scopes.splice(globalIndex < 0 ? scopes.length : globalIndex, 0, thisScope);
+            }
             return response(request, { scopes });
           }
           case "variables": {
+            const sourceScope = sourceScopeByReference.get(request.arguments?.variablesReference);
+            if (sourceScope) {
+              const variables = [];
+              for (const name of sourceScope.bindings) {
+                const answer = await client.send(
+                  "Debugger.evaluateOnCallFrame",
+                  {
+                    callFrameId: sourceScope.callFrameId,
+                    expression: name,
+                    generatePreview: true,
+                    returnByValue: false,
+                  },
+                  { timeoutMs: 10_000 },
+                );
+                if (answer.exceptionDetails || !answer.result) continue;
+                variables.push({
+                  name,
+                  value: remoteValue(answer.result),
+                  type: answer.result.type,
+                  variablesReference: referenceFor(answer.result),
+                  evaluateName: name,
+                });
+              }
+              return response(request, { variables });
+            }
             const objectId = objectByReference.get(request.arguments?.variablesReference);
             if (!objectId) throw new Error("Unknown or stale variables reference");
             const result = await client.send(
@@ -467,9 +685,11 @@ export async function createDapAdapter(options = {}) {
             });
           case "disconnect":
           case "terminate":
+            disconnecting = true;
             if (paused.length) await client?.send("Debugger.resume", {}, { timeoutMs: 5_000 }).catch(() => {});
             await client?.close();
             client = undefined;
+            await stopOwnedDev();
             return response(request);
           default:
             throw new Error(`Unsupported DAP request: ${request.command}`);
@@ -478,13 +698,16 @@ export async function createDapAdapter(options = {}) {
         return failure(request, error);
       }
     },
-    afterResponse(request) {
-      if (request.command === "initialize") event("initialized");
+    afterResponse(request, answer) {
+      // Configuration requests can arrive as soon as initialized is emitted.
+      // The inspector must already be attached before accepting breakpoints.
+      if ((request.command === "attach" || request.command === "launch") && answer.success) event("initialized");
       if (request.command === "disconnect" || request.command === "terminate") event("terminated");
     },
     async close() {
       await client?.close();
       client = undefined;
+      if (!disconnecting) await stopOwnedDev();
     },
   };
 }
@@ -507,7 +730,7 @@ export async function runDapSession(options = {}) {
       queue = queue.then(async () => {
         const answer = await adapter.handle(request);
         transport.send(answer);
-        adapter.afterResponse(request);
+        adapter.afterResponse(request, answer);
         if (request.command === "disconnect" || request.command === "terminate") {
           transport.close();
           resolve();

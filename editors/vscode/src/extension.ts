@@ -17,6 +17,7 @@ import {
   profileLaunch,
   resolveLiveValueDocument,
   resolveDehermCli,
+  resolveDebugNode,
   selectDehermProject,
   type DehermProject,
 } from "./core.js";
@@ -301,9 +302,13 @@ class DehermDebugAdapterFactory implements vscode.DebugAdapterDescriptorFactory 
       workspaceRoot: project.workspaceRoot,
       configuredPath,
     });
-    const nodeExecutable =
+    const configuredNode =
       vscode.workspace.getConfiguration("deherm", vscode.Uri.file(project.projectRoot)).get<string>("nodePath") ||
       undefined;
+    const nodeExecutable = await resolveDebugNode({
+      configuredPath: configuredNode,
+      workspaceRoot: project.workspaceRoot,
+    });
     const launch = debugAdapterLaunch({
       cliPath,
       projectRoot: project.projectRoot,

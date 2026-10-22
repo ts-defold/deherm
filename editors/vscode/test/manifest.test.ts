@@ -6,7 +6,7 @@ import test from "node:test";
 const root = path.resolve(import.meta.dirname, "..");
 const manifest = JSON.parse(await readFile(path.join(root, "package.json"), "utf8"));
 
-test("VS Code manifest is a thin workspace extension with an attach configuration", () => {
+test("VS Code manifest is a thin workspace extension with launch and attach configurations", () => {
   assert.equal(manifest.name, "deherm");
   assert.equal(manifest.publisher, "ts-defold");
   assert.equal(manifest.main, "./dist/extension.cjs");
@@ -25,6 +25,12 @@ test("VS Code manifest is a thin workspace extension with an attach configuratio
   assert.ok(debuggerContribution);
   assert.equal(debuggerContribution.initialConfigurations[0].request, "attach");
   assert.equal(debuggerContribution.initialConfigurations[0].project, "${workspaceFolder}");
+  assert.deepEqual(debuggerContribution.configurationAttributes.launch.required, ["project", "entry"]);
+  assert.ok(
+    debuggerContribution.configurationSnippets.some(
+      ({ body }: { body: { request: string } }) => body.request === "launch",
+    ),
+  );
 });
 
 test("VSIX client depends on the protocol client but never embeds the deherm compiler package", () => {

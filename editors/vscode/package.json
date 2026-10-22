@@ -96,6 +96,27 @@
           "typescriptreact"
         ],
         "configurationAttributes": {
+          "launch": {
+            "required": [
+              "project",
+              "entry"
+            ],
+            "properties": {
+              "project": {
+                "type": "string",
+                "description": "Defold project directory or game.project file.",
+                "default": "${workspaceFolder}"
+              },
+              "entry": {
+                "type": "string",
+                "description": "Authored TypeScript entry point, relative to the Defold project."
+              },
+              "inspectorSession": {
+                "type": "string",
+                "description": "Optional inspector-session descriptor. Relative paths resolve from the Defold project root."
+              }
+            }
+          },
           "attach": {
             "required": [
               "project"
@@ -119,6 +140,17 @@
           }
         },
         "configurationSnippets": [
+          {
+            "label": "déherm: Launch game and debug",
+            "description": "Start a native déherm dev session, launch Defold, and attach Hermes.",
+            "body": {
+              "type": "deherm",
+              "request": "launch",
+              "name": "déherm: Launch game and debug",
+              "project": "${workspaceFolder}",
+              "entry": "main/main.script.ts"
+            }
+          },
           {
             "label": "déherm: Attach to running game",
             "description": "Attach to the Hermes or browser inspector published by deherm dev.",

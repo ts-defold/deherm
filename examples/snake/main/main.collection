@@ -7,6 +7,14 @@ instances {
 instances {
   id: "controller"
   prototype: "/main/controller.go"
+  component_properties {
+    id: "snake"
+    properties {
+      id: "tickSeconds"
+      value: "0.2"
+      type: PROPERTY_TYPE_NUMBER
+    }
+  }
 }
 instances {
   id: "hud"

@@ -1,4 +1,5 @@
-import { stat } from "node:fs/promises";
+import { access, stat } from "node:fs/promises";
+import { constants } from "node:fs";
 import path from "node:path";
 
 export interface DehermProject {
@@ -119,6 +120,50 @@ async function regularFile(file: string): Promise<boolean> {
     if ((error as NodeJS.ErrnoException)?.code === "ENOENT") return false;
     throw error;
   }
+}
+
+async function executableFile(file: string): Promise<boolean> {
+  if (!(await regularFile(file))) return false;
+  try {
+    await access(file, constants.X_OK);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/** VS Code treats a bare `node` debug-adapter command as its Electron helper. */
+export async function resolveDebugNode({
+  configuredPath,
+  workspaceRoot = process.cwd(),
+  environment = process.env,
+  platform = process.platform,
+  isExecutable = executableFile,
+}: {
+  configuredPath?: string;
+  workspaceRoot?: string;
+  environment?: NodeJS.ProcessEnv;
+  platform?: NodeJS.Platform;
+  isExecutable?: (file: string) => Promise<boolean>;
+} = {}): Promise<string> {
+  const paths = pathsFor(platform);
+  const requested = configuredPath?.trim();
+  if (requested && (paths.isAbsolute(requested) || /[\\/]/u.test(requested))) {
+    const candidate = paths.isAbsolute(requested) ? paths.resolve(requested) : paths.resolve(workspaceRoot, requested);
+    if (await isExecutable(candidate)) return candidate;
+    throw new Error(`Configured deherm.nodePath is not an executable file: ${candidate}`);
+  }
+  const command = requested || (platform === "win32" ? "node.exe" : "node");
+  const pathValue =
+    platform === "win32"
+      ? Object.entries(environment).find(([key]) => key.toLowerCase() === "path")?.[1]
+      : environment.PATH;
+  for (const directory of (pathValue ?? "").split(platform === "win32" ? ";" : ":")) {
+    if (!directory) continue;
+    const candidate = paths.resolve(directory, command);
+    if (await isExecutable(candidate)) return candidate;
+  }
+  throw new Error(`Could not find ${command} on PATH; set deherm.nodePath to a Node.js executable`);
 }
 
 export async function resolveDehermCli({

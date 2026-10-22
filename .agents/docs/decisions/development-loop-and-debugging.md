@@ -4,8 +4,12 @@ title: Make ttsc, hot reload, CDP debugging, and profiling one development loop
 description: Use ttsc for semantic transforms, reload complete runtime generations safely, and expose Hermes/browser debugging through CDP and VS Code.
 tags: [decision, ttsc, hot-reload, vscode, debugging, profiling]
 status: proposed
-generated: { by: codex/gpt-5, at: 2026-09-17T15:20:00-04:00 }
+generated: { by: codex/gpt-6, at: 2026-10-22T01:00:00Z }
 sources:
+  - resource: ../../../packages/cli/src/dev/dap-adapter.mjs
+    title: Authored debugger scopes and owned launch lifecycle
+  - resource: ../../../packages/cli/src/dev/debug-source-scopes.mjs
+    title: TypeScript snapshot scope extraction
   - id: hermes-cdp
     resource: https://github.com/facebook/hermes/tree/4947871513667919bf2fe225134af3e3a1a3772c/API/hermes/cdp
     title: Pinned Hermes Chrome DevTools Protocol API
@@ -197,7 +201,42 @@ stdin/stdout. It maps authored `.ts` breakpoints and stack frames through the
 live composed source map, exposes scopes, variables, watches and source
 content, carries conditional breakpoints and exception policy, and reapplies
 breakpoints whenever HMR reports the stable bundle URL as a newly parsed
-script. Detaching while paused resumes before releasing the one native frontend.
+script. Its DAP `initialized` event follows a successful `attach`/`launch`,
+not merely the `initialize` capabilities response: VS Code may send breakpoint
+and exception configuration immediately after that event, so the inspector
+frontend must already be connected. Detaching while paused resumes before
+releasing the one native frontend.
+The thin VS Code client resolves the Node executable to an absolute file before
+creating its debug-adapter process. A bare `node` command in this VS Code launch
+path may instead invoke the app's Electron helper, which cannot load the CLI's
+top-level-await entrypoint. The installed-package Snake probe reproduced the
+brief attach toolbar and then reached a persistent, verified breakpoint in
+`onInput` after absolute-Node launch and native engine restart; this is live
+editor/engine evidence, distinct from the focused DAP unit test.
+The live probe also showed Hermes reporting only global/`this` scopes for an
+authored component frame, although `evaluateOnCallFrame` correctly resolves
+`self` and callback arguments on hover. The DAP now parses the source-map's
+authored TypeScript snapshot with the same TypeScript 7 parser family used by
+component generation. It derives candidate arguments, active block locals,
+and module bindings at the paused source coordinate, then lazily evaluates
+each name in Hermes. Runtime failures/optimized-away values are omitted; the
+source text never supplies a fabricated value. Native Hermes scopes remain
+authoritative when present. Synthetic references are invalidated on resume,
+`this` stays ahead of the expensive global scope, and a changed source file
+suppresses stale scope metadata with one Debug Console explanation per frame.
+Likewise, a breakpoint against an authored file that differs from the active
+source-map snapshot is unverified until rebuild/HMR, rather than verifying an
+old generated instruction; an unsaved editor buffer is also unverified. The
+breakpoint reason is surfaced in VS Code, and missing authored scope metadata
+emits one Debug Console explanation per frame instead of silently disappearing.
+The VS Code `launch` request owns a new headless `deherm dev` child, waits for
+an inspector descriptor with that exact child PID and a fresh session ID,
+then attaches; disconnect sends SIGTERM only to that owned child. `attach`
+never owns or stops an operator-run dev session. Focused DAP/AST tests cover
+failed process spawning without waiting for a nonexistent exit event,
+launch ownership, location-sensitive
+scope membership, scope order, values, stale references, and source drift;
+live editor validation of the expanded scopes is tracked separately below.
 HTML5 uses the browser's existing CDP endpoint with the same authored source
 paths. The project-owned browser inspector descriptor records Chrome's exact
 dynamic target WebSocket, while the DAP binds breakpoints by the

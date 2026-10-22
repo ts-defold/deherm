@@ -1,4 +1,13 @@
-import { defineComponent, factory, go, msg, vmath, type DefoldHash, type OnInputAction } from "@deherm/project";
+import {
+  defineComponent,
+  factory,
+  go,
+  msg,
+  property,
+  vmath,
+  type DefoldHash,
+  type OnInputAction,
+} from "@deherm/project";
 import {
   HEIGHT,
   WIDTH,
@@ -22,6 +31,7 @@ const LEFT_EDGE = 480 - (WIDTH * CELL) / 2 + CELL / 2;
 const BOTTOM_EDGE = 258 - (HEIGHT * CELL) / 2 + CELL / 2;
 
 interface SnakeSelf {
+  tickSeconds: number;
   state: SnakeState;
   mode: "attract" | "player";
   attractSeed: number;
@@ -71,6 +81,9 @@ function reset(self: SnakeSelf, mode: "attract" | "player"): void {
 }
 
 export default defineComponent({
+  properties: {
+    tickSeconds: property.number(0.13),
+  },
   init(self: SnakeSelf): void {
     self.attractSeed = 0x5eedd00d;
     reset(self, "attract");
@@ -79,7 +92,7 @@ export default defineComponent({
   update(self: SnakeSelf, dt: number): void {
     if (self.state.status !== "playing") return;
     self.elapsed += dt;
-    if (self.elapsed < 0.13) return;
+    if (self.elapsed < self.tickSeconds) return;
     self.elapsed = 0;
     if (self.mode === "attract") turnSnake(self.state, attractDirection(self.state));
     stepSnake(self.state);

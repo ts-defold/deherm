@@ -10,6 +10,7 @@ import {
   profileLaunch,
   resolveLiveValueDocument,
   resolveDehermCli,
+  resolveDebugNode,
   selectDehermProject,
   type DehermProject,
 } from "../src/core.ts";
@@ -67,6 +68,34 @@ test("CLI resolution uses the nearest workspace package and honors an explicit o
       isFile: async () => false,
     }),
     /pnpm add -D @ts-defold\/deherm/,
+  );
+});
+
+test("debug adapter resolves a real Node executable instead of VS Code's bare-node helper", async () => {
+  const executable = async (file: string) => file === "/opt/node/bin/node";
+  assert.equal(
+    await resolveDebugNode({
+      environment: { PATH: "/usr/bin:/opt/node/bin" },
+      platform: "darwin",
+      isExecutable: executable,
+    }),
+    "/opt/node/bin/node",
+  );
+  assert.equal(
+    await resolveDebugNode({ configuredPath: "/opt/node/bin/node", platform: "darwin", isExecutable: executable }),
+    "/opt/node/bin/node",
+  );
+  await assert.rejects(
+    resolveDebugNode({ environment: { PATH: "/usr/bin" }, platform: "darwin", isExecutable: executable }),
+    /set deherm\.nodePath/u,
+  );
+  assert.equal(
+    await resolveDebugNode({
+      environment: { Path: "C:\\Windows;C:\\node" },
+      platform: "win32",
+      isExecutable: async (file) => file === "C:\\node\\node.exe",
+    }),
+    "C:\\node\\node.exe",
   );
 });
 
