@@ -1,9 +1,41 @@
-ERROR:DLIB: Unable to bind to log socket (-1): ACCES
 INFO:DLIB: Log server started on port <ephemeral>
 headless-conformance:driver:cases:34
 headless-conformance:case-begin	contract_0138
 INFO:GRAPHICS: Installed graphics device 'ADAPTER_FAMILY_NULL'
 INFO:ENGINE: Defold Engine 1.14.0 (7f0f554)
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/84/df546b615f8b85
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/27/823e731928f4db
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/53/4b168a341ccf50
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/5a/c449316e124afd
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/06/f5f70ea3b6f806
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/bb/c441e01eb86910
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/90/b9a417d102e4be
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/0a/4c0d80d82065fd
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/6a/dd59aac5aeec24
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/8e/958cb8311e9f98
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/f1/19eaa5066be6e5
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/d9/2aad5ec2d57dcd
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a4/a469dd1dc54ed8
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/ba/a0e6deb3244710
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/4b/25c704825e7df6
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a9/07b284490cc78e
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/9d/180d2ff6d9221a
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/30/c93939460c8e22
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/95/b3f21387bdd6cb
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a8/67af639ef066a8
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/f2/62b61ee3a4b57a
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/fe/b7a487c1ecb7fc
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/41/fba4f2f3b5cedf
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/88/8b90f237d6eb58
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/c1/8fdf8e41fe12b4
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/b9/0217f7fcd0e7ff
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/0c/18dd900044f4b4
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/48/93effb3d6fd199
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/7b/524a291d17dbbe
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/98/b770b60868ab60
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a8/c474eaecd0acaa
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/ea/14dfe6d20cc6e9
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/7b/1f4e52f227dd3c
 INFO:ENGINE: Loading data from: archive:<repo>/build/conformance/headless/project/build/bob/game.dmanifest
 INFO:DEFOLD_HERMES: TypeScript bundle is waiting for script instance attachment
 INFO:ENGINE: Initialised sound device 'default'
@@ -219,9 +251,44 @@ INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0138	script:b2d.fixture
 INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0138	script:b2d.fixture.test_point#required	scratch-reuse	observed	64 repetitions
 INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0138	script:b2d.fixture.test_point#required	error-model	observed	raised and boundary remained usable
 INFO:DEFOLD_HERMES: deherm-headless-conformance:case-result:contract_0138:observed
+ERROR:DLIB: Unable to open index file '/Users/mini/Library/Application Support/Defold/http-cache/index'
+INFO:DLIB: Flushing http cache to disk
 headless-conformance:case-end	contract_0138	exited	0	3
 headless-conformance:case-begin	contract_0139
 INFO:ENGINE: Defold Engine 1.14.0 (7f0f554)
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/84/df546b615f8b85
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/27/823e731928f4db
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/53/4b168a341ccf50
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/5a/c449316e124afd
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/06/f5f70ea3b6f806
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/bb/c441e01eb86910
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/90/b9a417d102e4be
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/0a/4c0d80d82065fd
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/6a/dd59aac5aeec24
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/8e/958cb8311e9f98
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/f1/19eaa5066be6e5
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/d9/2aad5ec2d57dcd
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a4/a469dd1dc54ed8
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/ba/a0e6deb3244710
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/4b/25c704825e7df6
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a9/07b284490cc78e
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/9d/180d2ff6d9221a
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/30/c93939460c8e22
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/95/b3f21387bdd6cb
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a8/67af639ef066a8
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/f2/62b61ee3a4b57a
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/fe/b7a487c1ecb7fc
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/41/fba4f2f3b5cedf
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/88/8b90f237d6eb58
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/c1/8fdf8e41fe12b4
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/b9/0217f7fcd0e7ff
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/0c/18dd900044f4b4
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/48/93effb3d6fd199
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/7b/524a291d17dbbe
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/98/b770b60868ab60
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a8/c474eaecd0acaa
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/ea/14dfe6d20cc6e9
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/7b/1f4e52f227dd3c
 INFO:ENGINE: Loading data from: archive:<repo>/build/conformance/headless/project/build/bob/game.dmanifest
 INFO:DEFOLD_HERMES: TypeScript bundle is waiting for script instance attachment
 INFO:ENGINE: Initialised sound device 'default'
@@ -287,9 +354,44 @@ INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0139	script:b2d.joint.g
 INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0139	script:b2d.world.cast_ray_closest#required	handle-provenance	blocked-producer-raised	box2d-world: handle route is unavailable in the active runtime profile
 INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0139	script:b2d.world.cast_ray_closest#required-and-optional	handle-provenance	blocked-producer-raised	box2d-world: handle route is unavailable in the active runtime profile
 INFO:DEFOLD_HERMES: deherm-headless-conformance:case-result:contract_0139:observed
+ERROR:DLIB: Unable to open index file '/Users/mini/Library/Application Support/Defold/http-cache/index'
+INFO:DLIB: Flushing http cache to disk
 headless-conformance:case-end	contract_0139	exited	0	3
 headless-conformance:case-begin	contract_0140
 INFO:ENGINE: Defold Engine 1.14.0 (7f0f554)
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/84/df546b615f8b85
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/27/823e731928f4db
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/53/4b168a341ccf50
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/5a/c449316e124afd
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/06/f5f70ea3b6f806
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/bb/c441e01eb86910
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/90/b9a417d102e4be
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/0a/4c0d80d82065fd
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/6a/dd59aac5aeec24
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/8e/958cb8311e9f98
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/f1/19eaa5066be6e5
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/d9/2aad5ec2d57dcd
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a4/a469dd1dc54ed8
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/ba/a0e6deb3244710
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/4b/25c704825e7df6
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a9/07b284490cc78e
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/9d/180d2ff6d9221a
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/30/c93939460c8e22
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/95/b3f21387bdd6cb
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a8/67af639ef066a8
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/f2/62b61ee3a4b57a
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/fe/b7a487c1ecb7fc
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/41/fba4f2f3b5cedf
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/88/8b90f237d6eb58
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/c1/8fdf8e41fe12b4
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/b9/0217f7fcd0e7ff
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/0c/18dd900044f4b4
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/48/93effb3d6fd199
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/7b/524a291d17dbbe
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/98/b770b60868ab60
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a8/c474eaecd0acaa
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/ea/14dfe6d20cc6e9
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/7b/1f4e52f227dd3c
 INFO:ENGINE: Loading data from: archive:<repo>/build/conformance/headless/project/build/bob/game.dmanifest
 INFO:DEFOLD_HERMES: TypeScript bundle is waiting for script instance attachment
 INFO:ENGINE: Initialised sound device 'default'
@@ -305,9 +407,44 @@ INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0140	script:b2d.body.de
 INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0140	script:b2d.body.destroy_fixture#required	scratch-reuse	not-applicable	route destroys its engine object, so repetition would not address the same object
 INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0140	script:b2d.body.destroy_fixture#required	error-model	observed-raise-only	raised; boundary re-invocation withheld for a destructive route
 INFO:DEFOLD_HERMES: deherm-headless-conformance:case-result:contract_0140:observed
+ERROR:DLIB: Unable to open index file '/Users/mini/Library/Application Support/Defold/http-cache/index'
+INFO:DLIB: Flushing http cache to disk
 headless-conformance:case-end	contract_0140	exited	0	3
 headless-conformance:case-begin	contract_0141
 INFO:ENGINE: Defold Engine 1.14.0 (7f0f554)
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/84/df546b615f8b85
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/27/823e731928f4db
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/53/4b168a341ccf50
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/5a/c449316e124afd
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/06/f5f70ea3b6f806
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/bb/c441e01eb86910
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/90/b9a417d102e4be
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/0a/4c0d80d82065fd
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/6a/dd59aac5aeec24
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/8e/958cb8311e9f98
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/f1/19eaa5066be6e5
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/d9/2aad5ec2d57dcd
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a4/a469dd1dc54ed8
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/ba/a0e6deb3244710
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/4b/25c704825e7df6
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a9/07b284490cc78e
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/9d/180d2ff6d9221a
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/30/c93939460c8e22
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/95/b3f21387bdd6cb
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a8/67af639ef066a8
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/f2/62b61ee3a4b57a
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/fe/b7a487c1ecb7fc
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/41/fba4f2f3b5cedf
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/88/8b90f237d6eb58
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/c1/8fdf8e41fe12b4
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/b9/0217f7fcd0e7ff
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/0c/18dd900044f4b4
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/48/93effb3d6fd199
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/7b/524a291d17dbbe
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/98/b770b60868ab60
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a8/c474eaecd0acaa
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/ea/14dfe6d20cc6e9
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/7b/1f4e52f227dd3c
 INFO:ENGINE: Loading data from: archive:<repo>/build/conformance/headless/project/build/bob/game.dmanifest
 INFO:DEFOLD_HERMES: TypeScript bundle is waiting for script instance attachment
 INFO:ENGINE: Initialised sound device 'default'
@@ -323,9 +460,44 @@ INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0141	script:b2d.body.ge
 INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0141	script:b2d.body.get_next#required	scratch-reuse	observed	64 repetitions
 INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0141	script:b2d.body.get_next#required	error-model	observed	raised and boundary remained usable
 INFO:DEFOLD_HERMES: deherm-headless-conformance:case-result:contract_0141:observed
+ERROR:DLIB: Unable to open index file '/Users/mini/Library/Application Support/Defold/http-cache/index'
+INFO:DLIB: Flushing http cache to disk
 headless-conformance:case-end	contract_0141	exited	0	3
 headless-conformance:case-begin	contract_0142
 INFO:ENGINE: Defold Engine 1.14.0 (7f0f554)
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/84/df546b615f8b85
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/27/823e731928f4db
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/53/4b168a341ccf50
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/5a/c449316e124afd
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/06/f5f70ea3b6f806
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/bb/c441e01eb86910
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/90/b9a417d102e4be
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/0a/4c0d80d82065fd
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/6a/dd59aac5aeec24
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/8e/958cb8311e9f98
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/f1/19eaa5066be6e5
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/d9/2aad5ec2d57dcd
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a4/a469dd1dc54ed8
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/ba/a0e6deb3244710
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/4b/25c704825e7df6
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a9/07b284490cc78e
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/9d/180d2ff6d9221a
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/30/c93939460c8e22
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/95/b3f21387bdd6cb
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a8/67af639ef066a8
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/f2/62b61ee3a4b57a
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/fe/b7a487c1ecb7fc
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/41/fba4f2f3b5cedf
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/88/8b90f237d6eb58
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/c1/8fdf8e41fe12b4
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/b9/0217f7fcd0e7ff
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/0c/18dd900044f4b4
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/48/93effb3d6fd199
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/7b/524a291d17dbbe
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/98/b770b60868ab60
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a8/c474eaecd0acaa
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/ea/14dfe6d20cc6e9
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/7b/1f4e52f227dd3c
 INFO:ENGINE: Loading data from: archive:<repo>/build/conformance/headless/project/build/bob/game.dmanifest
 INFO:DEFOLD_HERMES: TypeScript bundle is waiting for script instance attachment
 INFO:ENGINE: Initialised sound device 'default'
@@ -341,9 +513,44 @@ INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0142	script:b2d.body.ge
 INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0142	script:b2d.body.get_world#required	scratch-reuse	observed	64 repetitions
 INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0142	script:b2d.body.get_world#required	error-model	observed	raised and boundary remained usable
 INFO:DEFOLD_HERMES: deherm-headless-conformance:case-result:contract_0142:observed
+ERROR:DLIB: Unable to open index file '/Users/mini/Library/Application Support/Defold/http-cache/index'
+INFO:DLIB: Flushing http cache to disk
 headless-conformance:case-end	contract_0142	exited	0	3
 headless-conformance:case-begin	contract_0147
 INFO:ENGINE: Defold Engine 1.14.0 (7f0f554)
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/84/df546b615f8b85
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/27/823e731928f4db
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/53/4b168a341ccf50
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/5a/c449316e124afd
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/06/f5f70ea3b6f806
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/bb/c441e01eb86910
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/90/b9a417d102e4be
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/0a/4c0d80d82065fd
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/6a/dd59aac5aeec24
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/8e/958cb8311e9f98
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/f1/19eaa5066be6e5
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/d9/2aad5ec2d57dcd
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a4/a469dd1dc54ed8
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/ba/a0e6deb3244710
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/4b/25c704825e7df6
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a9/07b284490cc78e
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/9d/180d2ff6d9221a
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/30/c93939460c8e22
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/95/b3f21387bdd6cb
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a8/67af639ef066a8
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/f2/62b61ee3a4b57a
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/fe/b7a487c1ecb7fc
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/41/fba4f2f3b5cedf
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/88/8b90f237d6eb58
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/c1/8fdf8e41fe12b4
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/b9/0217f7fcd0e7ff
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/0c/18dd900044f4b4
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/48/93effb3d6fd199
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/7b/524a291d17dbbe
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/98/b770b60868ab60
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a8/c474eaecd0acaa
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/ea/14dfe6d20cc6e9
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/7b/1f4e52f227dd3c
 INFO:ENGINE: Loading data from: archive:<repo>/build/conformance/headless/project/build/bob/game.dmanifest
 INFO:DEFOLD_HERMES: TypeScript bundle is waiting for script instance attachment
 INFO:ENGINE: Initialised sound device 'default'
@@ -358,9 +565,44 @@ INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0147	script:b2d.get_bod
 INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0147	script:b2d.get_body#required	scratch-reuse	observed	64 repetitions
 INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0147	script:b2d.get_body#required	error-model	observed	raised and boundary remained usable
 INFO:DEFOLD_HERMES: deherm-headless-conformance:case-result:contract_0147:observed
+ERROR:DLIB: Unable to open index file '/Users/mini/Library/Application Support/Defold/http-cache/index'
+INFO:DLIB: Flushing http cache to disk
 headless-conformance:case-end	contract_0147	exited	0	3
 headless-conformance:case-begin	contract_0148
 INFO:ENGINE: Defold Engine 1.14.0 (7f0f554)
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/84/df546b615f8b85
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/27/823e731928f4db
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/53/4b168a341ccf50
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/5a/c449316e124afd
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/06/f5f70ea3b6f806
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/bb/c441e01eb86910
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/90/b9a417d102e4be
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/0a/4c0d80d82065fd
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/6a/dd59aac5aeec24
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/8e/958cb8311e9f98
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/f1/19eaa5066be6e5
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/d9/2aad5ec2d57dcd
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a4/a469dd1dc54ed8
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/ba/a0e6deb3244710
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/4b/25c704825e7df6
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a9/07b284490cc78e
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/9d/180d2ff6d9221a
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/30/c93939460c8e22
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/95/b3f21387bdd6cb
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a8/67af639ef066a8
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/f2/62b61ee3a4b57a
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/fe/b7a487c1ecb7fc
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/41/fba4f2f3b5cedf
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/88/8b90f237d6eb58
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/c1/8fdf8e41fe12b4
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/b9/0217f7fcd0e7ff
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/0c/18dd900044f4b4
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/48/93effb3d6fd199
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/7b/524a291d17dbbe
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/98/b770b60868ab60
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a8/c474eaecd0acaa
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/ea/14dfe6d20cc6e9
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/7b/1f4e52f227dd3c
 INFO:ENGINE: Loading data from: archive:<repo>/build/conformance/headless/project/build/bob/game.dmanifest
 INFO:DEFOLD_HERMES: TypeScript bundle is waiting for script instance attachment
 INFO:ENGINE: Initialised sound device 'default'
@@ -378,9 +620,44 @@ INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0148	script:bullet3d.ge
 INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0148	script:bullet3d.get_version#required	scratch-reuse	observed	64 repetitions
 INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0148	script:bullet3d.get_version#required	error-model	not-applicable	route has no required argument to withhold
 INFO:DEFOLD_HERMES: deherm-headless-conformance:case-result:contract_0148:observed
+ERROR:DLIB: Unable to open index file '/Users/mini/Library/Application Support/Defold/http-cache/index'
+INFO:DLIB: Flushing http cache to disk
 headless-conformance:case-end	contract_0148	exited	0	3
 headless-conformance:case-begin	contract_0149
 INFO:ENGINE: Defold Engine 1.14.0 (7f0f554)
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/84/df546b615f8b85
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/27/823e731928f4db
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/53/4b168a341ccf50
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/5a/c449316e124afd
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/06/f5f70ea3b6f806
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/bb/c441e01eb86910
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/90/b9a417d102e4be
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/0a/4c0d80d82065fd
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/6a/dd59aac5aeec24
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/8e/958cb8311e9f98
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/f1/19eaa5066be6e5
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/d9/2aad5ec2d57dcd
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a4/a469dd1dc54ed8
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/ba/a0e6deb3244710
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/4b/25c704825e7df6
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a9/07b284490cc78e
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/9d/180d2ff6d9221a
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/30/c93939460c8e22
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/95/b3f21387bdd6cb
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a8/67af639ef066a8
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/f2/62b61ee3a4b57a
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/fe/b7a487c1ecb7fc
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/41/fba4f2f3b5cedf
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/88/8b90f237d6eb58
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/c1/8fdf8e41fe12b4
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/b9/0217f7fcd0e7ff
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/0c/18dd900044f4b4
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/48/93effb3d6fd199
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/7b/524a291d17dbbe
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/98/b770b60868ab60
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a8/c474eaecd0acaa
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/ea/14dfe6d20cc6e9
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/7b/1f4e52f227dd3c
 INFO:ENGINE: Loading data from: archive:<repo>/build/conformance/headless/project/build/bob/game.dmanifest
 INFO:DEFOLD_HERMES: TypeScript bundle is waiting for script instance attachment
 INFO:ENGINE: Initialised sound device 'default'
@@ -395,9 +672,44 @@ INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0149	script:b2d.get_wor
 INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0149	script:b2d.get_world#required	scratch-reuse	observed	64 repetitions
 INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0149	script:b2d.get_world#required	error-model	not-applicable	route has no required argument to withhold
 INFO:DEFOLD_HERMES: deherm-headless-conformance:case-result:contract_0149:observed
+ERROR:DLIB: Unable to open index file '/Users/mini/Library/Application Support/Defold/http-cache/index'
+INFO:DLIB: Flushing http cache to disk
 headless-conformance:case-end	contract_0149	exited	0	3
 headless-conformance:case-begin	contract_0150
 INFO:ENGINE: Defold Engine 1.14.0 (7f0f554)
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/84/df546b615f8b85
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/27/823e731928f4db
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/53/4b168a341ccf50
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/5a/c449316e124afd
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/06/f5f70ea3b6f806
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/bb/c441e01eb86910
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/90/b9a417d102e4be
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/0a/4c0d80d82065fd
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/6a/dd59aac5aeec24
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/8e/958cb8311e9f98
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/f1/19eaa5066be6e5
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/d9/2aad5ec2d57dcd
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a4/a469dd1dc54ed8
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/ba/a0e6deb3244710
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/4b/25c704825e7df6
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a9/07b284490cc78e
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/9d/180d2ff6d9221a
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/30/c93939460c8e22
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/95/b3f21387bdd6cb
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a8/67af639ef066a8
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/f2/62b61ee3a4b57a
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/fe/b7a487c1ecb7fc
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/41/fba4f2f3b5cedf
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/88/8b90f237d6eb58
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/c1/8fdf8e41fe12b4
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/b9/0217f7fcd0e7ff
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/0c/18dd900044f4b4
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/48/93effb3d6fd199
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/7b/524a291d17dbbe
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/98/b770b60868ab60
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a8/c474eaecd0acaa
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/ea/14dfe6d20cc6e9
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/7b/1f4e52f227dd3c
 INFO:ENGINE: Loading data from: archive:<repo>/build/conformance/headless/project/build/bob/game.dmanifest
 INFO:DEFOLD_HERMES: TypeScript bundle is waiting for script instance attachment
 INFO:ENGINE: Initialised sound device 'default'
@@ -499,9 +811,44 @@ INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0150	script:b2d.joint.c
 INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0150	script:b2d.joint.create_wheel#required-and-optional	scratch-reuse	observed	64 repetitions
 INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0150	script:b2d.joint.create_wheel#required-and-optional	error-model	observed	raised and boundary remained usable
 INFO:DEFOLD_HERMES: deherm-headless-conformance:case-result:contract_0150:observed
+ERROR:DLIB: Unable to open index file '/Users/mini/Library/Application Support/Defold/http-cache/index'
+INFO:DLIB: Flushing http cache to disk
 headless-conformance:case-end	contract_0150	exited	0	3
 headless-conformance:case-begin	contract_0151
 INFO:ENGINE: Defold Engine 1.14.0 (7f0f554)
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/84/df546b615f8b85
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/27/823e731928f4db
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/53/4b168a341ccf50
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/5a/c449316e124afd
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/06/f5f70ea3b6f806
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/bb/c441e01eb86910
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/90/b9a417d102e4be
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/0a/4c0d80d82065fd
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/6a/dd59aac5aeec24
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/8e/958cb8311e9f98
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/f1/19eaa5066be6e5
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/d9/2aad5ec2d57dcd
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a4/a469dd1dc54ed8
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/ba/a0e6deb3244710
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/4b/25c704825e7df6
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a9/07b284490cc78e
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/9d/180d2ff6d9221a
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/30/c93939460c8e22
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/95/b3f21387bdd6cb
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a8/67af639ef066a8
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/f2/62b61ee3a4b57a
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/fe/b7a487c1ecb7fc
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/41/fba4f2f3b5cedf
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/88/8b90f237d6eb58
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/c1/8fdf8e41fe12b4
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/b9/0217f7fcd0e7ff
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/0c/18dd900044f4b4
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/48/93effb3d6fd199
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/7b/524a291d17dbbe
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/98/b770b60868ab60
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a8/c474eaecd0acaa
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/ea/14dfe6d20cc6e9
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/7b/1f4e52f227dd3c
 INFO:ENGINE: Loading data from: archive:<repo>/build/conformance/headless/project/build/bob/game.dmanifest
 INFO:DEFOLD_HERMES: TypeScript bundle is waiting for script instance attachment
 INFO:ENGINE: Initialised sound device 'default'
@@ -531,9 +878,44 @@ INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0151	script:b2d.joint.c
 INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0151	script:b2d.joint.create_gear#required-and-optional	scratch-reuse	observed	64 repetitions
 INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0151	script:b2d.joint.create_gear#required-and-optional	error-model	observed	raised and boundary remained usable
 INFO:DEFOLD_HERMES: deherm-headless-conformance:case-result:contract_0151:observed
+ERROR:DLIB: Unable to open index file '/Users/mini/Library/Application Support/Defold/http-cache/index'
+INFO:DLIB: Flushing http cache to disk
 headless-conformance:case-end	contract_0151	exited	0	3
 headless-conformance:case-begin	contract_0152
 INFO:ENGINE: Defold Engine 1.14.0 (7f0f554)
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/84/df546b615f8b85
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/27/823e731928f4db
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/53/4b168a341ccf50
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/5a/c449316e124afd
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/06/f5f70ea3b6f806
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/bb/c441e01eb86910
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/90/b9a417d102e4be
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/0a/4c0d80d82065fd
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/6a/dd59aac5aeec24
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/8e/958cb8311e9f98
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/f1/19eaa5066be6e5
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/d9/2aad5ec2d57dcd
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a4/a469dd1dc54ed8
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/ba/a0e6deb3244710
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/4b/25c704825e7df6
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a9/07b284490cc78e
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/9d/180d2ff6d9221a
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/30/c93939460c8e22
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/95/b3f21387bdd6cb
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a8/67af639ef066a8
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/f2/62b61ee3a4b57a
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/fe/b7a487c1ecb7fc
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/41/fba4f2f3b5cedf
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/88/8b90f237d6eb58
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/c1/8fdf8e41fe12b4
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/b9/0217f7fcd0e7ff
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/0c/18dd900044f4b4
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/48/93effb3d6fd199
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/7b/524a291d17dbbe
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/98/b770b60868ab60
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a8/c474eaecd0acaa
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/ea/14dfe6d20cc6e9
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/7b/1f4e52f227dd3c
 INFO:ENGINE: Loading data from: archive:<repo>/build/conformance/headless/project/build/bob/game.dmanifest
 INFO:DEFOLD_HERMES: TypeScript bundle is waiting for script instance attachment
 INFO:ENGINE: Initialised sound device 'default'
@@ -549,9 +931,44 @@ INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0152	script:b2d.joint.d
 INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0152	script:b2d.joint.destroy#required	scratch-reuse	not-applicable	route destroys its engine object, so repetition would not address the same object
 INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0152	script:b2d.joint.destroy#required	error-model	observed-raise-only	raised; boundary re-invocation withheld for a destructive route
 INFO:DEFOLD_HERMES: deherm-headless-conformance:case-result:contract_0152:observed
+ERROR:DLIB: Unable to open index file '/Users/mini/Library/Application Support/Defold/http-cache/index'
+INFO:DLIB: Flushing http cache to disk
 headless-conformance:case-end	contract_0152	exited	0	3
 headless-conformance:case-begin	contract_0153
 INFO:ENGINE: Defold Engine 1.14.0 (7f0f554)
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/84/df546b615f8b85
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/27/823e731928f4db
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/53/4b168a341ccf50
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/5a/c449316e124afd
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/06/f5f70ea3b6f806
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/bb/c441e01eb86910
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/90/b9a417d102e4be
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/0a/4c0d80d82065fd
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/6a/dd59aac5aeec24
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/8e/958cb8311e9f98
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/f1/19eaa5066be6e5
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/d9/2aad5ec2d57dcd
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a4/a469dd1dc54ed8
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/ba/a0e6deb3244710
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/4b/25c704825e7df6
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a9/07b284490cc78e
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/9d/180d2ff6d9221a
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/30/c93939460c8e22
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/95/b3f21387bdd6cb
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a8/67af639ef066a8
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/f2/62b61ee3a4b57a
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/fe/b7a487c1ecb7fc
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/41/fba4f2f3b5cedf
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/88/8b90f237d6eb58
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/c1/8fdf8e41fe12b4
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/b9/0217f7fcd0e7ff
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/0c/18dd900044f4b4
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/48/93effb3d6fd199
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/7b/524a291d17dbbe
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/98/b770b60868ab60
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a8/c474eaecd0acaa
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/ea/14dfe6d20cc6e9
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/7b/1f4e52f227dd3c
 INFO:ENGINE: Loading data from: archive:<repo>/build/conformance/headless/project/build/bob/game.dmanifest
 INFO:DEFOLD_HERMES: TypeScript bundle is waiting for script instance attachment
 INFO:ENGINE: Initialised sound device 'default'
@@ -763,9 +1180,44 @@ INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0153	script:b2d.joint.s
 INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0153	script:b2d.joint.set_spring_damping_ratio#required	scratch-reuse	observed	64 repetitions
 INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0153	script:b2d.joint.set_spring_damping_ratio#required	error-model	observed	raised and boundary remained usable
 INFO:DEFOLD_HERMES: deherm-headless-conformance:case-result:contract_0153:observed
+ERROR:DLIB: Unable to open index file '/Users/mini/Library/Application Support/Defold/http-cache/index'
+INFO:DLIB: Flushing http cache to disk
 headless-conformance:case-end	contract_0153	exited	0	3
 headless-conformance:case-begin	contract_0154
 INFO:ENGINE: Defold Engine 1.14.0 (7f0f554)
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/84/df546b615f8b85
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/27/823e731928f4db
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/53/4b168a341ccf50
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/5a/c449316e124afd
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/06/f5f70ea3b6f806
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/bb/c441e01eb86910
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/90/b9a417d102e4be
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/0a/4c0d80d82065fd
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/6a/dd59aac5aeec24
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/8e/958cb8311e9f98
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/f1/19eaa5066be6e5
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/d9/2aad5ec2d57dcd
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a4/a469dd1dc54ed8
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/ba/a0e6deb3244710
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/4b/25c704825e7df6
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a9/07b284490cc78e
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/9d/180d2ff6d9221a
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/30/c93939460c8e22
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/95/b3f21387bdd6cb
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a8/67af639ef066a8
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/f2/62b61ee3a4b57a
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/fe/b7a487c1ecb7fc
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/41/fba4f2f3b5cedf
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/88/8b90f237d6eb58
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/c1/8fdf8e41fe12b4
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/b9/0217f7fcd0e7ff
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/0c/18dd900044f4b4
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/48/93effb3d6fd199
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/7b/524a291d17dbbe
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/98/b770b60868ab60
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a8/c474eaecd0acaa
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/ea/14dfe6d20cc6e9
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/7b/1f4e52f227dd3c
 INFO:ENGINE: Loading data from: archive:<repo>/build/conformance/headless/project/build/bob/game.dmanifest
 INFO:DEFOLD_HERMES: TypeScript bundle is waiting for script instance attachment
 INFO:ENGINE: Initialised sound device 'default'
@@ -785,9 +1237,44 @@ INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0154	script:b2d.joint.g
 INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0154	script:b2d.joint.get_body_b#required	scratch-reuse	observed	64 repetitions
 INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0154	script:b2d.joint.get_body_b#required	error-model	observed	raised and boundary remained usable
 INFO:DEFOLD_HERMES: deherm-headless-conformance:case-result:contract_0154:observed
+ERROR:DLIB: Unable to open index file '/Users/mini/Library/Application Support/Defold/http-cache/index'
+INFO:DLIB: Flushing http cache to disk
 headless-conformance:case-end	contract_0154	exited	0	3
 headless-conformance:case-begin	contract_0160
 INFO:ENGINE: Defold Engine 1.14.0 (7f0f554)
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/84/df546b615f8b85
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/27/823e731928f4db
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/53/4b168a341ccf50
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/5a/c449316e124afd
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/06/f5f70ea3b6f806
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/bb/c441e01eb86910
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/90/b9a417d102e4be
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/0a/4c0d80d82065fd
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/6a/dd59aac5aeec24
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/8e/958cb8311e9f98
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/f1/19eaa5066be6e5
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/d9/2aad5ec2d57dcd
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a4/a469dd1dc54ed8
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/ba/a0e6deb3244710
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/4b/25c704825e7df6
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a9/07b284490cc78e
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/9d/180d2ff6d9221a
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/30/c93939460c8e22
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/95/b3f21387bdd6cb
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a8/67af639ef066a8
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/f2/62b61ee3a4b57a
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/fe/b7a487c1ecb7fc
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/41/fba4f2f3b5cedf
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/88/8b90f237d6eb58
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/c1/8fdf8e41fe12b4
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/b9/0217f7fcd0e7ff
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/0c/18dd900044f4b4
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/48/93effb3d6fd199
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/7b/524a291d17dbbe
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/98/b770b60868ab60
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a8/c474eaecd0acaa
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/ea/14dfe6d20cc6e9
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/7b/1f4e52f227dd3c
 INFO:ENGINE: Loading data from: archive:<repo>/build/conformance/headless/project/build/bob/game.dmanifest
 INFO:DEFOLD_HERMES: TypeScript bundle is waiting for script instance attachment
 INFO:ENGINE: Initialised sound device 'default'
@@ -1414,9 +1901,44 @@ INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0160	script:camera.set_
 INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0160	script:camera.set_near_z#required-and-optional	scratch-reuse	observed	64 repetitions
 INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0160	script:camera.set_near_z#required-and-optional	error-model	observed	raised and boundary remained usable
 INFO:DEFOLD_HERMES: deherm-headless-conformance:case-result:contract_0160:observed
+ERROR:DLIB: Unable to open index file '/Users/mini/Library/Application Support/Defold/http-cache/index'
+INFO:DLIB: Flushing http cache to disk
 headless-conformance:case-end	contract_0160	exited	0	3
 headless-conformance:case-begin	contract_0165
 INFO:ENGINE: Defold Engine 1.14.0 (7f0f554)
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/84/df546b615f8b85
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/27/823e731928f4db
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/53/4b168a341ccf50
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/5a/c449316e124afd
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/06/f5f70ea3b6f806
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/bb/c441e01eb86910
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/90/b9a417d102e4be
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/0a/4c0d80d82065fd
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/6a/dd59aac5aeec24
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/8e/958cb8311e9f98
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/f1/19eaa5066be6e5
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/d9/2aad5ec2d57dcd
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a4/a469dd1dc54ed8
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/ba/a0e6deb3244710
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/4b/25c704825e7df6
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a9/07b284490cc78e
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/9d/180d2ff6d9221a
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/30/c93939460c8e22
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/95/b3f21387bdd6cb
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a8/67af639ef066a8
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/f2/62b61ee3a4b57a
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/fe/b7a487c1ecb7fc
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/41/fba4f2f3b5cedf
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/88/8b90f237d6eb58
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/c1/8fdf8e41fe12b4
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/b9/0217f7fcd0e7ff
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/0c/18dd900044f4b4
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/48/93effb3d6fd199
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/7b/524a291d17dbbe
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/98/b770b60868ab60
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a8/c474eaecd0acaa
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/ea/14dfe6d20cc6e9
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/7b/1f4e52f227dd3c
 INFO:ENGINE: Loading data from: archive:<repo>/build/conformance/headless/project/build/bob/game.dmanifest
 INFO:DEFOLD_HERMES: TypeScript bundle is waiting for script instance attachment
 INFO:ENGINE: Initialised sound device 'default'
@@ -1736,9 +2258,44 @@ INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0165	script:bullet3d.co
 INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0165	script:bullet3d.collision_object.activate#required-and-optional	scratch-reuse	observed	64 repetitions
 INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0165	script:bullet3d.collision_object.activate#required-and-optional	error-model	observed	raised and boundary remained usable
 INFO:DEFOLD_HERMES: deherm-headless-conformance:case-result:contract_0165:observed
+ERROR:DLIB: Unable to open index file '/Users/mini/Library/Application Support/Defold/http-cache/index'
+INFO:DLIB: Flushing http cache to disk
 headless-conformance:case-end	contract_0165	exited	0	3
 headless-conformance:case-begin	contract_0166
 INFO:ENGINE: Defold Engine 1.14.0 (7f0f554)
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/84/df546b615f8b85
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/27/823e731928f4db
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/53/4b168a341ccf50
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/5a/c449316e124afd
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/06/f5f70ea3b6f806
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/bb/c441e01eb86910
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/90/b9a417d102e4be
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/0a/4c0d80d82065fd
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/6a/dd59aac5aeec24
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/8e/958cb8311e9f98
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/f1/19eaa5066be6e5
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/d9/2aad5ec2d57dcd
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a4/a469dd1dc54ed8
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/ba/a0e6deb3244710
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/4b/25c704825e7df6
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a9/07b284490cc78e
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/9d/180d2ff6d9221a
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/30/c93939460c8e22
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/95/b3f21387bdd6cb
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a8/67af639ef066a8
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/f2/62b61ee3a4b57a
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/fe/b7a487c1ecb7fc
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/41/fba4f2f3b5cedf
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/88/8b90f237d6eb58
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/c1/8fdf8e41fe12b4
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/b9/0217f7fcd0e7ff
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/0c/18dd900044f4b4
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/48/93effb3d6fd199
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/7b/524a291d17dbbe
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/98/b770b60868ab60
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a8/c474eaecd0acaa
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/ea/14dfe6d20cc6e9
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/7b/1f4e52f227dd3c
 INFO:ENGINE: Loading data from: archive:<repo>/build/conformance/headless/project/build/bob/game.dmanifest
 INFO:DEFOLD_HERMES: TypeScript bundle is waiting for script instance attachment
 INFO:ENGINE: Initialised sound device 'default'
@@ -1754,9 +2311,44 @@ INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0166	script:bullet3d.co
 INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0166	script:bullet3d.collision_object.get_shape#required	scratch-reuse	observed	64 repetitions
 INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0166	script:bullet3d.collision_object.get_shape#required	error-model	observed	raised and boundary remained usable
 INFO:DEFOLD_HERMES: deherm-headless-conformance:case-result:contract_0166:observed
+ERROR:DLIB: Unable to open index file '/Users/mini/Library/Application Support/Defold/http-cache/index'
+INFO:DLIB: Flushing http cache to disk
 headless-conformance:case-end	contract_0166	exited	0	3
 headless-conformance:case-begin	contract_0168
 INFO:ENGINE: Defold Engine 1.14.0 (7f0f554)
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/84/df546b615f8b85
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/27/823e731928f4db
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/53/4b168a341ccf50
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/5a/c449316e124afd
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/06/f5f70ea3b6f806
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/bb/c441e01eb86910
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/90/b9a417d102e4be
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/0a/4c0d80d82065fd
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/6a/dd59aac5aeec24
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/8e/958cb8311e9f98
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/f1/19eaa5066be6e5
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/d9/2aad5ec2d57dcd
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a4/a469dd1dc54ed8
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/ba/a0e6deb3244710
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/4b/25c704825e7df6
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a9/07b284490cc78e
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/9d/180d2ff6d9221a
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/30/c93939460c8e22
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/95/b3f21387bdd6cb
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a8/67af639ef066a8
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/f2/62b61ee3a4b57a
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/fe/b7a487c1ecb7fc
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/41/fba4f2f3b5cedf
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/88/8b90f237d6eb58
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/c1/8fdf8e41fe12b4
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/b9/0217f7fcd0e7ff
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/0c/18dd900044f4b4
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/48/93effb3d6fd199
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/7b/524a291d17dbbe
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/98/b770b60868ab60
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a8/c474eaecd0acaa
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/ea/14dfe6d20cc6e9
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/7b/1f4e52f227dd3c
 INFO:ENGINE: Loading data from: archive:<repo>/build/conformance/headless/project/build/bob/game.dmanifest
 INFO:DEFOLD_HERMES: TypeScript bundle is waiting for script instance attachment
 INFO:ENGINE: Initialised sound device 'default'
@@ -1828,9 +2420,44 @@ INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0168	script:bullet3d.co
 INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0168	script:bullet3d.constraint.create_slider#required-and-optional	scratch-reuse	observed	64 repetitions
 INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0168	script:bullet3d.constraint.create_slider#required-and-optional	error-model	observed	raised and boundary remained usable
 INFO:DEFOLD_HERMES: deherm-headless-conformance:case-result:contract_0168:observed
+ERROR:DLIB: Unable to open index file '/Users/mini/Library/Application Support/Defold/http-cache/index'
+INFO:DLIB: Flushing http cache to disk
 headless-conformance:case-end	contract_0168	exited	0	3
 headless-conformance:case-begin	contract_0169
 INFO:ENGINE: Defold Engine 1.14.0 (7f0f554)
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/84/df546b615f8b85
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/27/823e731928f4db
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/53/4b168a341ccf50
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/5a/c449316e124afd
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/06/f5f70ea3b6f806
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/bb/c441e01eb86910
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/90/b9a417d102e4be
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/0a/4c0d80d82065fd
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/6a/dd59aac5aeec24
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/8e/958cb8311e9f98
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/f1/19eaa5066be6e5
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/d9/2aad5ec2d57dcd
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a4/a469dd1dc54ed8
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/ba/a0e6deb3244710
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/4b/25c704825e7df6
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a9/07b284490cc78e
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/9d/180d2ff6d9221a
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/30/c93939460c8e22
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/95/b3f21387bdd6cb
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a8/67af639ef066a8
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/f2/62b61ee3a4b57a
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/fe/b7a487c1ecb7fc
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/41/fba4f2f3b5cedf
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/88/8b90f237d6eb58
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/c1/8fdf8e41fe12b4
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/b9/0217f7fcd0e7ff
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/0c/18dd900044f4b4
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/48/93effb3d6fd199
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/7b/524a291d17dbbe
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/98/b770b60868ab60
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a8/c474eaecd0acaa
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/ea/14dfe6d20cc6e9
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/7b/1f4e52f227dd3c
 INFO:ENGINE: Loading data from: archive:<repo>/build/conformance/headless/project/build/bob/game.dmanifest
 INFO:DEFOLD_HERMES: TypeScript bundle is waiting for script instance attachment
 INFO:ENGINE: Initialised sound device 'default'
@@ -1843,9 +2470,44 @@ INFO:DEFOLD_HERMES: TypeScript application initialized after script instance att
 INFO:DEFOLD_HERMES: Extension update entered (application initialized: true)
 INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0169	script:bullet3d.constraint.destroy#required	handle-provenance	blocked-producer-raised	bullet-constraint: bad argument #5 to '?' (vector3 expected, got table)
 INFO:DEFOLD_HERMES: deherm-headless-conformance:case-result:contract_0169:observed
+ERROR:DLIB: Unable to open index file '/Users/mini/Library/Application Support/Defold/http-cache/index'
+INFO:DLIB: Flushing http cache to disk
 headless-conformance:case-end	contract_0169	exited	0	3
 headless-conformance:case-begin	contract_0170
 INFO:ENGINE: Defold Engine 1.14.0 (7f0f554)
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/84/df546b615f8b85
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/27/823e731928f4db
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/53/4b168a341ccf50
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/5a/c449316e124afd
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/06/f5f70ea3b6f806
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/bb/c441e01eb86910
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/90/b9a417d102e4be
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/0a/4c0d80d82065fd
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/6a/dd59aac5aeec24
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/8e/958cb8311e9f98
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/f1/19eaa5066be6e5
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/d9/2aad5ec2d57dcd
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a4/a469dd1dc54ed8
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/ba/a0e6deb3244710
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/4b/25c704825e7df6
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a9/07b284490cc78e
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/9d/180d2ff6d9221a
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/30/c93939460c8e22
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/95/b3f21387bdd6cb
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a8/67af639ef066a8
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/f2/62b61ee3a4b57a
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/fe/b7a487c1ecb7fc
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/41/fba4f2f3b5cedf
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/88/8b90f237d6eb58
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/c1/8fdf8e41fe12b4
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/b9/0217f7fcd0e7ff
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/0c/18dd900044f4b4
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/48/93effb3d6fd199
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/7b/524a291d17dbbe
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/98/b770b60868ab60
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a8/c474eaecd0acaa
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/ea/14dfe6d20cc6e9
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/7b/1f4e52f227dd3c
 INFO:ENGINE: Loading data from: archive:<repo>/build/conformance/headless/project/build/bob/game.dmanifest
 INFO:DEFOLD_HERMES: TypeScript bundle is waiting for script instance attachment
 INFO:ENGINE: Initialised sound device 'default'
@@ -1896,9 +2558,44 @@ INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0170	script:bullet3d.co
 INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0170	script:bullet3d.constraint.set_hinge_limits#required-and-optional	handle-provenance	blocked-producer-raised	bullet-constraint: bad argument #5 to '?' (vector3 expected, got table)
 INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0170	script:bullet3d.constraint.set_spring_equilibrium_point#required-and-optional	handle-provenance	blocked-producer-raised	bullet-constraint: bad argument #5 to '?' (vector3 expected, got table)
 INFO:DEFOLD_HERMES: deherm-headless-conformance:case-result:contract_0170:observed
+ERROR:DLIB: Unable to open index file '/Users/mini/Library/Application Support/Defold/http-cache/index'
+INFO:DLIB: Flushing http cache to disk
 headless-conformance:case-end	contract_0170	exited	0	3
 headless-conformance:case-begin	contract_0171
 INFO:ENGINE: Defold Engine 1.14.0 (7f0f554)
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/84/df546b615f8b85
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/27/823e731928f4db
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/53/4b168a341ccf50
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/5a/c449316e124afd
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/06/f5f70ea3b6f806
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/bb/c441e01eb86910
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/90/b9a417d102e4be
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/0a/4c0d80d82065fd
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/6a/dd59aac5aeec24
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/8e/958cb8311e9f98
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/f1/19eaa5066be6e5
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/d9/2aad5ec2d57dcd
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a4/a469dd1dc54ed8
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/ba/a0e6deb3244710
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/4b/25c704825e7df6
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a9/07b284490cc78e
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/9d/180d2ff6d9221a
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/30/c93939460c8e22
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/95/b3f21387bdd6cb
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a8/67af639ef066a8
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/f2/62b61ee3a4b57a
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/fe/b7a487c1ecb7fc
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/41/fba4f2f3b5cedf
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/88/8b90f237d6eb58
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/c1/8fdf8e41fe12b4
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/b9/0217f7fcd0e7ff
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/0c/18dd900044f4b4
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/48/93effb3d6fd199
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/7b/524a291d17dbbe
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/98/b770b60868ab60
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a8/c474eaecd0acaa
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/ea/14dfe6d20cc6e9
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/7b/1f4e52f227dd3c
 INFO:ENGINE: Loading data from: archive:<repo>/build/conformance/headless/project/build/bob/game.dmanifest
 INFO:DEFOLD_HERMES: TypeScript bundle is waiting for script instance attachment
 INFO:ENGINE: Initialised sound device 'default'
@@ -1912,9 +2609,44 @@ INFO:DEFOLD_HERMES: Extension update entered (application initialized: true)
 INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0171	script:bullet3d.constraint.get_body_a#required	handle-provenance	blocked-producer-raised	bullet-constraint: bad argument #5 to '?' (vector3 expected, got table)
 INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0171	script:bullet3d.constraint.get_body_b#required	handle-provenance	blocked-producer-raised	bullet-constraint: bad argument #5 to '?' (vector3 expected, got table)
 INFO:DEFOLD_HERMES: deherm-headless-conformance:case-result:contract_0171:observed
+ERROR:DLIB: Unable to open index file '/Users/mini/Library/Application Support/Defold/http-cache/index'
+INFO:DLIB: Flushing http cache to disk
 headless-conformance:case-end	contract_0171	exited	0	3
 headless-conformance:case-begin	contract_0172
 INFO:ENGINE: Defold Engine 1.14.0 (7f0f554)
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/84/df546b615f8b85
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/27/823e731928f4db
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/53/4b168a341ccf50
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/5a/c449316e124afd
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/06/f5f70ea3b6f806
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/bb/c441e01eb86910
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/90/b9a417d102e4be
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/0a/4c0d80d82065fd
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/6a/dd59aac5aeec24
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/8e/958cb8311e9f98
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/f1/19eaa5066be6e5
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/d9/2aad5ec2d57dcd
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a4/a469dd1dc54ed8
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/ba/a0e6deb3244710
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/4b/25c704825e7df6
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a9/07b284490cc78e
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/9d/180d2ff6d9221a
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/30/c93939460c8e22
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/95/b3f21387bdd6cb
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a8/67af639ef066a8
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/f2/62b61ee3a4b57a
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/fe/b7a487c1ecb7fc
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/41/fba4f2f3b5cedf
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/88/8b90f237d6eb58
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/c1/8fdf8e41fe12b4
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/b9/0217f7fcd0e7ff
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/0c/18dd900044f4b4
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/48/93effb3d6fd199
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/7b/524a291d17dbbe
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/98/b770b60868ab60
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a8/c474eaecd0acaa
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/ea/14dfe6d20cc6e9
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/7b/1f4e52f227dd3c
 INFO:ENGINE: Loading data from: archive:<repo>/build/conformance/headless/project/build/bob/game.dmanifest
 INFO:DEFOLD_HERMES: TypeScript bundle is waiting for script instance attachment
 INFO:ENGINE: Initialised sound device 'default'
@@ -1927,9 +2659,44 @@ INFO:DEFOLD_HERMES: TypeScript application initialized after script instance att
 INFO:DEFOLD_HERMES: Extension update entered (application initialized: true)
 INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0172	script:bullet3d.constraint.get_world#required	handle-provenance	blocked-producer-raised	bullet-constraint: bad argument #5 to '?' (vector3 expected, got table)
 INFO:DEFOLD_HERMES: deherm-headless-conformance:case-result:contract_0172:observed
+ERROR:DLIB: Unable to open index file '/Users/mini/Library/Application Support/Defold/http-cache/index'
+INFO:DLIB: Flushing http cache to disk
 headless-conformance:case-end	contract_0172	exited	0	3
 headless-conformance:case-begin	contract_0173
 INFO:ENGINE: Defold Engine 1.14.0 (7f0f554)
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/84/df546b615f8b85
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/27/823e731928f4db
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/53/4b168a341ccf50
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/5a/c449316e124afd
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/06/f5f70ea3b6f806
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/bb/c441e01eb86910
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/90/b9a417d102e4be
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/0a/4c0d80d82065fd
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/6a/dd59aac5aeec24
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/8e/958cb8311e9f98
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/f1/19eaa5066be6e5
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/d9/2aad5ec2d57dcd
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a4/a469dd1dc54ed8
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/ba/a0e6deb3244710
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/4b/25c704825e7df6
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a9/07b284490cc78e
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/9d/180d2ff6d9221a
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/30/c93939460c8e22
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/95/b3f21387bdd6cb
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a8/67af639ef066a8
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/f2/62b61ee3a4b57a
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/fe/b7a487c1ecb7fc
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/41/fba4f2f3b5cedf
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/88/8b90f237d6eb58
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/c1/8fdf8e41fe12b4
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/b9/0217f7fcd0e7ff
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/0c/18dd900044f4b4
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/48/93effb3d6fd199
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/7b/524a291d17dbbe
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/98/b770b60868ab60
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a8/c474eaecd0acaa
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/ea/14dfe6d20cc6e9
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/7b/1f4e52f227dd3c
 INFO:ENGINE: Loading data from: archive:<repo>/build/conformance/headless/project/build/bob/game.dmanifest
 INFO:DEFOLD_HERMES: TypeScript bundle is waiting for script instance attachment
 INFO:ENGINE: Initialised sound device 'default'
@@ -1947,9 +2714,44 @@ INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0173	script:bullet3d.ge
 INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0173	script:bullet3d.get_rigid_body#required	scratch-reuse	observed	64 repetitions
 INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0173	script:bullet3d.get_rigid_body#required	error-model	observed	raised and boundary remained usable
 INFO:DEFOLD_HERMES: deherm-headless-conformance:case-result:contract_0173:observed
+ERROR:DLIB: Unable to open index file '/Users/mini/Library/Application Support/Defold/http-cache/index'
+INFO:DLIB: Flushing http cache to disk
 headless-conformance:case-end	contract_0173	exited	0	3
 headless-conformance:case-begin	contract_0174
 INFO:ENGINE: Defold Engine 1.14.0 (7f0f554)
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/84/df546b615f8b85
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/27/823e731928f4db
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/53/4b168a341ccf50
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/5a/c449316e124afd
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/06/f5f70ea3b6f806
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/bb/c441e01eb86910
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/90/b9a417d102e4be
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/0a/4c0d80d82065fd
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/6a/dd59aac5aeec24
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/8e/958cb8311e9f98
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/f1/19eaa5066be6e5
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/d9/2aad5ec2d57dcd
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a4/a469dd1dc54ed8
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/ba/a0e6deb3244710
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/4b/25c704825e7df6
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a9/07b284490cc78e
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/9d/180d2ff6d9221a
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/30/c93939460c8e22
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/95/b3f21387bdd6cb
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a8/67af639ef066a8
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/f2/62b61ee3a4b57a
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/fe/b7a487c1ecb7fc
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/41/fba4f2f3b5cedf
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/88/8b90f237d6eb58
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/c1/8fdf8e41fe12b4
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/b9/0217f7fcd0e7ff
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/0c/18dd900044f4b4
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/48/93effb3d6fd199
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/7b/524a291d17dbbe
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/98/b770b60868ab60
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a8/c474eaecd0acaa
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/ea/14dfe6d20cc6e9
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/7b/1f4e52f227dd3c
 INFO:ENGINE: Loading data from: archive:<repo>/build/conformance/headless/project/build/bob/game.dmanifest
 INFO:DEFOLD_HERMES: TypeScript bundle is waiting for script instance attachment
 INFO:ENGINE: Initialised sound device 'default'
@@ -1964,9 +2766,44 @@ INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0174	script:bullet3d.ge
 INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0174	script:bullet3d.get_world#required	scratch-reuse	observed	64 repetitions
 INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0174	script:bullet3d.get_world#required	error-model	not-applicable	route has no required argument to withhold
 INFO:DEFOLD_HERMES: deherm-headless-conformance:case-result:contract_0174:observed
+ERROR:DLIB: Unable to open index file '/Users/mini/Library/Application Support/Defold/http-cache/index'
+INFO:DLIB: Flushing http cache to disk
 headless-conformance:case-end	contract_0174	exited	0	3
 headless-conformance:case-begin	contract_0175
 INFO:ENGINE: Defold Engine 1.14.0 (7f0f554)
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/84/df546b615f8b85
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/27/823e731928f4db
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/53/4b168a341ccf50
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/5a/c449316e124afd
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/06/f5f70ea3b6f806
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/bb/c441e01eb86910
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/90/b9a417d102e4be
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/0a/4c0d80d82065fd
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/6a/dd59aac5aeec24
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/8e/958cb8311e9f98
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/f1/19eaa5066be6e5
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/d9/2aad5ec2d57dcd
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a4/a469dd1dc54ed8
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/ba/a0e6deb3244710
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/4b/25c704825e7df6
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a9/07b284490cc78e
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/9d/180d2ff6d9221a
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/30/c93939460c8e22
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/95/b3f21387bdd6cb
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a8/67af639ef066a8
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/f2/62b61ee3a4b57a
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/fe/b7a487c1ecb7fc
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/41/fba4f2f3b5cedf
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/88/8b90f237d6eb58
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/c1/8fdf8e41fe12b4
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/b9/0217f7fcd0e7ff
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/0c/18dd900044f4b4
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/48/93effb3d6fd199
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/7b/524a291d17dbbe
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/98/b770b60868ab60
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a8/c474eaecd0acaa
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/ea/14dfe6d20cc6e9
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/7b/1f4e52f227dd3c
 INFO:ENGINE: Loading data from: archive:<repo>/build/conformance/headless/project/build/bob/game.dmanifest
 INFO:DEFOLD_HERMES: TypeScript bundle is waiting for script instance attachment
 INFO:ENGINE: Initialised sound device 'default'
@@ -1982,9 +2819,44 @@ INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0175	script:bullet3d.ri
 INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0175	script:bullet3d.rigid_body.get_world#required	scratch-reuse	observed	64 repetitions
 INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0175	script:bullet3d.rigid_body.get_world#required	error-model	observed	raised and boundary remained usable
 INFO:DEFOLD_HERMES: deherm-headless-conformance:case-result:contract_0175:observed
+ERROR:DLIB: Unable to open index file '/Users/mini/Library/Application Support/Defold/http-cache/index'
+INFO:DLIB: Flushing http cache to disk
 headless-conformance:case-end	contract_0175	exited	0	3
 headless-conformance:case-begin	contract_0176
 INFO:ENGINE: Defold Engine 1.14.0 (7f0f554)
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/84/df546b615f8b85
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/27/823e731928f4db
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/53/4b168a341ccf50
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/5a/c449316e124afd
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/06/f5f70ea3b6f806
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/bb/c441e01eb86910
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/90/b9a417d102e4be
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/0a/4c0d80d82065fd
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/6a/dd59aac5aeec24
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/8e/958cb8311e9f98
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/f1/19eaa5066be6e5
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/d9/2aad5ec2d57dcd
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a4/a469dd1dc54ed8
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/ba/a0e6deb3244710
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/4b/25c704825e7df6
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a9/07b284490cc78e
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/9d/180d2ff6d9221a
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/30/c93939460c8e22
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/95/b3f21387bdd6cb
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a8/67af639ef066a8
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/f2/62b61ee3a4b57a
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/fe/b7a487c1ecb7fc
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/41/fba4f2f3b5cedf
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/88/8b90f237d6eb58
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/c1/8fdf8e41fe12b4
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/b9/0217f7fcd0e7ff
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/0c/18dd900044f4b4
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/48/93effb3d6fd199
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/7b/524a291d17dbbe
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/98/b770b60868ab60
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a8/c474eaecd0acaa
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/ea/14dfe6d20cc6e9
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/7b/1f4e52f227dd3c
 INFO:ENGINE: Loading data from: archive:<repo>/build/conformance/headless/project/build/bob/game.dmanifest
 INFO:DEFOLD_HERMES: TypeScript bundle is waiting for script instance attachment
 INFO:ENGINE: Initialised sound device 'default'
@@ -2000,9 +2872,44 @@ INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0176	script:bullet3d.sh
 INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0176	script:bullet3d.shape.get_collision_object#required	scratch-reuse	observed	64 repetitions
 INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0176	script:bullet3d.shape.get_collision_object#required	error-model	observed	raised and boundary remained usable
 INFO:DEFOLD_HERMES: deherm-headless-conformance:case-result:contract_0176:observed
+ERROR:DLIB: Unable to open index file '/Users/mini/Library/Application Support/Defold/http-cache/index'
+INFO:DLIB: Flushing http cache to disk
 headless-conformance:case-end	contract_0176	exited	0	3
 headless-conformance:case-begin	contract_0177
 INFO:ENGINE: Defold Engine 1.14.0 (7f0f554)
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/84/df546b615f8b85
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/27/823e731928f4db
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/53/4b168a341ccf50
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/5a/c449316e124afd
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/06/f5f70ea3b6f806
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/bb/c441e01eb86910
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/90/b9a417d102e4be
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/0a/4c0d80d82065fd
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/6a/dd59aac5aeec24
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/8e/958cb8311e9f98
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/f1/19eaa5066be6e5
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/d9/2aad5ec2d57dcd
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a4/a469dd1dc54ed8
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/ba/a0e6deb3244710
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/4b/25c704825e7df6
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a9/07b284490cc78e
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/9d/180d2ff6d9221a
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/30/c93939460c8e22
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/95/b3f21387bdd6cb
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a8/67af639ef066a8
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/f2/62b61ee3a4b57a
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/fe/b7a487c1ecb7fc
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/41/fba4f2f3b5cedf
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/88/8b90f237d6eb58
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/c1/8fdf8e41fe12b4
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/b9/0217f7fcd0e7ff
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/0c/18dd900044f4b4
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/48/93effb3d6fd199
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/7b/524a291d17dbbe
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/98/b770b60868ab60
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a8/c474eaecd0acaa
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/ea/14dfe6d20cc6e9
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/7b/1f4e52f227dd3c
 INFO:ENGINE: Loading data from: archive:<repo>/build/conformance/headless/project/build/bob/game.dmanifest
 INFO:DEFOLD_HERMES: TypeScript bundle is waiting for script instance attachment
 INFO:ENGINE: Initialised sound device 'default'
@@ -2030,9 +2937,44 @@ INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0177	script:bullet3d.sh
 INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0177	script:bullet3d.shape.set_local_transform#required	scratch-reuse	observed	64 repetitions
 INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0177	script:bullet3d.shape.set_local_transform#required	error-model	observed	raised and boundary remained usable
 INFO:DEFOLD_HERMES: deherm-headless-conformance:case-result:contract_0177:observed
+ERROR:DLIB: Unable to open index file '/Users/mini/Library/Application Support/Defold/http-cache/index'
+INFO:DLIB: Flushing http cache to disk
 headless-conformance:case-end	contract_0177	exited	0	3
 headless-conformance:case-begin	contract_0179
 INFO:ENGINE: Defold Engine 1.14.0 (7f0f554)
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/84/df546b615f8b85
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/27/823e731928f4db
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/53/4b168a341ccf50
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/5a/c449316e124afd
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/06/f5f70ea3b6f806
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/bb/c441e01eb86910
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/90/b9a417d102e4be
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/0a/4c0d80d82065fd
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/6a/dd59aac5aeec24
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/8e/958cb8311e9f98
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/f1/19eaa5066be6e5
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/d9/2aad5ec2d57dcd
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a4/a469dd1dc54ed8
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/ba/a0e6deb3244710
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/4b/25c704825e7df6
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a9/07b284490cc78e
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/9d/180d2ff6d9221a
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/30/c93939460c8e22
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/95/b3f21387bdd6cb
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a8/67af639ef066a8
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/f2/62b61ee3a4b57a
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/fe/b7a487c1ecb7fc
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/41/fba4f2f3b5cedf
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/88/8b90f237d6eb58
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/c1/8fdf8e41fe12b4
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/b9/0217f7fcd0e7ff
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/0c/18dd900044f4b4
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/48/93effb3d6fd199
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/7b/524a291d17dbbe
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/98/b770b60868ab60
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a8/c474eaecd0acaa
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/ea/14dfe6d20cc6e9
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/7b/1f4e52f227dd3c
 INFO:ENGINE: Loading data from: archive:<repo>/build/conformance/headless/project/build/bob/game.dmanifest
 INFO:DEFOLD_HERMES: TypeScript bundle is waiting for script instance attachment
 INFO:ENGINE: Initialised sound device 'default'
@@ -2060,9 +3002,44 @@ INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0179	script:bullet3d.wo
 INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0179	script:bullet3d.world.set_gravity#required	scratch-reuse	observed	64 repetitions
 INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0179	script:bullet3d.world.set_gravity#required	error-model	observed	raised and boundary remained usable
 INFO:DEFOLD_HERMES: deherm-headless-conformance:case-result:contract_0179:observed
+ERROR:DLIB: Unable to open index file '/Users/mini/Library/Application Support/Defold/http-cache/index'
+INFO:DLIB: Flushing http cache to disk
 headless-conformance:case-end	contract_0179	exited	0	3
 headless-conformance:case-begin	contract_0180
 INFO:ENGINE: Defold Engine 1.14.0 (7f0f554)
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/84/df546b615f8b85
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/27/823e731928f4db
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/53/4b168a341ccf50
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/5a/c449316e124afd
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/06/f5f70ea3b6f806
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/bb/c441e01eb86910
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/90/b9a417d102e4be
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/0a/4c0d80d82065fd
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/6a/dd59aac5aeec24
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/8e/958cb8311e9f98
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/f1/19eaa5066be6e5
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/d9/2aad5ec2d57dcd
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a4/a469dd1dc54ed8
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/ba/a0e6deb3244710
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/4b/25c704825e7df6
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a9/07b284490cc78e
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/9d/180d2ff6d9221a
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/30/c93939460c8e22
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/95/b3f21387bdd6cb
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a8/67af639ef066a8
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/f2/62b61ee3a4b57a
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/fe/b7a487c1ecb7fc
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/41/fba4f2f3b5cedf
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/88/8b90f237d6eb58
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/c1/8fdf8e41fe12b4
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/b9/0217f7fcd0e7ff
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/0c/18dd900044f4b4
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/48/93effb3d6fd199
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/7b/524a291d17dbbe
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/98/b770b60868ab60
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a8/c474eaecd0acaa
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/ea/14dfe6d20cc6e9
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/7b/1f4e52f227dd3c
 INFO:ENGINE: Loading data from: archive:<repo>/build/conformance/headless/project/build/bob/game.dmanifest
 INFO:DEFOLD_HERMES: TypeScript bundle is waiting for script instance attachment
 INFO:ENGINE: Initialised sound device 'default'
@@ -2107,9 +3084,44 @@ INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0180	script:go.get_worl
 INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0180	script:go.get_world_transform#required-and-optional	scratch-reuse	observed	64 repetitions
 INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0180	script:go.get_world_transform#required-and-optional	error-model	not-applicable	route has no required argument to withhold
 INFO:DEFOLD_HERMES: deherm-headless-conformance:case-result:contract_0180:observed
+ERROR:DLIB: Unable to open index file '/Users/mini/Library/Application Support/Defold/http-cache/index'
+INFO:DLIB: Flushing http cache to disk
 headless-conformance:case-end	contract_0180	exited	0	3
 headless-conformance:case-begin	contract_0181
 INFO:ENGINE: Defold Engine 1.14.0 (7f0f554)
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/84/df546b615f8b85
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/27/823e731928f4db
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/53/4b168a341ccf50
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/5a/c449316e124afd
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/06/f5f70ea3b6f806
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/bb/c441e01eb86910
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/90/b9a417d102e4be
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/0a/4c0d80d82065fd
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/6a/dd59aac5aeec24
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/8e/958cb8311e9f98
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/f1/19eaa5066be6e5
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/d9/2aad5ec2d57dcd
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a4/a469dd1dc54ed8
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/ba/a0e6deb3244710
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/4b/25c704825e7df6
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a9/07b284490cc78e
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/9d/180d2ff6d9221a
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/30/c93939460c8e22
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/95/b3f21387bdd6cb
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a8/67af639ef066a8
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/f2/62b61ee3a4b57a
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/fe/b7a487c1ecb7fc
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/41/fba4f2f3b5cedf
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/88/8b90f237d6eb58
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/c1/8fdf8e41fe12b4
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/b9/0217f7fcd0e7ff
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/0c/18dd900044f4b4
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/48/93effb3d6fd199
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/7b/524a291d17dbbe
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/98/b770b60868ab60
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a8/c474eaecd0acaa
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/ea/14dfe6d20cc6e9
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/7b/1f4e52f227dd3c
 INFO:ENGINE: Loading data from: archive:<repo>/build/conformance/headless/project/build/bob/game.dmanifest
 INFO:DEFOLD_HERMES: TypeScript bundle is waiting for script instance attachment
 INFO:ENGINE: Initialised sound device 'default'
@@ -2127,9 +3139,44 @@ INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0181	script:collectionf
 INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0181	script:collectionfactory.load#required-and-optional	scratch-reuse	observed	64 repetitions
 INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0181	script:collectionfactory.load#required-and-optional	error-model	not-applicable	route has no required argument to withhold
 INFO:DEFOLD_HERMES: deherm-headless-conformance:case-result:contract_0181:observed
+ERROR:DLIB: Unable to open index file '/Users/mini/Library/Application Support/Defold/http-cache/index'
+INFO:DLIB: Flushing http cache to disk
 headless-conformance:case-end	contract_0181	exited	0	3
 headless-conformance:case-begin	contract_0185
 INFO:ENGINE: Defold Engine 1.14.0 (7f0f554)
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/84/df546b615f8b85
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/27/823e731928f4db
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/53/4b168a341ccf50
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/5a/c449316e124afd
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/06/f5f70ea3b6f806
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/bb/c441e01eb86910
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/90/b9a417d102e4be
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/0a/4c0d80d82065fd
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/6a/dd59aac5aeec24
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/8e/958cb8311e9f98
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/f1/19eaa5066be6e5
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/d9/2aad5ec2d57dcd
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a4/a469dd1dc54ed8
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/ba/a0e6deb3244710
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/4b/25c704825e7df6
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a9/07b284490cc78e
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/9d/180d2ff6d9221a
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/30/c93939460c8e22
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/95/b3f21387bdd6cb
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a8/67af639ef066a8
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/f2/62b61ee3a4b57a
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/fe/b7a487c1ecb7fc
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/41/fba4f2f3b5cedf
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/88/8b90f237d6eb58
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/c1/8fdf8e41fe12b4
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/b9/0217f7fcd0e7ff
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/0c/18dd900044f4b4
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/48/93effb3d6fd199
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/7b/524a291d17dbbe
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/98/b770b60868ab60
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a8/c474eaecd0acaa
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/ea/14dfe6d20cc6e9
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/7b/1f4e52f227dd3c
 INFO:ENGINE: Loading data from: archive:<repo>/build/conformance/headless/project/build/bob/game.dmanifest
 INFO:DEFOLD_HERMES: TypeScript bundle is waiting for script instance attachment
 INFO:ENGINE: Initialised sound device 'default'
@@ -2147,9 +3194,44 @@ INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0185	script:factory.cre
 INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0185	script:factory.create#required-and-optional	scratch-reuse	observed	64 repetitions
 INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0185	script:factory.create#required-and-optional	error-model	observed	raised and boundary remained usable
 INFO:DEFOLD_HERMES: deherm-headless-conformance:case-result:contract_0185:observed
+ERROR:DLIB: Unable to open index file '/Users/mini/Library/Application Support/Defold/http-cache/index'
+INFO:DLIB: Flushing http cache to disk
 headless-conformance:case-end	contract_0185	exited	0	3
 headless-conformance:case-begin	contract_0186
 INFO:ENGINE: Defold Engine 1.14.0 (7f0f554)
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/84/df546b615f8b85
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/27/823e731928f4db
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/53/4b168a341ccf50
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/5a/c449316e124afd
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/06/f5f70ea3b6f806
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/bb/c441e01eb86910
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/90/b9a417d102e4be
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/0a/4c0d80d82065fd
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/6a/dd59aac5aeec24
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/8e/958cb8311e9f98
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/f1/19eaa5066be6e5
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/d9/2aad5ec2d57dcd
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a4/a469dd1dc54ed8
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/ba/a0e6deb3244710
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/4b/25c704825e7df6
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a9/07b284490cc78e
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/9d/180d2ff6d9221a
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/30/c93939460c8e22
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/95/b3f21387bdd6cb
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a8/67af639ef066a8
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/f2/62b61ee3a4b57a
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/fe/b7a487c1ecb7fc
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/41/fba4f2f3b5cedf
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/88/8b90f237d6eb58
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/c1/8fdf8e41fe12b4
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/b9/0217f7fcd0e7ff
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/0c/18dd900044f4b4
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/48/93effb3d6fd199
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/7b/524a291d17dbbe
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/98/b770b60868ab60
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a8/c474eaecd0acaa
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/ea/14dfe6d20cc6e9
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/7b/1f4e52f227dd3c
 INFO:ENGINE: Loading data from: archive:<repo>/build/conformance/headless/project/build/bob/game.dmanifest
 INFO:DEFOLD_HERMES: TypeScript bundle is waiting for script instance attachment
 INFO:ENGINE: Initialised sound device 'default'
@@ -2167,9 +3249,44 @@ INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0186	script:factory.loa
 INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0186	script:factory.load#required-and-optional	scratch-reuse	observed	64 repetitions
 INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0186	script:factory.load#required-and-optional	error-model	not-applicable	route has no required argument to withhold
 INFO:DEFOLD_HERMES: deherm-headless-conformance:case-result:contract_0186:observed
+ERROR:DLIB: Unable to open index file '/Users/mini/Library/Application Support/Defold/http-cache/index'
+INFO:DLIB: Flushing http cache to disk
 headless-conformance:case-end	contract_0186	exited	0	3
 headless-conformance:case-begin	contract_0205
 INFO:ENGINE: Defold Engine 1.14.0 (7f0f554)
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/84/df546b615f8b85
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/27/823e731928f4db
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/53/4b168a341ccf50
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/5a/c449316e124afd
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/06/f5f70ea3b6f806
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/bb/c441e01eb86910
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/90/b9a417d102e4be
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/0a/4c0d80d82065fd
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/6a/dd59aac5aeec24
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/8e/958cb8311e9f98
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/f1/19eaa5066be6e5
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/d9/2aad5ec2d57dcd
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a4/a469dd1dc54ed8
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/ba/a0e6deb3244710
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/4b/25c704825e7df6
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a9/07b284490cc78e
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/9d/180d2ff6d9221a
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/30/c93939460c8e22
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/95/b3f21387bdd6cb
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a8/67af639ef066a8
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/f2/62b61ee3a4b57a
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/fe/b7a487c1ecb7fc
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/41/fba4f2f3b5cedf
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/88/8b90f237d6eb58
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/c1/8fdf8e41fe12b4
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/b9/0217f7fcd0e7ff
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/0c/18dd900044f4b4
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/48/93effb3d6fd199
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/7b/524a291d17dbbe
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/98/b770b60868ab60
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a8/c474eaecd0acaa
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/ea/14dfe6d20cc6e9
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/7b/1f4e52f227dd3c
 INFO:ENGINE: Loading data from: archive:<repo>/build/conformance/headless/project/build/bob/game.dmanifest
 INFO:DEFOLD_HERMES: TypeScript bundle is waiting for script instance attachment
 INFO:ENGINE: Initialised sound device 'default'
@@ -2250,9 +3367,44 @@ INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0205	script:particlefx.
 INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0205	script:particlefx.play#required	scratch-reuse	observed	64 repetitions
 INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0205	script:particlefx.play#required	error-model	observed	raised and boundary remained usable
 INFO:DEFOLD_HERMES: deherm-headless-conformance:case-result:contract_0205:observed
+ERROR:DLIB: Unable to open index file '/Users/mini/Library/Application Support/Defold/http-cache/index'
+INFO:DLIB: Flushing http cache to disk
 headless-conformance:case-end	contract_0205	exited	0	3
 headless-conformance:case-begin	contract_0206
 INFO:ENGINE: Defold Engine 1.14.0 (7f0f554)
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/84/df546b615f8b85
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/27/823e731928f4db
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/53/4b168a341ccf50
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/5a/c449316e124afd
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/06/f5f70ea3b6f806
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/bb/c441e01eb86910
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/90/b9a417d102e4be
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/0a/4c0d80d82065fd
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/6a/dd59aac5aeec24
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/8e/958cb8311e9f98
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/f1/19eaa5066be6e5
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/d9/2aad5ec2d57dcd
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a4/a469dd1dc54ed8
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/ba/a0e6deb3244710
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/4b/25c704825e7df6
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a9/07b284490cc78e
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/9d/180d2ff6d9221a
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/30/c93939460c8e22
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/95/b3f21387bdd6cb
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a8/67af639ef066a8
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/f2/62b61ee3a4b57a
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/fe/b7a487c1ecb7fc
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/41/fba4f2f3b5cedf
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/88/8b90f237d6eb58
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/c1/8fdf8e41fe12b4
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/b9/0217f7fcd0e7ff
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/0c/18dd900044f4b4
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/48/93effb3d6fd199
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/7b/524a291d17dbbe
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/98/b770b60868ab60
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a8/c474eaecd0acaa
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/ea/14dfe6d20cc6e9
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/7b/1f4e52f227dd3c
 INFO:ENGINE: Loading data from: archive:<repo>/build/conformance/headless/project/build/bob/game.dmanifest
 INFO:DEFOLD_HERMES: TypeScript bundle is waiting for script instance attachment
 INFO:ENGINE: Initialised sound device 'default'
@@ -2267,9 +3419,44 @@ INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0206	script:physics.set
 INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0206	script:physics.set_event_listener#required	scratch-reuse	observed	64 repetitions
 INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0206	script:physics.set_event_listener#required	error-model	not-applicable	route has no required argument to withhold
 INFO:DEFOLD_HERMES: deherm-headless-conformance:case-result:contract_0206:observed
+ERROR:DLIB: Unable to open index file '/Users/mini/Library/Application Support/Defold/http-cache/index'
+INFO:DLIB: Flushing http cache to disk
 headless-conformance:case-end	contract_0206	exited	0	3
 headless-conformance:case-begin	contract_0218
 INFO:ENGINE: Defold Engine 1.14.0 (7f0f554)
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/84/df546b615f8b85
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/27/823e731928f4db
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/53/4b168a341ccf50
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/5a/c449316e124afd
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/06/f5f70ea3b6f806
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/bb/c441e01eb86910
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/90/b9a417d102e4be
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/0a/4c0d80d82065fd
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/6a/dd59aac5aeec24
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/8e/958cb8311e9f98
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/f1/19eaa5066be6e5
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/d9/2aad5ec2d57dcd
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a4/a469dd1dc54ed8
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/ba/a0e6deb3244710
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/4b/25c704825e7df6
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a9/07b284490cc78e
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/9d/180d2ff6d9221a
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/30/c93939460c8e22
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/95/b3f21387bdd6cb
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a8/67af639ef066a8
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/f2/62b61ee3a4b57a
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/fe/b7a487c1ecb7fc
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/41/fba4f2f3b5cedf
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/88/8b90f237d6eb58
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/c1/8fdf8e41fe12b4
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/b9/0217f7fcd0e7ff
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/0c/18dd900044f4b4
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/48/93effb3d6fd199
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/7b/524a291d17dbbe
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/98/b770b60868ab60
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/a8/c474eaecd0acaa
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/ea/14dfe6d20cc6e9
+WARNING:DLIB: Unable to remove /Users/mini/Library/Application Support/Defold/http-cache/7b/1f4e52f227dd3c
 INFO:ENGINE: Loading data from: archive:<repo>/build/conformance/headless/project/build/bob/game.dmanifest
 INFO:DEFOLD_HERMES: TypeScript bundle is waiting for script instance attachment
 INFO:ENGINE: Initialised sound device 'default'
@@ -2350,5 +3537,7 @@ INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0218	script:sprite.play
 INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0218	script:sprite.play_flipbook#required	scratch-reuse	observed	64 repetitions
 INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0218	script:sprite.play_flipbook#required	error-model	observed	raised and boundary remained usable
 INFO:DEFOLD_HERMES: deherm-headless-conformance:case-result:contract_0218:observed
+ERROR:DLIB: Unable to open index file '/Users/mini/Library/Application Support/Defold/http-cache/index'
+INFO:DLIB: Flushing http cache to disk
 headless-conformance:case-end	contract_0218	exited	0	3
 headless-conformance:driver:failures:0
