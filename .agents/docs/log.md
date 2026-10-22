@@ -17,6 +17,10 @@ resource projection without uploading to hosted Bob. The report explicitly
 does not claim native linkage or packaged runtime execution for that stage.
 The full existing Bob proof remains a separate command. Hosted validation of
 these newly committed changes has not yet completed.
+The isolated candidate execution caught an invalid harness assumption that
+`dev --json` was one JSON document; it emits an event stream and a final
+summary. The preparation proof now uses the compiler command's exit status
+and the explicit freshness verifier, leaving event-stream output unchanged.
 
 ## 2026-10-20 - Schedule policy discovery after the alpha release window
 

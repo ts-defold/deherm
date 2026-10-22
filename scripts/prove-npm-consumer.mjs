@@ -223,25 +223,13 @@ try {
     const bundles = [];
     const projections = [];
     if (prepareOnly) {
-      const built = JSON.parse(
-        run(
-          process.execPath,
-          [
-            gameCli,
-            "dev",
-            "--project",
-            game,
-            "--entry",
-            "src/main.script.ts",
-            "--once",
-            "--no-launch",
-            "--headless",
-            "--json",
-          ],
-          { cwd: game, env: environment },
-        ),
+      // dev's JSON mode is an event stream, not one JSON document. Its exit
+      // status proves compilation completed; verify-bundle checks the result.
+      run(
+        process.execPath,
+        [gameCli, "dev", "--project", game, "--entry", "src/main.script.ts", "--once", "--no-launch", "--headless"],
+        { cwd: game, env: environment },
       );
-      assert.equal(built.snapshot.phase, "built", "installed package did not compile the one-shot game bundle");
       const verifiedBundle = JSON.parse(
         run(process.execPath, [gameCli, "verify-bundle", "--project", game, "--json"], {
           cwd: game,
