@@ -28,6 +28,37 @@ jobs:
       - run: pnpm install --frozen-lockfile --ignore-scripts
       - run: pnpm check:release-preflight
 
+  package-candidate:
+    name: Clean npm candidate (no hosted Bob)
+    needs: preflight
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      GITHUB_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+      - run: bash scripts/bootstrap-upstreams.sh hermes
+      - run: node scripts/prove-npm-consumer.mjs --pack-only
+      - name: Prove the retained archive from an isolated install
+        run: |
+          archive="$(node -p 'require("./build/npm-consumer-proof.json").tarball')"
+          node scripts/prove-npm-consumer.mjs --candidate "$archive" --prepare-only
+      - uses: actions/upload-artifact@v6
+        with:
+          name: npm-premerge-candidate
+          path: |
+            build/npm-consumer-proof.json
+            build/npm-release-candidate/*.tgz
+          if-no-files-found: error
+
   portable-tooling:
     name: TUI, VS Code, and release contract (${{ matrix.os }})
     needs: preflight
@@ -89,7 +120,7 @@ jobs:
         if: runner.os == 'Linux'
         run: node --test tests/release-preflight.test.mjs
       - name: Aggregate test gate
-        if: runner.os == 'Linux' && github.event_name != 'pull_request'
+        if: runner.os == 'Linux'
         run: node scripts/run-release-command.mjs pnpm test
       - name: Portable development tooling
         if: runner.os != 'Linux'

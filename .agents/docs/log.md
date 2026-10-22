@@ -1,5 +1,23 @@
 # Defold Hermes knowledge log
 
+## 2026-10-21 - Commit release tooling and refresh real-engine evidence
+
+The authored debugger scopes, native launch ownership, absolute Node resolver,
+and Snake property demonstrations are committed together. Development-tooling,
+VS Code, DAP/source-scope, and release-preflight tests passed locally. Review
+caught and fixed failed-spawn cleanup: a child without a PID must not wait for
+an exit event or dereference a missing inspector descriptor. The real headless
+Defold conformance command was rerun successfully; its generated report and
+runtime log now describe the current plan rather than stale plan digests.
+
+The release workflow retains one npm candidate and consumes that exact archive
+from an isolated installation with `--prepare-only`. This exercises generation,
+typechecking, compilation, freshness verification and native/browser release
+resource projection without uploading to hosted Bob. The report explicitly
+does not claim native linkage or packaged runtime execution for that stage.
+The full existing Bob proof remains a separate command. Hosted validation of
+these newly committed changes has not yet completed.
+
 ## 2026-10-20 - Schedule policy discovery after the alpha release window
 
 Policy discovery is scheduled daily at 12:00 UTC (08:00 EDT, 07:00 EST), as

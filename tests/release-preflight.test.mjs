@@ -44,6 +44,28 @@ test("release and policy workflows gate expensive work on the preflight", async 
   assert.ok(policy.jobs.plan.steps.some((step) => step.run === "pnpm check:release-preflight"));
 });
 
+test("pull requests run the aggregate and prove one packed candidate without hosted Bob", async () => {
+  const release = YAML.parse(await readFile(path.join(root, ".github/workflows/release-readiness.yml"), "utf8"));
+  const portable = release.jobs["portable-tooling"].steps;
+  const aggregate = portable.find((step) => step.name === "Aggregate test gate");
+  assert.equal(aggregate.if, "runner.os == 'Linux'");
+
+  const candidate = release.jobs["package-candidate"];
+  assert.equal(candidate.needs, "preflight");
+  const commands = candidate.steps.map((step) => step.run).filter(Boolean);
+  assert.ok(commands.includes("bash scripts/bootstrap-upstreams.sh hermes"));
+  assert.ok(commands.includes("node scripts/prove-npm-consumer.mjs --pack-only"));
+  assert.ok(
+    commands.some((command) =>
+      command.includes('node scripts/prove-npm-consumer.mjs --candidate "$archive" --prepare-only'),
+    ),
+  );
+  assert.equal(
+    commands.some((command) => /prove-npm-snake|bob:|check-end-to-end/u.test(command)),
+    false,
+  );
+});
+
 test("native preflight rejects the prior pointer-shaped component ABI", async (context) => {
   try {
     await access(path.join(root, "upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h"));

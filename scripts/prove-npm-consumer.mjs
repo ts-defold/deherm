@@ -13,18 +13,22 @@ import { assertRetainedNpmCandidate } from "./lib/npm-candidate.mjs";
 const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const arguments_ = process.argv.slice(2);
 const packOnly = arguments_.includes("--pack-only");
+const prepareOnly = arguments_.includes("--prepare-only");
 const candidateIndex = arguments_.indexOf("--candidate");
 const candidate = candidateIndex < 0 ? null : arguments_[candidateIndex + 1];
 if (candidateIndex >= 0 && (!candidate || candidate.startsWith("--"))) {
   throw new Error("--candidate requires the retained npm tarball path");
 }
 if (packOnly && candidate) throw new Error("--pack-only cannot consume an existing candidate");
+if (packOnly && prepareOnly) throw new Error("--pack-only and --prepare-only are mutually exclusive");
 const positional = arguments_.filter(
   (argument, index) =>
-    argument !== "--pack-only" && (candidateIndex < 0 || (index !== candidateIndex && index !== candidateIndex + 1)),
+    argument !== "--pack-only" &&
+    argument !== "--prepare-only" &&
+    (candidateIndex < 0 || (index !== candidateIndex && index !== candidateIndex + 1)),
 );
 if (positional.length > 1 || positional.some((argument) => argument.startsWith("--"))) {
-  throw new Error("Usage: prove-npm-consumer.mjs [--pack-only | --candidate <tarball>] [report.json]");
+  throw new Error("Usage: prove-npm-consumer.mjs [--pack-only | --candidate <tarball>] [--prepare-only] [report.json]");
 }
 const outputArgument = positional[0];
 const output = path.resolve(outputArgument ?? path.join(repositoryRoot, "build", "npm-consumer-proof.json"));
@@ -217,32 +221,89 @@ try {
     assert.ok(verified.checkedFiles > 0, "generated SDK verification checked no files");
 
     const bundles = [];
-    for (const { target, representation } of targets) {
+    const projections = [];
+    if (prepareOnly) {
       const built = JSON.parse(
         run(
           process.execPath,
           [
             gameCli,
-            "bundle",
+            "dev",
             "--project",
             game,
             "--entry",
             "src/main.script.ts",
-            "--target",
-            target,
-            "--variant",
-            "release",
-            "--application-mode",
-            "dynamic",
+            "--once",
+            "--no-launch",
+            "--headless",
             "--json",
           ],
           { cwd: game, env: environment },
         ),
       );
-      assert.equal(built.target, target);
-      assert.equal(built.representation, representation);
-      assert.ok((await stat(built.bundleOutput)).isDirectory(), `${target} produced no bundle directory`);
-      bundles.push({ target, representation, bundleDirectory: path.basename(built.bundleOutput) });
+      assert.equal(built.snapshot.phase, "built", "installed package did not compile the one-shot game bundle");
+      const verifiedBundle = JSON.parse(
+        run(process.execPath, [gameCli, "verify-bundle", "--project", game, "--json"], {
+          cwd: game,
+          env: environment,
+        }),
+      );
+      assert.equal(verifiedBundle.ok, true, "installed package produced a stale or unbound pre-Bob bundle");
+      for (const { target, representation } of targets) {
+        const prepared = JSON.parse(
+          run(
+            process.execPath,
+            [
+              gameCli,
+              "prepare-bob",
+              "--project",
+              game,
+              "--target",
+              target,
+              "--variant",
+              "release",
+              "--application-mode",
+              "dynamic",
+              "--json",
+            ],
+            { cwd: game, env: environment },
+          ),
+        );
+        assert.equal(prepared.representation, representation);
+        assert.equal(prepared.platform, target);
+        if (representation === "hermes-bytecode") {
+          assert.ok(prepared.compilation?.outputBytes > 0, `${target} produced no release Hermes bytecode`);
+        }
+        projections.push({ target, representation });
+      }
+    } else {
+      for (const { target, representation } of targets) {
+        const built = JSON.parse(
+          run(
+            process.execPath,
+            [
+              gameCli,
+              "bundle",
+              "--project",
+              game,
+              "--entry",
+              "src/main.script.ts",
+              "--target",
+              target,
+              "--variant",
+              "release",
+              "--application-mode",
+              "dynamic",
+              "--json",
+            ],
+            { cwd: game, env: environment },
+          ),
+        );
+        assert.equal(built.target, target);
+        assert.equal(built.representation, representation);
+        assert.ok((await stat(built.bundleOutput)).isDirectory(), `${target} produced no bundle directory`);
+        bundles.push({ target, representation, bundleDirectory: path.basename(built.bundleOutput) });
+      }
     }
 
     assert.deepEqual(
@@ -261,10 +322,13 @@ try {
         "generated",
         "typechecked",
         "verified",
-        "bob-bundled",
+        prepareOnly ? "pre-bob-bundle-prepared" : "bob-bundled",
       ],
       bundles,
-      limitation: "Build and native link only; no packaged-game runtime was executed.",
+      ...(prepareOnly ? { projections } : {}),
+      limitation: prepareOnly
+        ? "Locally compiled and projected; Bob, native link, and packaged-game runtime were not executed."
+        : "Build and native link only; no packaged-game runtime was executed.",
     });
   }
   await mkdir(path.dirname(output), { recursive: true });
