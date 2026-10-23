@@ -305,6 +305,20 @@ function shapeContains(shapes, index, predicate, seen = new Set()) {
   return shape.children.some((child) => shapeContains(shapes, child, predicate, seen));
 }
 
+// One entry per callback in the driven value tree, including repeated shapes
+// under different fields. The slot identifies its containing argument; paths
+// retain the structural location for nested exact-call diagnostics.
+function callbackArgumentPaths(shapes, indices) {
+  const paths = [];
+  const collect = (index, path) => {
+    const shape = shapes[index];
+    if (shape.code === SHAPE.callback) paths.push(path);
+    else for (const [childIndex, child] of shape.children.entries()) collect(child, [...path, childIndex]);
+  };
+  for (const [slot, index] of indices.entries()) collect(index, [slot]);
+  return paths;
+}
+
 function collectHandleNeeds(shapes, index, into, seen = new Set()) {
   if (seen.has(index)) return;
   seen.add(index);
@@ -861,12 +875,12 @@ export function buildRecordingEngineModel(inputs) {
     } else if (browserCallback && browserSelection === "emit") {
       const callbackArgument = 1024 + (route.stableId % 8192);
       const callbackResult = 16384 + (route.stableId % 8192);
+      const callbackPaths = callbackArgumentPaths(shapeList, route.argumentShapes);
       route.exactVector.laneOverride = {
         lane: "browser-wasm-callback-registry",
         stableId: route.stableId,
-        callbackSlots: route.argumentShapes.flatMap((shapeIndex, index) =>
-          shapeList[shapeIndex].code === SHAPE.callback ? [index] : [],
-        ),
+        callbackSlots: callbackPaths.map(([slot]) => slot),
+        ...(callbackPaths.some((path) => path.length > 1) ? { callbackPaths } : {}),
         callbackInvocation: {
           argumentValues: [`num:${callbackArgument}`, `str:browser-callback-${route.stableId}`],
           resultValues: [`num:${callbackResult}`, `str:browser-result-${route.stableId}`],

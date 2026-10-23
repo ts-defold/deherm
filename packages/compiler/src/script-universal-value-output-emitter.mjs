@@ -1626,7 +1626,7 @@ export {DehermStaticValue,DehermStaticUndefined,DehermStaticNull,DehermStaticBoo
 
 /**
  * The browser target gate. A route is unexecutable in the browser host only
- * when this generator's own lifecycle ledger machine-blocks it; every other
+ * when its output shapes require an unsupported callable result; every other
  * selected route reaches the browser through the generated direct-memory
  * universal provider, whatever its optimized native lane does. The gate is a
  * structural consequence of the ledger, never a hand-maintained route list.

@@ -13,8 +13,6 @@ export { resolveBrowserExactPrerequisites } from "./check-dmsdk-browser-exact-ca
 import { defaultChromeBinary, openBundlePage, waitFor } from "../packages/cli/src/dev/browser-host.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const reportPath = path.join(root, "packages/bindings/generated/defold-script-recording-engine.json");
-const browserBootstrapPath = path.join(root, "defold/defold_hermes/lib/web/library_defold_hermes.js");
 
 function sha256(value) {
   return createHash("sha256").update(value).digest("hex");
@@ -88,8 +86,11 @@ export function extractProductionCallbackRegistry(source) {
   );
 }
 
-export async function materializeScriptBrowserCallbackExactVectors() {
-  const reportText = await readFile(reportPath, "utf8");
+export async function materializeScriptBrowserCallbackExactVectors(sourceRoot = root) {
+  const reportText = await readFile(
+    path.join(sourceRoot, "packages/bindings/generated/defold-script-recording-engine.json"),
+    "utf8",
+  );
   const report = JSON.parse(reportText);
   const target = report.applicabilityCatalog.targets.indexOf("browser-wasm");
   if (target < 0) throw new Error("script recording catalog has no browser-wasm target");
@@ -125,14 +126,16 @@ export async function materializeScriptBrowserCallbackExactVectors() {
   };
 }
 
-export async function buildScriptBrowserCallbackExactModule({ output, prerequisites }) {
-  const materialized = await materializeScriptBrowserCallbackExactVectors();
+export async function buildScriptBrowserCallbackExactModule({ output, prerequisites, sourceRoot = root }) {
+  const materialized = await materializeScriptBrowserCallbackExactVectors(sourceRoot);
   await mkdir(output, { recursive: true });
   await mkdir(prerequisites.emCache, { recursive: true });
   const htmlPath = path.join(output, "index.html");
   const callbackRegistryPath = path.join(output, "production_callback_registry.js");
   const runtimeLifecyclePath = path.join(output, "runtime_lifecycle.js");
-  const callbackRegistry = extractProductionCallbackRegistry(await readFile(browserBootstrapPath, "utf8"));
+  const callbackRegistry = extractProductionCallbackRegistry(
+    await readFile(path.join(root, "defold/defold_hermes/lib/web/library_defold_hermes.js"), "utf8"),
+  );
   await writeFile(callbackRegistryPath, callbackRegistry);
   await writeFile(
     runtimeLifecyclePath,
@@ -149,22 +152,23 @@ export async function buildScriptBrowserCallbackExactModule({ output, prerequisi
       "-sENVIRONMENT=web",
       "-sEXIT_RUNTIME=1",
       "-sFILESYSTEM=0",
+      `-I${path.join(sourceRoot, "defold/defold_hermes/include")}`,
       `-I${path.join(root, "defold/defold_hermes/include")}`,
-      `-I${path.join(root, "tests/fixtures")}`,
-      path.join(root, "defold/defold_hermes/src/generated_script_universal_value_bindings.cpp"),
-      path.join(root, "defold/defold_hermes/src/generated_script_universal_value_capi.cpp"),
+      `-I${path.join(sourceRoot, "tests/fixtures")}`,
+      path.join(sourceRoot, "defold/defold_hermes/src/generated_script_universal_value_bindings.cpp"),
+      path.join(sourceRoot, "defold/defold_hermes/src/generated_script_universal_value_capi.cpp"),
       path.join(root, "defold/defold_hermes/src/script_bridge_capi.cpp"),
-      path.join(root, "tests/fixtures/generated_script_recording_tables.cpp"),
-      path.join(root, "tests/fixtures/generated_script_recording_provider.cpp"),
-      path.join(root, "tests/fixtures/generated_script_recording_browser_callback_driver.cpp"),
+      path.join(sourceRoot, "tests/fixtures/generated_script_recording_tables.cpp"),
+      path.join(sourceRoot, "tests/fixtures/generated_script_recording_provider.cpp"),
+      path.join(sourceRoot, "tests/fixtures/generated_script_recording_browser_callback_driver.cpp"),
       "--js-library",
       callbackRegistryPath,
       "--pre-js",
       runtimeLifecyclePath,
       "--js-library",
-      path.join(root, "defold/defold_hermes/lib/web/generated_script_universal_value.js"),
+      path.join(sourceRoot, "defold/defold_hermes/lib/web/generated_script_universal_value.js"),
       "--js-library",
-      path.join(root, "tests/fixtures/generated_script_recording_browser_callback_driver.js"),
+      path.join(sourceRoot, "tests/fixtures/generated_script_recording_browser_callback_driver.js"),
       "-o",
       htmlPath,
     ],
@@ -211,7 +215,11 @@ export async function runScriptBrowserCallbackExactCall(options = {}) {
     options.output ?? (await mkdtemp(path.join(tmpdir(), "deherm-script-browser-callback-exact."))),
   );
   try {
-    const built = await buildScriptBrowserCallbackExactModule({ output, prerequisites });
+    const built = await buildScriptBrowserCallbackExactModule({
+      output,
+      prerequisites,
+      sourceRoot: options.sourceRoot,
+    });
     const marker = `DEHERM_SCRIPT_BROWSER_EXACT_OK routes=${built.vectors.length}`;
     const page = await openBundlePage({
       bundleDirectory: output,

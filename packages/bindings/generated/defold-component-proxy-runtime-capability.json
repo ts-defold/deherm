@@ -125,7 +125,7 @@
     },
     "adapterSource": {
       "path": "defold/defold_hermes/src/script_scalar_lua_adapter.cpp",
-      "sha256": "3617b8eada46411810a98c24bbc8868b5e1a313b85d20870c67d5bde83877db2"
+      "sha256": "6e5e548f0eddbeda0f8d04d11f35ff5f084bbf64a4f6ea1a4eaf847af9c1ffe7"
     },
     "componentSdk": {
       "path": "packages/sdk/src/component.ts",

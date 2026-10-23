@@ -188,4 +188,32 @@ any file outside these slices with root first.
   steps and is not counted as a failed code check. Adapter/runtime/test code is
   instrumented; upstream prebuilt Hermes objects are not.
 - Logs are retained under `/private/tmp/deherm-callback-wave-native-*.log`.
-  Browser/generator, clean-room, aggregate and exact-alpha replay are pending.
+- Generator B and root integration: callback input eligibility no longer needs
+  a reviewed lifetime; callable output blocking is derived from output shape.
+  Generic metadata remains null rather than inventing terminal/one-shot facts.
+  Recording fixtures traverse bounded nested records and use an isolated
+  synthetic surface for actual browser verification. Pure mutation tests are
+  registered in the normal aggregate; the opt-in browser execution and native
+  ownership fixture are wired into the existing policy engine job.
+- Root independently compared committed pre-change lowering output with the
+  regenerated baseline: all 12,140 backend selections and 2,428 implementation
+  lane sets are unchanged. This is generation/selection evidence, not a new
+  end-to-end performance measurement.
+- Owning regeneration refreshed the canonical sentinel before recipe extraction;
+  the additive local fixture store was pruned only through its generator.
+  The regenerated policy closure passes its generator check. No published
+  historical policy or contributor upstream pin was changed.
+- Browser execution passed outside the macOS sandbox: existing real Wasm probe
+  exercised 1,052 routes, including 23 callback routes; the unseen nested-input
+  probe observed two callbacks, four invocations, two releases and four bridge
+  reentries. Both initial sandbox launches aborted Chrome before its debugging
+  endpoint opened; the unchanged probes passed with the bounded escalation.
+- Native regular and ASan/UBSan targets passed again after shared regeneration.
+- Integration reconciled downstream hashes through the declared source pipeline:
+  accounting descriptions feed table schemas/records, the canonical plan feeds
+  typed-native reports, and recording must run after plan refresh. The independent
+  source-pipeline SDK golden was refreshed with its capture command. No generated
+  bytes were edited manually. Fresh clean-room and aggregate results are pending.
+- Focused materializer/generator tests passed 37/37, with the opt-in browser test
+  skipped in that unit invocation and executed separately as recorded above.
+- Exact-alpha hosted replay remains pending until the signed integration push.

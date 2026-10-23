@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
-  "scope": "Every callable script route selected mechanically by one bounded universal value-graph fallback; browser callbacks are promoted only when the generated lifecycle ledger marks them registry-eligible, and optimized lanes remain preferred at runtime.",
+  "scope": "Every callable script route selected mechanically by one bounded universal value-graph fallback; browser callback inputs use the bounded registry transport independently of optional reviewed lifecycle specialization, callable results stay blocked, and optimized lanes remain preferred at runtime.",
   "evidenceBoundary": "The shared recursive Lua backend, fixed-layout C ABI, sound-typed Static Hermes frame marshaller, direct-memory browser provider, and browser callback trampoline are generated and independently harness-tested. Static Hermes runtime execution proves the shape subset that carries no retained Lua handle, whose Defold value types all have a pinned transparent layout, and whose callback inputs are optional and declined to the JSI lane when present; packaged Defold and packaged browser execution remain unverified.",
   "selection": {
     "loweringFamilies": [
@@ -937,9 +937,9 @@
     ]
   },
   "targetSupport": {
-    "nativeDynamicHermes": "generated-recursive-jsi-lua-adapter-with-23-registry-eligible-callback-inputs-and-2-rooted-higher-order-lua-closure-results-native-harness-proven-packaged-engine-unverified",
+    "nativeDynamicHermes": "generated-recursive-jsi-lua-adapter-with-registry-callback-inputs-and-rooted-higher-order-lua-closure-results-native-harness-proven-packaged-engine-unverified",
     "nativeStaticHermes": "generated-sound-typed-fixed-capacity-frame-marshal-runtime-proven-for-optional-input-callbacks-that-decline-to-jsi-non-handle-non-defold-value-shapes-packaged-engine-unverified",
-    "html5BrowserHost": "generated-direct-wasm-memory-provider-plus-23-registry-eligible-callback-trampolines-node-and-native-harness-proven-2-higher-order-lua-closures-blocked-packaged-browser-engine-unverified"
+    "html5BrowserHost": "generated-direct-wasm-memory-provider-plus-registry-callback-trampolines-node-and-native-harness-proven-higher-order-lua-closures-blocked-packaged-browser-engine-unverified"
   },
   "targetEvidence": {
     "nativeDynamicHermes": {
@@ -1007,10 +1007,10 @@
     }
   },
   "inputHashes": {
-    "projection": "9f6072dc210528fa3bbc0cbb2957f0984c6fbe3657d31326be639a576e3e063a",
+    "projection": "e97f1d6f6bd6cb083746be35b268876cc0f0b0f2c8ec668d651e972849c32804",
     "apiIr": "1e7e05b70976fb689b8416ecff7b5911122de0691d7f76a6a7455e20e3630049",
     "callbacks": "2303eaf9998bb4e4de658cc3d8966ebcae540a986d19bfd228954fea49e90c57",
-    "classification": "cabf4cd6b94a6bea60bea2f4a2aa31b62229c2cc576fcdc75213616f13a39bc7",
+    "classification": "76885a4d22a57002239057b6a2ea3129052e89ccb17cff7e291c7e70f4f8f8ba",
     "policy": "b3175f748511992272cd33980fc6c0737e920c152d9880f1e63e503061e11f7b",
     "layouts": "a905f72450a2164d414d90e37359ea9b0207609ead5c16e928b39400c32f3d5b",
     "constants": "53815679718931177edd274504ea8f2decba28f6dac328f27a039070a2c82198"

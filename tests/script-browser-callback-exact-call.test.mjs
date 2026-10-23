@@ -42,8 +42,8 @@ test("browser exact vectors close every emitted direct-memory and callback route
           vector.callbackSlots.length > 0 &&
           vector.callbackInvocation.argumentValues.length === 2 &&
           vector.callbackInvocation.resultValues.length === 2 &&
-          typeof vector.lifecycle.lifetime === "string" &&
-          typeof vector.lifecycle.owner === "string",
+          (vector.lifecycle.lifetime === null || typeof vector.lifecycle.lifetime === "string") &&
+          (vector.lifecycle.owner === null || typeof vector.lifecycle.owner === "string"),
       ),
   );
   assert.equal(new Set(materialized.vectors.map(({ stableId }) => stableId)).size, browserSummary.routeCount);
@@ -84,7 +84,9 @@ test("generated browser driver uses the production arena and reverse trampoline"
   assert.match(library, /result handles; expected/);
   assert.doesNotMatch(library, /ccall|cwrap|Embind|embind/);
   assert.match(provider, /std::array<ScriptCallback,/);
-  assert.match(provider, /callbacks\.callbacks\[callbacks\.count\+\+\] = \*callback/);
+  assert.match(provider, /observation\.callbacks\[observation\.count\+\+\] = \*callback/);
+  assert.match(provider, /retainBrowserCallbacks\(entries\[index\]\.value/);
+  assert.match(library, /for\(var invocation=0;invocation<2;\+\+invocation\)/);
   assert.match(provider, /gBrowserHandleReleaseCount/);
   assert.match(provider, /browser released the wrong handle identity/);
   assert.doesNotMatch(provider, /void Release\(void\*, ScriptHandleKind, uint32_t, uint64_t\) noexcept \{\}/);

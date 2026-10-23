@@ -147,6 +147,12 @@ function shapeKinds(signature) {
   return [...kinds].sort(compareCodeUnits);
 }
 
+function containsCallbackShape(value) {
+  if (!value || typeof value !== "object") return false;
+  if (value.kind === "callback") return true;
+  return Object.values(value).some(containsCallbackShape);
+}
+
 function marshallingProgram(signature, invoker) {
   const operations = [];
   const parameters = signature.parameters ?? [];
@@ -1223,6 +1229,7 @@ function staticOptionalCallbackTransport(signature) {
     if (shape.result) walk(shape.result, childOptional, phase);
     for (const value of shape.values ?? []) walk(value, childOptional, phase);
     for (const value of shape.types ?? []) walk(value, childOptional, phase);
+    for (const value of shape.variants ?? []) walk(value, childOptional, phase);
     for (const parameter of shape.parameters ?? []) {
       walk(parameter.value ?? parameter.type, childOptional || parameter.optional === true, "input");
     }
@@ -1242,8 +1249,7 @@ function backendRecord(unit, target, resolutions, implementationLanes, valueType
   const resolved = new Map(resolutions.get(unit.identity.id) ?? []);
   const implementations = implementationLanes.get(unit.identity.id) ?? [];
   const universalImplementation = implementations.find(({ lane }) => lane === "script-universal-value");
-  const higherOrderClosure =
-    unit.shapeKinds.includes("callback") && universalImplementation?.browserCallback?.registryEligible === false;
+  const higherOrderClosure = containsCallbackShape(unit.publicSignature.returns);
   const unsupportedHigherOrderClosure = higherOrderClosure && target.target !== "dynamicHermesJsi";
   const universalCallbackTransport =
     !unit.shapeKinds.includes("callback") || universalImplementation?.browserCallback?.registryEligible === true;

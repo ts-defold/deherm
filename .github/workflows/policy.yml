@@ -373,6 +373,7 @@ jobs:
         run: pnpm configure:native
       - name: Compile and run generated Lua/script exact-call twins
         run: |
+          node scripts/build-script-api-e2e.mjs
           cmake --build build/native --target \
             defold-hermes-script-recording-engine \
             defold-hermes-script-recording-lua-adapter \
@@ -380,6 +381,7 @@ jobs:
             defold-hermes-script-recording-native-pod \
             defold-hermes-lua-bridge-test \
             defold-hermes-lua-hermes-e2e \
+            defold-hermes-script-api-hermes-e2e \
             defold-hermes-static-special-call-test \
             --parallel
           build/native/defold-hermes-script-recording-engine \
@@ -392,6 +394,7 @@ jobs:
             tests/fixtures/generated_script_recording_native_pod_driver.js
           build/native/defold-hermes-lua-bridge-test
           build/native/defold-hermes-lua-hermes-e2e
+          build/native/defold-hermes-script-api-hermes-e2e build/script-api-e2e.js
           build/native/defold-hermes-static-special-call-test
           node --test tests/web-library.test.mjs
       - name: Compile and run the bounded Static Hermes exact-call unit
@@ -420,6 +423,8 @@ jobs:
         run: pnpm test:dmsdk-browser-exact-call
       - name: Compile and run every emitted script exact call in real browser Wasm
         run: pnpm test:script-browser-exact-call
+      - name: Exercise unseen callback registrations in real browser Wasm
+        run: DEHERM_TEST_CALLBACK_FALLBACK_BROWSER=1 node --test tests/script-callback-fallback.test.mjs
       - id: engine
         name: Materialize the runtime and exercise every generated route
         continue-on-error: true

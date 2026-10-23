@@ -41,12 +41,43 @@ struct BrowserCallbackObservation {
   // ScriptValue::data points into the per-call decoder arena. Persist the
   // callback record by value while retaining its registry context; retaining
   // only the arena pointer would make the reverse call use dead scratch.
-  std::array<ScriptCallback, DEHERM_RECORDING_MAX_ARGUMENT_COUNT> callbacks{};
+  std::array<ScriptCallback, DEHERM_RECORDING_MAX_BROWSER_CALLBACK_COUNT> callbacks{};
   uint32_t count = 0;
   uint32_t invocations = 0;
 };
 
 BrowserCallbackObservation gBrowserCallbacks[DEHERM_RECORDING_ROUTE_COUNT];
+
+uint32_t releaseBrowserCallbacks(BrowserCallbackObservation& observation) {
+  const uint32_t count = observation.count;
+  while (observation.count != 0) {
+    ScriptCallback& callback = observation.callbacks[--observation.count];
+    if (callback.release) callback.release(callback.context);
+    callback = {};
+  }
+  return count;
+}
+
+bool retainBrowserCallbacks(const ScriptValue& value, BrowserCallbackObservation& observation,
+    uint32_t depth, uint32_t& remainingEntries) {
+  if (depth > DEHERM_RECORDING_MAX_INPUT_DEPTH) return false;
+  if (value.tag == ScriptValueTag::kCallback) {
+    const auto* callback = static_cast<const ScriptCallback*>(value.data);
+    if (!callback || !callback->invoke || !callback->retain || !callback->release ||
+        observation.count >= observation.callbacks.size()) return false;
+    callback->retain(callback->context);
+    observation.callbacks[observation.count++] = *callback;
+  } else if (value.tag == ScriptValueTag::kTable) {
+    if (value.length > remainingEntries || (value.length != 0 && !value.data)) return false;
+    remainingEntries -= value.length;
+    const auto* entries = static_cast<const ScriptTableEntry*>(value.data);
+    for (uint32_t index = 0; index < value.length; ++index) {
+      if (!retainBrowserCallbacks(entries[index].key, observation, depth + 1u, remainingEntries) ||
+          !retainBrowserCallbacks(entries[index].value, observation, depth + 1u, remainingEntries)) return false;
+    }
+  }
+  return true;
+}
 uint32_t gBrowserHandleReleaseCount = 0;
 uint32_t gBrowserHandleIssuedOrdinal = DEHERM_RECORDING_HANDLE_SEED_COUNT;
 uint32_t gBrowserHandleReleaseByOrdinal[DEHERM_RECORDING_BROWSER_HANDLE_RELEASE_CAPACITY]{};
@@ -496,19 +527,15 @@ bool Dispatch(void*, ScriptCallFrame* frame) {
       return false;
     }
     callbacks.invocations = 0;
+    uint32_t remainingEntries = DEHERM_RECORDING_MAX_INPUT_ENTRIES;
     for (uint32_t index = 0; index < frame->argumentCount; ++index) {
-      if (frame->arguments[index].tag != ScriptValueTag::kCallback) continue;
-      auto* callback = const_cast<ScriptCallback*>(
-          static_cast<const ScriptCallback*>(frame->arguments[index].data));
-      if (!callback || !callback->invoke || !callback->retain || !callback->release ||
-          callbacks.count >= callbacks.callbacks.size()) {
+      if (!retainBrowserCallbacks(frame->arguments[index], callbacks, 0, remainingEntries)) {
+        releaseBrowserCallbacks(callbacks);
         observation.violation = "browser-callback-contract-is-malformed";
         ++gViolations;
         std::snprintf(gLastError, sizeof(gLastError), "%s", observation.violation.c_str());
         return false;
       }
-      callback->retain(callback->context);
-      callbacks.callbacks[callbacks.count++] = *callback;
     }
   }
 
@@ -741,13 +768,7 @@ int deherm_recording_browser_invoke_callback(
 uint32_t deherm_recording_browser_release_callbacks(uint32_t route) {
   if (route >= DEHERM_RECORDING_ROUTE_COUNT) return 0;
   BrowserCallbackObservation& observation = gBrowserCallbacks[route];
-  const uint32_t count = observation.count;
-  while (observation.count) {
-    ScriptCallback& callback = observation.callbacks[--observation.count];
-    if (callback.release) callback.release(callback.context);
-    callback = {};
-  }
-  return count;
+  return releaseBrowserCallbacks(observation);
 }
 
 int deherm_recording_browser_verify_route(
@@ -760,7 +781,7 @@ int deherm_recording_browser_verify_route(
   const BrowserCallbackObservation& callbacks = gBrowserCallbacks[route];
   return descriptor.stableId == stableId && observation.recorded &&
       observation.violation.empty() && observation.arity == expectedArgumentCount &&
-      observation.arguments == expectedArguments && callbacks.invocations == callbacks.count;
+      observation.arguments == expectedArguments && callbacks.invocations == callbacks.count * 2u;
 }
 
 }  // extern "C"

@@ -201,6 +201,7 @@ function staticOptionalCallbackTransport(signature) {
     if (shape.result) walk(shape.result, childOptional, phase);
     for (const value of shape.values ?? []) walk(value, childOptional, phase);
     for (const value of shape.types ?? []) walk(value, childOptional, phase);
+    for (const value of shape.variants ?? []) walk(value, childOptional, phase);
     for (const parameter of shape.parameters ?? []) {
       walk(parameter.value ?? parameter.type, childOptional || parameter.optional === true, "input");
     }
@@ -408,6 +409,7 @@ export function generateUniversalValueBindings(inputs) {
     const signature = signatureById.get(row.id);
     assert(signature, `${row.id}: universal selection lost its projected signature`);
     const callback = callbackById.get(row.id);
+    const callbackResult = collectShapeKinds(signature.returns).has("callback");
     const resultSemanticKind = resultSemanticKindById.get(row.id) ?? null;
     const sized = {
       ...row,
@@ -427,17 +429,18 @@ export function generateUniversalValueBindings(inputs) {
         id: row.id,
         status: VOID,
         reason: "unreviewed-callback-lifecycle",
-        detail: "The API and universal descriptor are emitted, but the browser callback transport stays fail-closed.",
+        detail:
+          "Reviewed lifecycle specialization is absent; generic callback inputs retain their Lua-owned registry transport.",
       });
       return {
         ...sized,
         browserCallback: {
-          registryEligible: false,
+          registryEligible: !callbackResult,
           reviewedLifecycle: false,
           lifetime: null,
           owner: null,
           threadAffinity: null,
-          machineBlock: "unreviewed-callback-lifecycle-for-revision",
+          machineBlock: callbackResult ? "blocked-higher-order-lua-closure" : null,
         },
       };
     }
@@ -445,7 +448,7 @@ export function generateUniversalValueBindings(inputs) {
       ? {
           ...sized,
           browserCallback: {
-            registryEligible: callback.registryEligible,
+            registryEligible: !callbackResult,
             lifetime: callback.lifetime,
             owner: callback.owner,
             threadAffinity: callback.threadAffinity,
@@ -506,8 +509,11 @@ export function generateUniversalValueBindings(inputs) {
   const reviewedBlockedBrowserCallbackRoutes = blockedBrowserCallbackRoutes.filter(
     ({ browserCallback }) => browserCallback.reviewedLifecycle !== false,
   );
+  const reviewedBrowserCallbackRoutes = browserCallbackRoutes.filter(
+    ({ browserCallback }) => browserCallback.reviewedLifecycle !== false,
+  );
   assert(
-    browserCallbackRoutes.length === callbacks.registryEligibleRouteCount &&
+    reviewedBrowserCallbackRoutes.length === callbacks.registryEligibleRouteCount &&
       reviewedBlockedBrowserCallbackRoutes.length === callbacks.higherOrderClosureRouteCount,
     "universal browser callback partition differs from the lifecycle ledger",
   );
@@ -579,7 +585,7 @@ export function generateUniversalValueBindings(inputs) {
     schemaVersion: 1,
     defoldRevision: projection.defoldRevision,
     scope:
-      "Every callable script route selected mechanically by one bounded universal value-graph fallback; browser callbacks are promoted only when the generated lifecycle ledger marks them registry-eligible, and optimized lanes remain preferred at runtime.",
+      "Every callable script route selected mechanically by one bounded universal value-graph fallback; browser callback inputs use the bounded registry transport independently of optional reviewed lifecycle specialization, callable results stay blocked, and optimized lanes remain preferred at runtime.",
     evidenceBoundary:
       "The shared recursive Lua backend, fixed-layout C ABI, sound-typed Static Hermes frame marshaller, direct-memory browser provider, and browser callback trampoline are generated and independently harness-tested. Static Hermes runtime execution proves the shape subset that carries no retained Lua handle, whose Defold value types all have a pinned transparent layout, and whose callback inputs are optional and declined to the JSI lane when present; packaged Defold and packaged browser execution remain unverified.",
     selection: policy.selection,
