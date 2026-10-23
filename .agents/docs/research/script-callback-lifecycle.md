@@ -4,6 +4,14 @@ title: Generated script callback lifecycle frontier
 description: Source-pinned lifecycle metadata and fixed-capacity ownership rules for all callback-shaped Defold script APIs.
 tags: [research, generated, script-api, callbacks, lifecycle, memory]
 status: active
+generated: { by: codex/gpt-6, at: 2026-10-23T11:53:03Z }
+sources:
+  - resource: ../../../defold/defold_hermes/src/script_scalar_lua_adapter.cpp
+    title: Generic callback roots and adapter lifetime guard
+  - resource: ../../../native/script_api_hermes_e2e.cpp
+    title: Real Lua and Hermes ownership regressions
+  - resource: ../decisions/callback-fallback-resilience.md
+    title: Reviewed implementation and verification plan
 ---
 
 # Generated script callback lifecycle frontier
@@ -80,10 +88,23 @@ userdata arguments are recorded in a fixed borrowed-handle ledger and released
 on successful invocation, JavaScript failure, or argument-decoding failure;
 the JSI/browser wrappers are non-owning so finalization cannot double-release
 them. The ASan/UBSan Hermes/Lua harness exercises both success and failure
-cleanup, post-runtime invocation, and later Lua collection. Callback-bearing
-calls also consult the generated lifecycle ledger before Lua lookup. Ordinary
-retained inputs require `registryEligible`; a higher-order route must instead
-carry the generated `higher-order-closure` lifetime before it may reach Lua.
+cleanup, post-runtime invocation, and later Lua collection. Native generic
+callback inputs no longer depend on membership in the reviewed lifecycle
+ledger. Lua reachability owns their retained descriptors; lifetime metadata
+remains specialization evidence rather than an executable-route allowlist.
+Each callback userdata also retains the adapter's existing lifetime guard.
+Shutdown invalidates it before adapter resources are released, so later Lua
+finalizers reject invocation without dereferencing the destroyed adapter.
+Reinitialization creates a distinct lifetime rather than reviving old closures.
+
+The native regression adds nested callback records on a generic transport
+fixture, deferred/repeated invocation, bridge reentry, retained callbacks after
+Lua failure, exact retain/release counts, and callback invocation during Lua
+finalization after adapter destruction. The old executable rejects this input
+at the removed ledger gate; the rebuilt real Lua/Hermes executable passes.
+ASan/UBSan passes for the adapter/runtime/test targets; upstream prebuilt
+Hermes objects are not sanitizer-instrumented. This is bridge ownership
+evidence, not a claim that Defold's real `sys.save` serializes functions.
 
 Dynamic Hermes now emits all 25 callback routes. A returned `LUA_TFUNCTION` is
 captured in a generation-scoped registry reference and exposed as an owning JSI

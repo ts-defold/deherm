@@ -176,5 +176,23 @@ globalThis.__defoldAppV1 = {
     }
 
     globalThis.__defoldHostV1.log("info", `after-error:${sys.getConfigInt("speed", 1)}`);
+
+    let deferredCalls = 0;
+    sys.save("callback", {
+      nested: {
+        callback(value: number) {
+          if (value < 0) throw new Error("deferred generic callback failure");
+          const result = value === 2 ? sys.getConfigInt("speed", 1) : value;
+          return result + ++deferredCalls;
+        },
+      },
+    });
+    let retainedFailure = false;
+    try {
+      sys.save("callback-error", { nested: { callback: () => 99 } });
+    } catch (error) {
+      retainedFailure = String(error).includes("retained callback before Lua failure");
+    }
+    if (!retainedFailure) throw new Error("generic callback Lua failure was not propagated");
   }
 };

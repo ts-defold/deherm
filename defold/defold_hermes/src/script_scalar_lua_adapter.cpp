@@ -1,6 +1,5 @@
 #include <defold_hermes/script_scalar_lua_adapter.hpp>
 #include <defold_hermes/value_tail_lua_trampoline.h>
-#include <defold_hermes/generated_script_callback_lifecycle.hpp>
 #include <defold_hermes/generated_script_value_bindings.hpp>
 #include <defold_hermes/script_matrix4_arena.hpp>
 #include <defold_hermes/script_url_arena.hpp>
@@ -99,6 +98,7 @@ constexpr const char* kLuaErrorTablePrefix = "__deherm_lua_error_table_v1__:";
 
 struct CallbackLuaRoot {
   ScriptCallback* callback = nullptr;
+  std::shared_ptr<LuaClosureLifetime> lifetime;
 };
 
 struct CallbackConsumeContext {
@@ -107,18 +107,6 @@ struct CallbackConsumeContext {
   int baseTop = 0;
   int resultCount = 0;
 };
-
-bool containsCallback(const ScriptValue& value, uint32_t depth = 0) noexcept {
-  if (value.tag == ScriptValueTag::kCallback) return true;
-  if (value.tag != ScriptValueTag::kTable || !value.data ||
-      depth >= universal_value::kMaximumDepth) return false;
-  const auto* entries = static_cast<const ScriptTableEntry*>(value.data);
-  for (uint32_t index = 0; index < value.length; ++index) {
-    if (containsCallback(entries[index].key, depth + 1) ||
-        containsCallback(entries[index].value, depth + 1)) return true;
-  }
-  return false;
-}
 
 const universal_value::ResultShapeNode* resultShapeChild(
     const universal_value::ResultShapeNode& shape,
@@ -782,6 +770,7 @@ int ScriptAdapter::LuaCallbackGc(lua_State* state) {
     ScriptCallback* callback = root->callback;
     root->callback = nullptr;
     callback->release(callback->context);
+    root->lifetime.reset();
   }
   return 0;
 }
@@ -806,11 +795,17 @@ bool ScriptAdapter::ConsumeCallbackResults(
 }
 
 int ScriptAdapter::LuaCallbackThunk(lua_State* state) {
-  auto* adapter = static_cast<ScriptAdapter*>(lua_touserdata(state, lua_upvalueindex(1)));
   auto* root = static_cast<CallbackLuaRoot*>(lua_touserdata(state, lua_upvalueindex(2)));
-  if (!adapter || !root || !root->callback || !root->callback->invoke) {
+  if (!root || !root->callback || !root->callback->invoke) {
     return luaL_error(state, "deherm callback is unavailable");
   }
+  // Lua finalizers can invoke a retained closure after extension finalization
+  // destroyed its adapter. Inspect the independently retained lifetime first.
+  if (!root->lifetime || !root->lifetime->active) {
+    return luaL_error(state, "deherm callback belongs to a destroyed Defold script adapter");
+  }
+  auto* adapter = static_cast<ScriptAdapter*>(lua_touserdata(state, lua_upvalueindex(1)));
+  if (!adapter) return luaL_error(state, "deherm callback is unavailable");
   const int argumentCount = lua_gettop(state);
   if (argumentCount < 0 || static_cast<size_t>(argumentCount) > universal_value::kMaximumArgumentCount) {
     return luaL_error(state, "deherm callback argument count exceeds the generated bound");
@@ -1191,8 +1186,8 @@ bool ScriptAdapter::pushStructuredValue(
         if (!callback->invoke || !callback->retain || !callback->release) {
           return fail("Structured Lua callback descriptor is incomplete");
         }
-        auto* root = static_cast<CallbackLuaRoot*>(lua_newuserdata(state_, sizeof(CallbackLuaRoot)));
-        root->callback = callback;
+        void* storage = lua_newuserdata(state_, sizeof(CallbackLuaRoot));
+        new (storage) CallbackLuaRoot{callback, luaClosureLifetime_};
         callback->retain(callback->context);
         if (luaL_newmetatable(state_, kCallbackMetatable)) {
           lua_pushcfunction(state_, LuaCallbackGc);
@@ -2554,19 +2549,6 @@ universal_value::DispatchStatus ScriptAdapter::invokeUniversalValue(
   if (!state_ || !frame) {
     writeError(error, errorCapacity, "Universal-value Lua backend is not initialized");
     return Status::kError;
-  }
-  bool hasCallback = false;
-  for (uint32_t index = 0; index < frame->argumentCount; ++index) {
-    hasCallback = hasCallback || containsCallback(frame->arguments[index]);
-  }
-  if (hasCallback) {
-    const auto* lifecycle = callback_lifecycle::find(operation.stableId);
-    if (!lifecycle || (!lifecycle->registryEligible &&
-        lifecycle->lifetime != callback_lifecycle::Lifetime::kHigherOrderClosure)) {
-      writeError(error, errorCapacity,
-          "Universal-value callback route is absent from the generated executable lifecycle ledger");
-      return Status::kError;
-    }
   }
   if (!bindUniversalValue(operation)) {
     writeError(error, errorCapacity, lastError());

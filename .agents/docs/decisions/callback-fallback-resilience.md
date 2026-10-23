@@ -175,3 +175,17 @@ scripts, central test registration, generated outputs, integration and commits.
 Luna owns execution of validation commands and the external verification log.
 Neither implementer runs shared regeneration or broad CMake builds. Coordinate
 any file outside these slices with root first.
+
+# Verification ledger
+
+- Planning baseline: lifecycle 6/6, browser unit 4/4, generator suites 12/12
+  passed on the unchanged pinned surface. These did not catch an unseen route.
+- Native A: Luna rebuilt the authored fixture, observed the pre-fix executable
+  fail at the reviewed-ledger gate, rebuilt the focused real Lua/Hermes target
+  with parallelism 2, and observed `script-api-hermes-e2e:ok`.
+- Native A sanitizer: the same target passed ASan/UBSan in the existing isolated
+  sanitizer tree. A fresh tree's redundant Hermes build was stopped at 93/498
+  steps and is not counted as a failed code check. Adapter/runtime/test code is
+  instrumented; upstream prebuilt Hermes objects are not.
+- Logs are retained under `/private/tmp/deherm-callback-wave-native-*.log`.
+  Browser/generator, clean-room, aggregate and exact-alpha replay are pending.

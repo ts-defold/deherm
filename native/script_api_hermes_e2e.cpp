@@ -1,6 +1,7 @@
 #include <defold_hermes/runtime.hpp>
 #include <defold_hermes/script_bridge_capi.hpp>
 #include <defold_hermes/script_scalar_lua_adapter.hpp>
+#include <defold_hermes/generated_script_callback_lifecycle.hpp>
 
 #include <dmsdk/dlib/vmath.h>
 
@@ -8,6 +9,7 @@
 #include <cstdlib>
 #include <fstream>
 #include <limits>
+#include <memory>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -60,7 +62,16 @@ int Exists(lua_State* state) {
 
 int Save(lua_State* state) {
   CheckInstance(state);
-  if (std::string(luaL_checkstring(state, 1)) != "state") return luaL_error(state, "wrong save path");
+  const std::string path = luaL_checkstring(state, 1);
+  if (path == "callback" || path == "callback-error") {
+    lua_getfield(state, 2, "nested");
+    lua_getfield(state, -1, "callback");
+    luaL_checktype(state, -1, LUA_TFUNCTION);
+    lua_setglobal(state, path == "callback" ? "__dehermGenericCallback" : "__dehermFailedJsCallback");
+    if (path == "callback-error") return luaL_error(state, "retained callback before Lua failure");
+    return 0;
+  }
+  if (path != "state") return luaL_error(state, "wrong save path");
   if (!lua_istable(state, 2)) return luaL_error(state, "save payload is not a table");
   lua_getfield(state, 2, "score");
   if (lua_tonumber(state, -1) != 42) return luaL_error(state, "save score mismatch");
@@ -315,6 +326,127 @@ defold_hermes::ScriptBridgeApi HarnessApi(BridgeHarness& harness) {
   return {&harness, DispatchHarness, LastHarnessError, ReleaseHarnessHandle};
 }
 
+struct CallbackProbe {
+  uint32_t retained = 0;
+  uint32_t released = 0;
+  uint32_t invoked = 0;
+  uint32_t finalized = 0;
+};
+
+bool InvokeProbe(void* raw, const defold_hermes::ScriptCallFrame*, void* context,
+    defold_hermes::ScriptCallbackConsume consume, char*, size_t) noexcept {
+  ++static_cast<CallbackProbe*>(raw)->invoked;
+  const defold_hermes::ScriptCallFrame results{};
+  return consume(context, &results);
+}
+
+void RetainProbe(void* raw) noexcept { ++static_cast<CallbackProbe*>(raw)->retained; }
+void ReleaseProbe(void* raw) noexcept { ++static_cast<CallbackProbe*>(raw)->released; }
+
+void InvokeRetained(lua_State* state, const char* name, const char* expectedError = nullptr) {
+  const int base = lua_gettop(state);
+  lua_getglobal(state, name);
+  if (!lua_isfunction(state, -1)) Fail("generic nested callback was not retained");
+  const int status = lua_pcall(state, 0, 0, 0);
+  if (expectedError) {
+    const char* error = lua_tostring(state, -1);
+    if (status == 0 || !error || !std::strstr(error, expectedError)) {
+      Fail("retained callback did not fail with the expected lifetime error");
+    }
+    lua_pop(state, 1);
+  } else if (status != 0) {
+    Fail(lua_tostring(state, -1));
+  }
+  if (lua_gettop(state) != base) Fail("retained callback leaked Lua stack");
+}
+
+void CheckGenericCallbackOwnership() {
+  constexpr uint32_t stableId = UINT32_C(798578280);  // sys.save accepts a generic record.
+  if (defold_hermes::callback_lifecycle::find(stableId)) Fail("generic probe acquired reviewed callback metadata");
+  lua_State* state = luaL_newstate();
+  if (!state) Fail("unable to create callback ownership Lua state");
+  const luaL_Reg sys[] = {{"save", Save}, {nullptr, nullptr}};
+  Register(state, "sys", sys);
+  CallbackProbe probe;
+  defold_hermes::ScriptCallback callback{&probe, InvokeProbe, RetainProbe, ReleaseProbe};
+  auto adapter = std::make_unique<scalar::ScriptAdapter>();
+  const auto* profile = defold_hermes::script_handle_lowering::findRuntimeProfile("default-legacy-bullet");
+  auto initialize = [&]() {
+    if (!profile || !adapter->initialize(state, {GetInstance, SetInstance},
+            defold_hermes::script_handle_lowering::runtimeProfileHandshake(*profile))) Fail("callback adapter initialization failed");
+    lua_pushnumber(state, 42);
+    if (!adapter->captureInstance(-1)) Fail(adapter->lastError());
+    lua_pop(state, 1);
+  };
+  auto dispatch = [&](const char* path) {
+    defold_hermes::ScriptTableEntry inner{};
+    inner.key.tag = defold_hermes::ScriptValueTag::kString;
+    inner.key.data = "callback";
+    inner.key.length = 8;
+    inner.value.tag = defold_hermes::ScriptValueTag::kCallback;
+    inner.value.data = &callback;
+    defold_hermes::ScriptTableEntry outer{};
+    outer.key.tag = defold_hermes::ScriptValueTag::kString;
+    outer.key.data = "nested";
+    outer.key.length = 6;
+    outer.value.tag = defold_hermes::ScriptValueTag::kTable;
+    outer.value.data = &inner;
+    outer.value.length = 1;
+    defold_hermes::ScriptValue arguments[2]{};
+    arguments[0].tag = defold_hermes::ScriptValueTag::kString;
+    arguments[0].data = path;
+    arguments[0].length = static_cast<uint32_t>(std::strlen(path));
+    arguments[1].tag = defold_hermes::ScriptValueTag::kTable;
+    arguments[1].data = &outer;
+    arguments[1].length = 1;
+    defold_hermes::ScriptCallFrame frame{};
+    frame.stableId = stableId;
+    frame.arguments = arguments;
+    frame.argumentCount = 2;
+    return adapter->api().dispatch(adapter->api().context, &frame);
+  };
+  initialize();
+  callback.release = nullptr;
+  if (dispatch("callback") || probe.retained != 0) Fail("incomplete callback descriptor was retained");
+  callback.release = ReleaseProbe;
+  if (!dispatch("callback")) Fail(adapter->lastError());
+  InvokeRetained(state, "__dehermGenericCallback");
+  InvokeRetained(state, "__dehermGenericCallback");
+  if (dispatch("callback-error")) Fail("retaining Lua failure unexpectedly succeeded");
+  InvokeRetained(state, "__dehermFailedJsCallback");
+  if (probe.retained != 2 || probe.released != 0 || probe.invoked != 3) Fail("generic ownership counts before GC are wrong");
+  lua_pushnil(state);
+  lua_setglobal(state, "__dehermFailedJsCallback");
+  lua_gc(state, LUA_GCCOLLECT, 0);
+  lua_gc(state, LUA_GCCOLLECT, 0);
+  if (probe.released != 1) Fail("Lua failure callback was not released by GC");
+  initialize();
+  InvokeRetained(state, "__dehermGenericCallback", "destroyed Defold script adapter");
+  if (!dispatch("callback")) Fail(adapter->lastError());
+  lua_gc(state, LUA_GCCOLLECT, 0);
+  lua_gc(state, LUA_GCCOLLECT, 0);
+  if (probe.retained != 3 || probe.released != 2) Fail("reinitialization callback ownership counts are wrong");
+  InvokeRetained(state, "__dehermGenericCallback");
+  // This finalizer is created after the callback root, matching Lua's reachable
+  // extension-finalize -> adapter destruction -> lua_close teardown order.
+  lua_newuserdata(state, 1);
+  lua_newtable(state);
+  lua_pushlightuserdata(state, &probe);
+  lua_pushcclosure(state, [](lua_State* closing) -> int {
+    InvokeRetained(closing, "__dehermGenericCallback", "destroyed Defold script adapter");
+    ++static_cast<CallbackProbe*>(lua_touserdata(closing, lua_upvalueindex(1)))->finalized;
+    return 0;
+  }, 1);
+  lua_setfield(state, -2, "__gc");
+  lua_setmetatable(state, -2);
+  lua_setglobal(state, "__dehermCallbackFinalizer");
+  adapter->shutdown();
+  adapter.reset();
+  InvokeRetained(state, "__dehermGenericCallback", "destroyed Defold script adapter");
+  lua_close(state);
+  if (probe.invoked != 4 || probe.finalized != 1 || probe.released != 3) Fail("post-adapter Lua finalization ownership counts are wrong");
+}
+
 }  // namespace
 
 int main(int argc, char** argv) {
@@ -472,10 +604,34 @@ int main(int argc, char** argv) {
   if (host.transcript[20] != "info:after-error:36") Fail("dispatch did not recover after Lua error");
   if (gCurrentInstance != 7) Fail("Defold script instance was not restored");
   if (lua_gettop(state) != baseTop) Fail("Lua stack was not restored");
-  if (gObservedCalls != 29) Fail("unexpected number of Lua calls");
+  if (gObservedCalls != 31) Fail("unexpected number of Lua calls");
   if (gTitle != "deherm") Fail("void scalar call did not execute");
   if (bridgeHarness.byteCalls != 2) Fail("Uint8Array and ArrayBuffer did not both cross the JSI byte carrier");
 
+    auto invokeDeferred = [&](double argument, double expected, bool throws = false) {
+      lua_getglobal(state, "__dehermGenericCallback");
+      if (!lua_isfunction(state, -1)) Fail("JSI nested callback did not survive dispatch return");
+      lua_pushnumber(state, argument);
+      const int status = lua_pcall(state, 1, 1, 0);
+      if (throws) {
+        const char* error = lua_tostring(state, -1);
+        if (status == 0 || !error || !std::strstr(error, "deferred generic callback failure")) {
+          Fail("deferred JSI callback error did not cross Lua");
+        }
+      } else if (status != 0 || !lua_isnumber(state, -1) || lua_tonumber(state, -1) != expected) {
+        Fail("deferred JSI callback lost repeated invocation or nested bridge reentry");
+      }
+      lua_pop(state, 1);
+      if (lua_gettop(state) != baseTop || gCurrentInstance != 7) Fail("deferred callback leaked stack or script context");
+    };
+    invokeDeferred(10, 11);
+    invokeDeferred(20, 22);
+    invokeDeferred(-1, 0, true);
+    invokeDeferred(2, 39);
+    InvokeRetained(state, "__dehermFailedJsCallback");
+    lua_pushnil(state);
+    lua_setglobal(state, "__dehermFailedJsCallback");
+    lua_gc(state, LUA_GCCOLLECT, 0);
     runtime.finalize();
   }
 
@@ -497,6 +653,9 @@ int main(int argc, char** argv) {
     Fail("destroyed-runtime callback failure was not explicit");
   }
   lua_pop(state, 1);
+  InvokeRetained(state, "__dehermGenericCallback", "destroyed Hermes runtime");
+  lua_pushnil(state);
+  lua_setglobal(state, "__dehermGenericCallback");
   lua_pushnil(state);
   lua_setglobal(state, "__dehermRetainedJsCallback");
   lua_gc(state, LUA_GCCOLLECT, 0);
@@ -506,6 +665,7 @@ int main(int argc, char** argv) {
   defold_hermes::uninstallScriptBridgeApi();
   adapter.shutdown();
   lua_close(state);
+  CheckGenericCallbackOwnership();
   std::printf("script-api-hermes-e2e:ok\n");
   return 0;
 }
