@@ -213,7 +213,21 @@ any file outside these slices with root first.
   accounting descriptions feed table schemas/records, the canonical plan feeds
   typed-native reports, and recording must run after plan refresh. The independent
   source-pipeline SDK golden was refreshed with its capture command. No generated
-  bytes were edited manually. Fresh clean-room and aggregate results are pending.
+  bytes were edited manually. Both clean rooms and the final aggregate pass.
 - Focused materializer/generator tests passed 37/37, with the opt-in browser test
   skipped in that unit invocation and executed separately as recorded above.
 - Exact-alpha hosted replay remains pending until the signed integration push.
+- Aggregate verification passed both clean rooms (113 script and 135 dmSDK
+  artifacts), then rejected the stale War Battles Static Hermes projection.
+  Its owning regeneration changes only the plan, typed-bridge and record hashes;
+  reachable routes, generated source and selection are unchanged. Its focused
+  retest passed 13/13, and the complete aggregate subsequently passed.
+- Final local gate: `pnpm check` exited 0, including script/dmSDK clean rooms,
+  generated-state, type, package/materializer, Static Hermes bridge, game-session,
+  documentation and knowledge checks. Log:
+  `/private/tmp/deherm-callback-wave-integration-pnpm-check-final3.log`.
+- Final real-browser rerun passed against the final recording report. The normal
+  aggregate intentionally skips the opt-in browser execution; that execution was
+  run separately, not inferred from the unit suite. No packaged Defold gameplay,
+  new Static Hermes callback ABI, or cross-platform hosted result is claimed by
+  these local tests.
