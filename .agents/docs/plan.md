@@ -4,7 +4,7 @@ title: Defold Hermes implementation plan
 description: Phased plan for a TypeScript-to-Hermes native runtime and browser-native HTML5 bridge.
 tags: [defold, hermes, typescript, spike]
 status: active
-generated: { by: codex/gpt-5, at: 2026-09-17T00:00:00-04:00 }
+generated: { by: codex/gpt-6, at: 2026-10-23T11:45:00Z }
 sources:
   - id: defold-extensions
     resource: https://defold.com/manuals/extensions/
@@ -17,6 +17,10 @@ sources:
 ---
 
 # Outcome
+
+Current release-resilience wave: [callback fallback resilience](decisions/callback-fallback-resilience.md).
+That scoped plan owns the three review passes, task dependency graph, two Sol
+implementation slices, and Luna verification ledger for the alpha callback gap.
 
 Deliver a TypeScript game-logic runtime with generated, measurable compatibility
 for the complete Defold script API and public dmSDK:
