@@ -1,5 +1,17 @@
 # Defold Hermes knowledge log
 
+## 2026-11-04 - Audit cross-workflow release identity and recovery
+
+An independent read-only adversarial review found four open orchestration gaps:
+native completion loses the original derived compatibility inputs; consumer
+commands can silently select the committed baseline instead of the new revision;
+native queuing can replace pending requests; partial manual reconciliation can
+close unrelated failures. Integration review confirmed these code paths and
+GitHub's pending replacement behavior. The existing continuous-publication
+decision now records bounded corrections and distinguishing lifecycle tests in
+dependency order. These findings are not implemented fixes or hosted acceptance;
+the parser, fallback and immutable-artifact contracts remain unchanged.
+
 ## 2026-11-04 - Reconcile headless CI inputs and Apple runner routing
 
 Reproduced the stale headless-plan failure locally and refreshed its six input

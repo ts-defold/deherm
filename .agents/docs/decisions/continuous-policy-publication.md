@@ -4,8 +4,12 @@ title: Continuous policy generation, engine evidence, and publication
 description: One nightly policy workflow derives every tracked Defold revision, emits every mechanically representable API, records verification without gating publication, and publishes the accumulated policy store directly to the website.
 tags: [decision, generator, policy, ci, conformance, pages]
 status: accepted
-generated: { by: codex/gpt-6, at: 2026-11-04T18:58:31Z }
+generated: { by: codex/gpt-6, at: 2026-11-04T19:01:40Z }
 sources:
+  - resource: ../../../scripts/reconcile-policy-derivation-issues.mjs
+    title: Derivation issue reconciliation scope
+  - resource: https://docs.github.com/en/actions/how-tos/write-workflows/choose-when-workflows-run/control-workflow-concurrency
+    title: Pending workflow replacement and queue capacity
   - resource: ../../../scripts/check-end-to-end.mjs
     title: Project-locked consumer build gate
   - resource: ../../../.github/workflows/end-to-end.yml
@@ -103,6 +107,40 @@ Defold is authoritative for the API present at a revision:
 # Nightly graph
 
 ## Reliability plan for rolling Defold revisions
+
+### Open implementation gaps from the November 4 adversarial audit
+
+The accepted automated-publication design is not fully implemented across
+workflow boundaries. A read-only independent review identified these gaps;
+integration review confirmed the relevant code paths. They require orchestration
+corrections, not a parser/runtime rewrite. None is fixed merely by today's green
+consumer matrix.
+
+| Priority | Missing invariant | Bounded correction and distinguishing regression |
+| --- | --- | --- |
+| High | Every derived compatibility identity survives artifact production and publication refresh. | Preserve per-compatibility inputs, deduplicate equivalent builds, and reconcile incomplete mappings even for indexed revisions. Test two different compatibility identities completing in reverse order after initial policy publication, then a clean refresh without rederivation. |
+| High | Consumer generation and builds use the revision whose policy was published. | Carry exact SHAs through packed, empty-cache consumer generation/typechecking, artifact readiness and build dispatch. Test distinct baseline/stable/alpha SHAs and assert the requested alpha reaches the project lock and dispatched build. |
+| Medium | Pending artifact requests are not silently replaced. | Use retained native-artifact queuing plus incomplete-work reconciliation. Assert queue configuration and preservation of two distinct pending compatibility requirements. |
+| Medium | Issue closure is limited to failures disproved by the run's actual scope. | Pass observed revision results into reconciliation. Test that successful manual alpha replay cannot close an unrelated stable failure, while complete tracked-channel success can. |
+
+The first defect combines the derivation loop's single final surface, the native
+callback's revision-free `artifact_refresh_only` dispatch, and discovery's
+indexed-SHA skip. A completed release can therefore remain unselected indefinitely.
+The second combines revision-free consumer commands with their committed-ledger
+default; validating published object hashes is not the same as generating from
+those objects in a clean installed package. The third is GitHub's default
+single-pending replacement behavior despite `cancel-in-progress: false`. The
+fourth is reconciliation closing all absent issue titles after a partial replay.
+
+Implement artifact identity/reconciliation first, consumer identity second, native
+queue retention alongside those, then scoped issue closure. Preserve immutable
+uploads, integrity checks, historical compatible mappings, usable-policy
+publication, fallback emission and architecture-specific performance lanes.
+This audit did not establish that any future upstream revision or hosted service
+is infallible; the required property is identity-preserving automatic convergence
+with actionable failures rather than maintainer replays.
+
+### Freshness and host routing
 
 The committed headless plan is checked by `pnpm check`, alongside its binding
 inputs. The policy engine job instead regenerates that downstream plan after
