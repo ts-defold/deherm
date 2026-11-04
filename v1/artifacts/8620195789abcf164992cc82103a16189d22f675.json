@@ -315,7 +315,7 @@
       },
       "compatibility": {
         "kind": "deherm.native-artifact-compatibility",
-        "sha256": "201a2a3626b57fa786ff71b3a0966bbcf21943ef5f1ed02d2880c18e4920a584"
+        "sha256": "fce733af5d58bb685ff8fba99194e65214a5f5bb6558672b354c262f6e1e9a31"
       }
     }
   }
