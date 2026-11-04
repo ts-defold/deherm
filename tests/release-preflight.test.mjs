@@ -33,7 +33,25 @@ test("release and policy workflows gate expensive work on the preflight", async 
   const release = YAML.parse(await readFile(path.join(root, ".github/workflows/release-readiness.yml"), "utf8"));
   const policy = YAML.parse(await readFile(path.join(root, ".github/workflows/policy.yml"), "utf8"));
   assert.equal(release.jobs["portable-tooling"].needs, "preflight");
+  assert.deepEqual(release.jobs["portable-tooling"].strategy.matrix.os, [
+    "ubuntu-24.04",
+    "macos-15-intel",
+    "windows-2025",
+  ]);
   assert.ok(release.jobs.preflight.steps.some((step) => step.run === "pnpm check:release-preflight"));
+  const portabilitySteps = release.jobs["portable-tooling"].steps;
+  const cleanProjectGeneration = portabilitySteps.find((step) => step.name === "Generate clean project SDK");
+  const lockedApplicationPreflight = portabilitySteps.find(
+    (step) => step.name === "Preflight locked Static Hermes application sources",
+  );
+  assert.equal(
+    cleanProjectGeneration.run,
+    "node bin/deherm.mjs generate --project examples/war-battles-online/defold --force",
+  );
+  assert.ok(
+    portabilitySteps.indexOf(cleanProjectGeneration) < portabilitySteps.indexOf(lockedApplicationPreflight),
+    "the application lock preflight must follow forced clean project generation so ignored warm outputs cannot mask stale locks",
+  );
   const native = release.jobs["portable-tooling"].steps.find(
     (step) => step.name === "Compile native component ABI fixture before aggregate tests",
   );

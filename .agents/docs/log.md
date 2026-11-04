@@ -16,8 +16,20 @@ identity. Rebuilding and running the pinned macOS headless driver succeeded:
 zero mismatches or engine faults. Its refreshed report changes only seven plan
 fingerprints; all observation records and the regenerated route-verification
 output are identical to the prior results. All remaining aggregate stages pass
-after that refresh. A complete aggregate repeat and new hosted build results
-are pending; no full-green claim.
+after that refresh, and the complete aggregate repeat passed. The hosted full
+consumer matrix passed every target, including all four Apple targets. OS-only
+policy-parity and release-tooling jobs also select Intel hosts; architecture-
+specific lanes are unchanged.
+
+Hosted release readiness then exposed an older War Battles application lock
+hidden by ignored warm generated files. Targeted forced project generation and
+a real candidate compile produced the identical application bytes; the normal
+artifact recorder refreshed the changed route-index input binding. Its regression
+now derives that index from canonical IR and plan before consulting cached files.
+Focused followup suites passed: release preflight 4/4, Static Hermes game gate
+13/13 and policy 44/44. Final followup aggregate, hosted release rerun and policy
+publication/engine checks remain pending; no full-green claim. An independent
+adversarial resilience review is examining recurring automation failure classes.
 
 ## 2026-10-21 - Commit release tooling and refresh real-engine evidence
 

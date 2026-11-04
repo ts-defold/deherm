@@ -106,7 +106,7 @@ test("policy host parity reproduces the Linux policy projection without obsolete
   assert.match(installer, /#include <GL\/glx\.h>/u);
   assert.match(derive, /args=\(--revision "\$revision" --workspace "\$workspace" --verify-current --adopt\)/u);
   assert.match(parity, /role: Linux canonical bytes/u);
-  assert.match(parity, /role: macOS reproduces Linux/u);
+  assert.match(parity, /os: macos-15-intel\s+role: macOS reproduces Linux/u);
   assert.match(parity, /role: Windows reproduces Linux/u);
   assert.match(parity, /Verify policy cache lifecycle on this host[\s\S]*pnpm test:policy-cache/u);
   for (const { root: revisionRoot } of REVISION_OUTPUT_ROOTS) {

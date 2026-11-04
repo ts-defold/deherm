@@ -278,7 +278,7 @@ jobs:
         include:
           - os: ubuntu-24.04
             role: Linux canonical bytes
-          - os: macos-15
+          - os: macos-15-intel
             role: macOS reproduces Linux
           - os: windows-2025
             role: Windows reproduces Linux

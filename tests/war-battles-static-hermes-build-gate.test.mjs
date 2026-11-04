@@ -6,6 +6,7 @@ import path from "node:path";
 import test, { after } from "node:test";
 
 import { createIncrementalCompiler } from "../packages/cli/src/dev/compiler.mjs";
+import { buildScriptRouteSymbolIndex } from "../packages/compiler/src/script-route-symbol-index.mjs";
 import {
   buildGate,
   hostFamilyExpectedDigests,
@@ -94,7 +95,19 @@ test("root and example scripts name the typed-native bridge gate explicitly", as
 
 test("project lock application sources match the freshly generated project", async () => {
   const lock = JSON.parse(await readFile(path.join(warBattlesProject, "deherm.lock"), "utf8"));
-  await verifyLockedApplicationSources(warBattlesProject, lock.buildArtifacts.artifacts["deherm/app.dehermc"]);
+  const lockedApplication = lock.buildArtifacts.artifacts["deherm/app.dehermc"];
+  const [scriptApiIr, loweringPlan] = await Promise.all([
+    readFile(path.join(root, "packages/bindings/generated/defold-script-api-ir.json"), "utf8"),
+    readFile(path.join(root, "packages/bindings/generated/defold-binding-lowering-plan.json"), "utf8"),
+  ]);
+  const canonicalRouteIndex = buildScriptRouteSymbolIndex(JSON.parse(scriptApiIr), JSON.parse(loweringPlan));
+  const canonicalRouteIndexSha256 = sha256(`${JSON.stringify(canonicalRouteIndex, null, 2)}\n`);
+  assert.equal(
+    lockedApplication.sources.files[".deherm/generated/script-route-symbol-index.json"],
+    canonicalRouteIndexSha256,
+    "project lock must bind the route-symbol index from the repository's canonical script IR and lowering plan",
+  );
+  await verifyLockedApplicationSources(warBattlesProject, lockedApplication);
 });
 
 test("War Battles Static Hermes gate derives a closed release route set", async () => {

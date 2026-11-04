@@ -4,7 +4,7 @@ title: Continuous policy generation, engine evidence, and publication
 description: One nightly policy workflow derives every tracked Defold revision, emits every mechanically representable API, records verification without gating publication, and publishes the accumulated policy store directly to the website.
 tags: [decision, generator, policy, ci, conformance, pages]
 status: accepted
-generated: { by: codex/gpt-6, at: 2026-11-04T18:28:09Z }
+generated: { by: codex/gpt-6, at: 2026-11-04T18:58:31Z }
 sources:
   - resource: ../../../scripts/check-end-to-end.mjs
     title: Project-locked consumer build gate
@@ -116,6 +116,20 @@ Extender's remote compilation. Run 41851764950 never acquired the four requested
 arm64 Mac runners. This switches to a supported alternative host, not Linux,
 automatic retries or a guarantee that GitHub will always have capacity. The
 target matrix and required build outcomes remain unchanged.
+
+OS-only policy-parity and release-tooling checks use that same explicit Intel
+host; architecture-specific native/compiler jobs retain their own target hosts.
+The full consumer run 41889668529 passed every target, including all four Apple
+targets. This is build/packaging evidence, not on-device execution evidence.
+
+Repository dogfood application locks must bind compiler inputs derived from the
+current canonical IR and lowering plan, not merely ignored generated files left
+in a warm workspace. The War Battles lock regression derives its route-symbol
+index independently of that cache. When inputs change, force project generation,
+compile using the recorded configuration, then record the actual compiled result
+through the normal artifact owner. Generation alone must not relabel an older
+application artifact as freshly compiled. Release portability checks force
+generation before checking the application lock.
 
 The full consumer matrix resolves the current stable channel once in its
 planning job (manual runs can select beta or alpha), then shares that exact SHA
