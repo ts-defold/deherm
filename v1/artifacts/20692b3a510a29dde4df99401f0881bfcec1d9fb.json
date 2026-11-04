@@ -136,8 +136,8 @@
       "releases": {
         "arm64_sim-ios": {
           "recipe": "apple",
-          "tag": "libs-apple-cdf0df8c4bef",
-          "fingerprint": "cdf0df8c4bef14b2576cb50158dc3285aaacbb57ed2103e251ae7433aa150d54"
+          "tag": "libs-apple-dcf85f379935",
+          "fingerprint": "dcf85f379935615d3796493f44967054d8aa4cfd697708641655c5b550ffc855"
         },
         "arm64-android": {
           "recipe": "android",
@@ -146,8 +146,8 @@
         },
         "arm64-ios": {
           "recipe": "apple",
-          "tag": "libs-apple-cdf0df8c4bef",
-          "fingerprint": "cdf0df8c4bef14b2576cb50158dc3285aaacbb57ed2103e251ae7433aa150d54"
+          "tag": "libs-apple-dcf85f379935",
+          "fingerprint": "dcf85f379935615d3796493f44967054d8aa4cfd697708641655c5b550ffc855"
         },
         "arm64-linux": {
           "recipe": "linux",
@@ -156,8 +156,8 @@
         },
         "arm64-osx": {
           "recipe": "apple",
-          "tag": "libs-apple-cdf0df8c4bef",
-          "fingerprint": "cdf0df8c4bef14b2576cb50158dc3285aaacbb57ed2103e251ae7433aa150d54"
+          "tag": "libs-apple-dcf85f379935",
+          "fingerprint": "dcf85f379935615d3796493f44967054d8aa4cfd697708641655c5b550ffc855"
         },
         "armv7-android": {
           "recipe": "android",
@@ -176,8 +176,8 @@
         },
         "x86_64-osx": {
           "recipe": "apple",
-          "tag": "libs-apple-cdf0df8c4bef",
-          "fingerprint": "cdf0df8c4bef14b2576cb50158dc3285aaacbb57ed2103e251ae7433aa150d54"
+          "tag": "libs-apple-dcf85f379935",
+          "fingerprint": "dcf85f379935615d3796493f44967054d8aa4cfd697708641655c5b550ffc855"
         },
         "x86_64-win32": {
           "recipe": "windows",
@@ -254,9 +254,9 @@
       "integrity": {
         "arm64_sim-ios": {
           "asset": "hermes-arm64_sim-ios.tar.gz.integrity.json",
-          "sha256": "b97b0af34f3efb3bede9fe82a9fed21f2308785944d8a77ae6aaf9d26d001876",
-          "archiveSha256": "02d7657a0ce0000656018718ea261e8c8be84105223fc09f5e764e21d297cad3",
-          "archiveBytes": 7274960
+          "sha256": "a6a55f5a3dd5d00a788622021d24561c7e108de36c60fa817892a84cd8e741c0",
+          "archiveSha256": "ad7524c4a082e5a7eb42f8ef67f282c285197f8985bfb57aa1ed9ca8dd27386b",
+          "archiveBytes": 7274758
         },
         "arm64-android": {
           "asset": "hermes-arm64-android.tar.gz.integrity.json",
@@ -266,9 +266,9 @@
         },
         "arm64-ios": {
           "asset": "hermes-arm64-ios.tar.gz.integrity.json",
-          "sha256": "9916b6cfaf0f9e64f1c78df4e893dba852c384717a1007da06348755e0fe350d",
-          "archiveSha256": "09c32c9303dab7683c2cd591715f8ffc4063d4614bf182ea7ee40b6a380c5d3a",
-          "archiveBytes": 7257714
+          "sha256": "e3ac07ee776c7bdb7a6f6ee4e01f72273cf794f80999798e58b1a009e8db6da5",
+          "archiveSha256": "62ac1d6945c5b35ef1c91190ff399e727f9bcaca050031fc8508a4e017921616",
+          "archiveBytes": 7256684
         },
         "arm64-linux": {
           "asset": "hermes-arm64-linux.tar.gz.integrity.json",
@@ -278,9 +278,9 @@
         },
         "arm64-osx": {
           "asset": "hermes-arm64-osx.tar.gz.integrity.json",
-          "sha256": "0e3087fdab4520a7e3756afada45c137ac5266595c390095a6cc5dd875fe1ef2",
-          "archiveSha256": "ff7e16ab750495b2a785a2041a0e869ad899ca624f47ba93b85ef4518c566b5b",
-          "archiveBytes": 7275513
+          "sha256": "80003d80f81d68b7515201421009a5fc5abb44218e5b6ea0564393fe4a23bc44",
+          "archiveSha256": "b9c5203b41fe256446a08376b5ed1abc3712fffe9c34658a5026d07fc56b7bba",
+          "archiveBytes": 7275168
         },
         "armv7-android": {
           "asset": "hermes-armv7-android.tar.gz.integrity.json",
@@ -302,9 +302,9 @@
         },
         "x86_64-osx": {
           "asset": "hermes-x86_64-osx.tar.gz.integrity.json",
-          "sha256": "569d106493ae99ae5df3a49fa6b4eccd73addbecc94601039ef8acfceaf497f4",
-          "archiveSha256": "9b034c27b4bc92b93de437ae24a6eee727b8e1fda8d8a650d1c63613109419f1",
-          "archiveBytes": 7500299
+          "sha256": "24b3f31c6260959f8d778fdf47bd8546e6b5a73283943f28cef8d9eeaf429a94",
+          "archiveSha256": "593303eecfce87dea25b85f0f31cab538f6396c643aab676f2d688337a98dcc9",
+          "archiveBytes": 7500487
         },
         "x86_64-win32": {
           "asset": "hermes-x86_64-win32.tar.gz.integrity.json",
@@ -315,7 +315,7 @@
       },
       "compatibility": {
         "kind": "deherm.native-artifact-compatibility",
-        "sha256": "1f4629b35435861983b84d2839afd2cb2776464e4aa0fd0dc0dc54302d6e49ef"
+        "sha256": "201a2a3626b57fa786ff71b3a0966bbcf21943ef5f1ed02d2880c18e4920a584"
       }
     }
   }
