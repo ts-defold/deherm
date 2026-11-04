@@ -35,13 +35,17 @@ on:
   schedule:
     # After the unified `policy` workflow's discovery window, so its accumulated
     # website catalogue can be current before this consumer proof resolves it.
-    - cron: '43 6 * * *'
+    - cron: "43 6 * * *"
   push:
     branches: [main]
   workflow_dispatch:
     inputs:
+      defold-sdk:
+        description: Exact Defold engine SHA to exercise (takes precedence over the channel)
+        required: false
+        type: string
       defold-channel:
-        description: Current Defold channel to resolve once for the complete consumer matrix
+        description: Channel to resolve, or Extender route when an exact SHA is supplied
         default: stable
         type: choice
         options: [stable, beta, alpha]
@@ -56,7 +60,7 @@ concurrency:
   # A cheap push proof and a full artifact-dispatched/Bob proof are different
   # lanes. A follow-up push may replace an older cheap run, but it must never
   # cancel the full matrix that native-artifacts started after publication.
-  group: end-to-end-${{ github.ref }}-${{ github.event_name == 'push' && 'push' || 'full' }}
+  group: end-to-end-${{ github.ref }}-${{ github.event_name == 'push' && 'push' || format('full-{0}-{1}-{2}', inputs.defold-sdk || '', inputs.defold-channel || 'stable', inputs.build-server || 'default') }}
   cancel-in-progress: true
 
 jobs:
@@ -74,7 +78,7 @@ jobs:
       - uses: actions/checkout@v7
       - uses: pnpm/action-setup@v6
       - uses: actions/setup-node@v7
-        with: { node-version: '22', cache: 'pnpm' }
+        with: { node-version: "22", cache: "pnpm" }
       - run: pnpm install --frozen-lockfile --ignore-scripts
       # The gate compares hosted Extender routing with the pinned Editor
       # source, so make that upstream prerequisite explicit in a clean runner.
@@ -87,9 +91,16 @@ jobs:
         run: node --test tests/end-to-end-gate.test.mjs
 
       - id: plan
+        env:
+          EXACT_REVISION: ${{ inputs.defold-sdk }}
+          CHANNEL: ${{ inputs.defold-channel || 'stable' }}
         run: |
           set -euo pipefail
-          node scripts/check-end-to-end.mjs --channel "${{ inputs.defold-channel || 'stable' }}" --plan --json > plan.json
+          if [ -n "$EXACT_REVISION" ]; then
+            node scripts/check-end-to-end.mjs --defold-sdk "$EXACT_REVISION" --plan --json > plan.json
+          else
+            node scripts/check-end-to-end.mjs --channel "$CHANNEL" --plan --json > plan.json
+          fi
           node -e '
             const plan = require("./plan.json");
             const exercised = plan.targets.filter((row) => row.disposition === "exercise").map((row) => row.target);
@@ -174,7 +185,7 @@ jobs:
       - uses: actions/checkout@v7
       - uses: pnpm/action-setup@v6
       - uses: actions/setup-node@v7
-        with: { node-version: '22', cache: 'pnpm' }
+        with: { node-version: "22", cache: "pnpm" }
       - run: pnpm install --frozen-lockfile --ignore-scripts
       - run: bash scripts/bootstrap-upstreams.sh hermes
       - run: node scripts/stage-hermes-public-headers.mjs
@@ -211,9 +222,9 @@ jobs:
       - uses: actions/checkout@v7
       - uses: pnpm/action-setup@v6
       - uses: actions/setup-node@v7
-        with: { node-version: '22', cache: 'pnpm' }
+        with: { node-version: "22", cache: "pnpm" }
       - uses: actions/setup-java@v5
-        with: { distribution: temurin, java-version: '25' }
+        with: { distribution: temurin, java-version: "25" }
       - run: pnpm install --frozen-lockfile --ignore-scripts
       - uses: actions/download-artifact@v7
         with:

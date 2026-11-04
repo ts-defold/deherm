@@ -107,13 +107,15 @@ export const stageNames = Object.freeze(["policy", "host-tools", "scaffold", "ge
 // to every consumer job. The contributor fixture revision is not a guarantee
 // that Defold's hosted Extender still retains that historical SDK.
 export async function selectDefoldRevision({ revision, channel }, resolveChannel) {
-  if (revision && channel) throw new Error("Choose --defold-sdk or --channel, not both");
-  if (channel) {
+  if (revision !== undefined && channel !== undefined) throw new Error("Choose --defold-sdk or --channel, not both");
+  if (channel !== undefined) {
+    if (!channel) throw new Error("--channel requires a channel name");
     const resolve =
       resolveChannel ?? (await import("../packages/cli/src/policy-client.mjs")).resolveDefoldChannelRevision;
     return (await resolve(channel)).revision;
   }
-  if (revision && !/^[a-f0-9]{40}$/u.test(revision)) throw new Error("--defold-sdk requires an exact Defold revision");
+  if (revision !== undefined && !/^[a-f0-9]{40}$/u.test(revision))
+    throw new Error("--defold-sdk requires an exact Defold revision");
   return revision ?? (await readLedger()).defoldRevision;
 }
 
@@ -158,6 +160,16 @@ export function scaffoldArguments({ project, defoldRevision, name = "deherm end 
     );
   }
   return ["create", project, "--name", name, "--defold-sdk", defoldRevision];
+}
+
+export async function assertProjectDefoldRevision(projectRoot, expectedRevision) {
+  const lock = JSON.parse(await readFile(path.join(projectRoot, "deherm.lock"), "utf8"));
+  if (lock.defoldRevision !== expectedRevision) {
+    throw new Error(
+      `Generated project lock records Defold ${JSON.stringify(lock.defoldRevision)}, expected ${expectedRevision}`,
+    );
+  }
+  return lock.defoldRevision;
 }
 
 async function readJson(relative) {
@@ -318,6 +330,7 @@ const stages = {
   async generate(context) {
     await node("bin/deherm.mjs", ["generate", "--project", context.project]);
     const { stdout } = await node("bin/deherm.mjs", ["typecheck", "--project", context.project]);
+    await assertProjectDefoldRevision(path.resolve(root, context.project), context.defoldRevision);
     return { detail: stdout.trim().split("\n").at(-1) ?? "generated and type checked" };
   },
 
@@ -414,18 +427,25 @@ export async function main(argv) {
   let revision;
   let channel;
   let buildServer = process.env.DEFOLD_HERMES_BUILD_SERVER || defaultBuildServer;
-  for (let index = 0; index < argv.length; index += 1) {
+  let index = 0;
+  const nextOptionValue = (option) => {
+    const value = argv[index + 1];
+    if (value === undefined || value.startsWith("--")) throw new Error(`${option} requires a value`);
+    index += 1;
+    return value;
+  };
+  for (; index < argv.length; index += 1) {
     const value = argv[index];
     if (value === "--json") json = true;
     else if (value === "--plan") plan = true;
     else if (value === "--project") {
-      project = argv[++index];
+      project = nextOptionValue(value);
       projectWasGiven = true;
-    } else if (value === "--defold-sdk") revision = argv[++index];
-    else if (value === "--channel") channel = argv[++index];
-    else if (value === "--build-server") buildServer = argv[++index];
-    else if (value === "--stage") requested.push(argv[++index]);
-    else if (value === "--target") only.push(argv[++index]);
+    } else if (value === "--defold-sdk") revision = nextOptionValue(value);
+    else if (value === "--channel") channel = nextOptionValue(value);
+    else if (value === "--build-server") buildServer = nextOptionValue(value);
+    else if (value === "--stage") requested.push(nextOptionValue(value));
+    else if (value === "--target") only.push(nextOptionValue(value));
     else throw new Error(`Unknown argument ${value}`);
   }
   for (const name of requested) {

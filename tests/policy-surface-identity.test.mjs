@@ -43,13 +43,13 @@ test("the handoff rejects a different run, source checkout, or archive byte", as
   }
 });
 
-test("native workflow pins every checkout to the policy producer commit", async () => {
+test("native workflow pins builder sources and reconstructs authenticated revision inputs", async () => {
   const policy = YAML.parse(await readFile(new URL("../.github/workflows/policy.yml", import.meta.url), "utf8"));
   const native = YAML.parse(
     await readFile(new URL("../.github/workflows/native-artifacts.yml", import.meta.url), "utf8"),
   );
   const dispatch = policy.jobs["request-native-artifacts"].steps.find((step) =>
-    step.name?.startsWith("Dispatch artifact"),
+    step.run?.includes("gh workflow run native-artifacts.yml"),
   );
   assert.match(dispatch.run, /policy_source_sha=/u);
   assert.ok(native.on.workflow_dispatch.inputs.policy_source_sha);
@@ -58,6 +58,8 @@ test("native workflow pins every checkout to the policy producer commit", async 
     if (!checkout) continue;
     assert.match(checkout.with.ref, /inputs\.policy_source_sha \|\| github\.sha/u, name);
   }
-  const install = native.jobs.plan.steps.find((step) => step.name === "Install policy-derived artifact inputs");
-  assert.match(install.run, /policy-surface-identity\.mjs verify[\s\S]*policy-surface\.mjs extract/u);
+  const install = native.jobs.plan.steps.find((step) => step.run?.includes("policy-native-artifact-inputs.mjs"));
+  assert.match(install.run, /hydrate-policy-site\.mjs[\s\S]*policy-native-artifact-inputs\.mjs/u);
+  assert.match(install.run, /--revision "\$POLICY_REVISION"[\s\S]*--compatibility "\$POLICY_COMPATIBILITY"/u);
+  assert.equal(native.on.workflow_dispatch.inputs.policy_run_id, undefined);
 });

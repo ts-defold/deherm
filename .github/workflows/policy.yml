@@ -10,7 +10,7 @@ name: policy
 on:
   schedule:
     # 08:00 EDT (fixed UTC-4); 07:00 EST in winter. Hosted runs may queue.
-    - cron: '0 12 * * *'
+    - cron: "0 12 * * *"
   push:
     branches: [main]
   pull_request:
@@ -19,10 +19,24 @@ on:
       revision:
         description: Derive this Defold revision instead of reading stable, beta and alpha
         required: false
+      revision_channel:
+        description: Extender channel to use for an explicit revision that is not currently tracked
+        type: choice
+        options: [stable, beta, alpha]
+        required: false
       artifact_refresh_only:
         description: Re-publish the current policy with a newly complete artifact mapping
         type: boolean
         default: false
+      artifact_policy_revision:
+        description: Exact indexed Defold revision whose native mapping was refreshed
+        required: false
+      artifact_compatibility_sha256:
+        description: Native compatibility identity whose immutable assets were refreshed
+        required: false
+      artifact_source_sha:
+        description: Builder source commit that produced the immutable native assets
+        required: false
       carry-reviews:
         description: Carry applicable reviewed lowering hints and report every carry
         type: boolean
@@ -44,6 +58,10 @@ jobs:
     outputs:
       derive: ${{ steps.plan.outputs.derive }}
       any: ${{ steps.plan.outputs.any }}
+      tracked_revisions: ${{ steps.plan.outputs.tracked_revisions }}
+      authoritative: ${{ steps.plan.outputs.authoritative }}
+      consumer_revisions: ${{ steps.plan.outputs.consumer_revisions }}
+      end_to_end_candidates: ${{ steps.plan.outputs.end_to_end_candidates }}
     steps:
       - uses: actions/checkout@v7
       - uses: actions/checkout@v7
@@ -53,27 +71,57 @@ jobs:
           path: build/published-policy-site
       - uses: pnpm/action-setup@v6
       - uses: actions/setup-node@v7
-        with: { node-version: '22', cache: 'pnpm' }
+        with: { node-version: "22", cache: "pnpm" }
       - run: pnpm install --frozen-lockfile --ignore-scripts
       - name: Fail fast on package-owned release inputs
         run: pnpm check:release-preflight
       - id: plan
         env:
           REQUESTED_REVISION: ${{ inputs.revision }}
+          REQUESTED_CHANNEL: ${{ inputs.revision_channel }}
+          CALLBACK_REVISION: ${{ inputs.artifact_policy_revision }}
+          CALLBACK_COMPATIBILITY: ${{ inputs.artifact_compatibility_sha256 }}
+          REFRESH_ONLY: ${{ inputs.artifact_refresh_only }}
+          EVENT_NAME: ${{ github.event_name }}
         run: |
           set -euo pipefail
-          if [ "${{ github.event_name }}" = workflow_dispatch ] && [ "${{ inputs.artifact_refresh_only }}" = true ]; then
-            derive='[]'
-          elif [ "${{ github.event_name }}" = workflow_dispatch ] && [ -n "$REQUESTED_REVISION" ]; then
-            derive="$(node -e 'process.stdout.write(JSON.stringify([{channel:"manual",sha1:process.env.REQUESTED_REVISION,version:null}]))')"
-          else
-            canary=()
-            if [ "${{ github.event_name }}" = push ] || [ "${{ github.event_name }}" = pull_request ]; then
-              canary=(--include-alpha-canary)
-            fi
-            derive="$(node scripts/track-defold-channels.mjs plan --json --index build/published-policy-site/v1/index/manifest.json "${canary[@]}" | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>process.stdout.write(JSON.stringify(JSON.parse(s).derive)))')"
+          canary=()
+          if [ "${{ github.event_name }}" = push ] || [ "${{ github.event_name }}" = pull_request ]; then
+            canary=(--include-alpha-canary)
           fi
+          channel_plan="$RUNNER_TEMP/channel-plan.json"
+          node scripts/track-defold-channels.mjs plan --json \
+            --index build/published-policy-site/v1/index/manifest.json "${canary[@]}" > "$channel_plan"
+          refresh_only=false
+          if [ "$REFRESH_ONLY" = true ]; then refresh_only=true; fi
+          compatibility_index_args=()
+          if [ "$refresh_only" = true ] && [ -n "$CALLBACK_REVISION" ] && [ -n "$CALLBACK_COMPATIBILITY" ]; then
+            node scripts/hydrate-policy-site.mjs --from build/published-policy-site
+            node scripts/policy-native-artifact-inputs.mjs --all \
+              --out "$RUNNER_TEMP/callback-compatibility-index.json"
+            compatibility_index_args=(
+              --callback-compatibility "$CALLBACK_COMPATIBILITY"
+              --compatibility-index "$RUNNER_TEMP/callback-compatibility-index.json"
+            )
+          fi
+          run_plan="$(node scripts/plan-policy-workflow.mjs \
+            --event "$EVENT_NAME" \
+            --requested-revision "$REQUESTED_REVISION" \
+            --requested-channel "$REQUESTED_CHANNEL" \
+            --refresh-only "$refresh_only" \
+            --callback-revision "$CALLBACK_REVISION" \
+            "${compatibility_index_args[@]}" \
+            --channel-plan "$channel_plan")"
+          derive="$(node -e 'process.stdout.write(JSON.stringify(JSON.parse(process.argv[1]).derive))' "$run_plan")"
+          tracked_revisions="$(node -e 'process.stdout.write(JSON.stringify(JSON.parse(process.argv[1]).trackedRevisions))' "$run_plan")"
+          authoritative="$(node -e 'process.stdout.write(String(JSON.parse(process.argv[1]).authoritative))' "$run_plan")"
+          consumer_revisions="$(node -e 'process.stdout.write(JSON.stringify(JSON.parse(process.argv[1]).consumerRevisions))' "$run_plan")"
+          end_to_end_candidates="$(node -e 'process.stdout.write(JSON.stringify(JSON.parse(process.argv[1]).endToEndCandidates))' "$run_plan")"
           echo "derive=$derive" >> "$GITHUB_OUTPUT"
+          echo "tracked_revisions=$tracked_revisions" >> "$GITHUB_OUTPUT"
+          echo "authoritative=$authoritative" >> "$GITHUB_OUTPUT"
+          echo "consumer_revisions=$consumer_revisions" >> "$GITHUB_OUTPUT"
+          echo "end_to_end_candidates=$end_to_end_candidates" >> "$GITHUB_OUTPUT"
           if [ "$derive" = '[]' ]; then
             echo 'any=false' >> "$GITHUB_OUTPUT"
           else
@@ -106,9 +154,9 @@ jobs:
           path: build/published-policy-site
       - uses: pnpm/action-setup@v6
       - uses: actions/setup-node@v7
-        with: { node-version: '22', cache: 'pnpm' }
+        with: { node-version: "22", cache: "pnpm" }
       - uses: actions/setup-python@v6
-        with: { python-version: '3.13' }
+        with: { python-version: "3.13" }
       - run: pnpm install --frozen-lockfile --ignore-scripts
 
       - name: Install and preflight policy native toolchain
@@ -128,18 +176,21 @@ jobs:
         name: Derive every new revision without review gates
         env:
           DERIVATIONS: ${{ needs.plan.outputs.derive }}
+          TRACKED_REVISIONS: ${{ needs.plan.outputs.tracked_revisions }}
+          SCOPE_FILE: ${{ runner.temp }}/policy-reports/reconciliation-scope.json
+          EXAMINED_TSV: ${{ runner.temp }}/policy-reports/examined.tsv
           CARRY_REVIEWS: ${{ (github.event_name != 'workflow_dispatch' || inputs.carry-reviews) && 'true' || 'false' }}
           MIRROR_BOB: ${{ github.ref == 'refs/heads/main' && github.event_name != 'pull_request' }}
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           mkdir -p "$RUNNER_TEMP/policy-reports"
+          : > "$EXAMINED_TSV"
           node -e '
             for (const row of JSON.parse(process.env.DERIVATIONS)) {
               process.stdout.write([row.channel, row.sha1, row.version ?? "unknown", row.canary === true ? "true" : "false"].join("\t") + "\n");
             }
           ' > "$RUNNER_TEMP/policy-revisions.tsv"
-
           generated=0
           failed=0
           while IFS=$'\t' read -r channel revision version canary; do
@@ -161,6 +212,7 @@ jobs:
               echo '```'
               node scripts/report-revision-audit.mjs --revision "$revision" || true
             } >> "$GITHUB_STEP_SUMMARY"
+            printf '%s\t%s\t%s\n' "$channel" "$revision" "$version" >> "$EXAMINED_TSV"
             if [ "$status" -eq 0 ]; then
               if [ "$MIRROR_BOB" = true ]; then
                 node scripts/publish-defold-bob-mirror.mjs --workspace "$workspace" --revision "$revision"
@@ -171,6 +223,16 @@ jobs:
               printf '%s\t%s\t%s\n' "$channel" "$revision" "$version" >> "$RUNNER_TEMP/policy-reports/failures.tsv"
             fi
           done < "$RUNNER_TEMP/policy-revisions.tsv"
+
+          node -e '
+            const tracked = JSON.parse(process.env.TRACKED_REVISIONS);
+            const examined = require("node:fs").readFileSync(process.env.EXAMINED_TSV, "utf8").trim().split("\n").filter(Boolean)
+              .map((line) => { const [channel, revision, version] = line.split("\t"); return {channel, revision, version: version || "unknown"}; });
+            require("node:fs").writeFileSync(process.env.SCOPE_FILE, JSON.stringify({
+              trackedRevisions: tracked === null ? null : tracked.map(({channel, sha1, version}) => ({channel, revision: sha1, version: version ?? "unknown"})),
+              examinedRevisions: examined,
+            }, null, 2) + "\n");
+          '
 
           # Even with no new revision, verify the committed store. When a
           # revision was not derivable, this still emits every already usable
@@ -186,7 +248,7 @@ jobs:
 
       - name: Reconcile actionable policy derivation issues
         if: >-
-          needs.plan.outputs.any == 'true' &&
+          (needs.plan.outputs.authoritative == 'true' || needs.plan.outputs.any == 'true') &&
           github.repository == 'ts-defold/deherm' &&
           github.ref == 'refs/heads/main'
         env:
@@ -197,7 +259,17 @@ jobs:
           node scripts/reconcile-policy-derivation-issues.mjs \
             --failures "$RUNNER_TEMP/policy-reports/failures.tsv" \
             --reports "$RUNNER_TEMP/policy-reports" \
+            --scope "$RUNNER_TEMP/policy-reports/reconciliation-scope.json" \
             --run-url "$RUN_URL"
+      - name: Reconcile optimization issues after authoritative channel planning
+        if: >-
+          needs.plan.outputs.authoritative == 'true' &&
+          github.repository == 'ts-defold/deherm' &&
+          github.ref == 'refs/heads/main'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
           node scripts/reconcile-policy-optimization-issues.mjs \
             --failures "$RUNNER_TEMP/policy-reports/failures.tsv" \
             --reports "$RUNNER_TEMP/policy-reports" \
@@ -226,10 +298,10 @@ jobs:
 
   request-native-artifacts:
     name: Request compatible native optimization artifacts
-    needs: [plan, derive]
+    needs: [publish-site]
     if: >-
-      needs.plan.outputs.any == 'true' &&
-      needs.derive.outputs.generated != '0' &&
+      needs.publish-site.result == 'success' &&
+      !(github.event_name == 'workflow_dispatch' && inputs.artifact_refresh_only) &&
       github.repository == 'ts-defold/deherm' &&
       github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
@@ -237,13 +309,28 @@ jobs:
       actions: write
       contents: read
     steps:
-      - name: Dispatch artifact production from this exact derived surface
+      - uses: actions/download-artifact@v7
+        with:
+          name: native-artifact-worklist
+          path: ${{ runner.temp }}/native-artifact-worklist
+      - name: Queue each missing compatibility recipe from the published store
         env:
           GH_TOKEN: ${{ github.token }}
-        run: >-
-          gh workflow run native-artifacts.yml --repo "${{ github.repository }}"
-          --ref "${{ github.ref_name }}" -f policy_run_id="${{ github.run_id }}"
-          -f policy_source_sha="${{ github.sha }}"
+        run: |
+          set -euo pipefail
+          worklist="$RUNNER_TEMP/native-artifact-worklist/native-work.json"
+          while IFS=$'\t' read -r revision compatibility; do
+            [ -n "$revision" ] || continue
+            gh workflow run native-artifacts.yml --repo "${{ github.repository }}" \
+              --ref "${{ github.ref_name }}" \
+              -f policy_defold_revision="$revision" \
+              -f policy_compatibility_sha256="$compatibility" \
+              -f policy_source_sha="${{ github.sha }}"
+          done < <(node -e '
+            for (const row of require(process.argv[1])) {
+              process.stdout.write(`${row.defoldRevision}\t${row.compatibilitySha256}\n`);
+            }
+          ' "$worklist")
 
   derivation-completeness:
     name: Every discovered revision derived
@@ -293,7 +380,7 @@ jobs:
           path: ${{ runner.temp }}/policy-surface
       - uses: pnpm/action-setup@v6
       - uses: actions/setup-node@v7
-        with: { node-version: '22', cache: 'pnpm' }
+        with: { node-version: "22", cache: "pnpm" }
       - run: pnpm install --frozen-lockfile --ignore-scripts
       - name: Verify policy cache lifecycle on this host
         run: pnpm test:policy-cache
@@ -331,9 +418,9 @@ jobs:
       - run: node scripts/policy-surface.mjs install --archive "$RUNNER_TEMP/policy-surface/policy-surface.tar.gz"
       - uses: pnpm/action-setup@v6
       - uses: actions/setup-node@v7
-        with: { node-version: '22', cache: 'pnpm' }
+        with: { node-version: "22", cache: "pnpm" }
       - uses: actions/setup-java@v5
-        with: { distribution: temurin, java-version: '25' }
+        with: { distribution: temurin, java-version: "25" }
       - name: Install and preflight policy native toolchain
         run: bash scripts/ci/install-policy-native-toolchain.sh --install
       - run: pnpm install --frozen-lockfile --ignore-scripts
@@ -367,7 +454,7 @@ jobs:
         run: node scripts/manage-native-artifacts.mjs pull --target x86_64-linux
       - name: Compile and run generated dmSDK and extension exact-call twins
         env:
-          DEHERM_REQUIRE_PACKAGED_HERMES: '1'
+          DEHERM_REQUIRE_PACKAGED_HERMES: "1"
         run: pnpm check:exact-call-materializers
       - name: Verify the selected SDK headless link projection
         run: pnpm test:headless-conformance
@@ -531,85 +618,77 @@ jobs:
       - run: node scripts/policy-surface.mjs install --archive "$RUNNER_TEMP/policy-surface/policy-surface.tar.gz"
       - uses: pnpm/action-setup@v6
       - uses: actions/setup-node@v7
-        with: { node-version: '22', cache: 'pnpm' }
+        with: { node-version: "22", cache: "pnpm" }
       - run: pnpm install --frozen-lockfile --ignore-scripts
       - name: Recover valid native mappings for older Defold revisions
         run: >-
           node scripts/collect-policy-artifact-history.mjs
           --site build/published-policy-site
           --out "$RUNNER_TEMP/artifact-history.json"
-      - run: bash scripts/bootstrap-upstreams.sh defold
-      - run: node scripts/generate-api-policy.mjs --check
-      - id: artifact-map
-        name: Select only a completely published artifact mapping
+      - name: Reconcile all indexed native compatibility mappings
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          current="$RUNNER_TEMP/current-artifact-references.json"
-          node scripts/project-artifact-references.mjs --out "$current"
-          missing=()
-          while IFS=$'\t' read -r family tag asset; do
-            if ! gh release view "$tag" --repo "${{ github.repository }}" \
-              --json assets --jq '.assets[].name' 2>/dev/null | grep -Fxq "$asset"; then
-              missing+=("$family:$tag:$asset")
-            fi
-          done < <(node scripts/project-artifact-references.mjs --from "$current" --list all)
-          if [ "${#missing[@]}" -eq 0 ]; then
-            integrity_root="$RUNNER_TEMP/release-integrity"
-            rm -rf "$integrity_root"
-            while IFS=$'\t' read -r family tag asset; do
-              mkdir -p "$integrity_root/$family"
-              gh release download "$tag" --repo "${{ github.repository }}" \
-                --pattern "$asset.integrity.json" --dir "$integrity_root/$family"
-            done < <(node scripts/project-artifact-references.mjs --from "$current" --list archives)
-            echo "integrity_root=$integrity_root" >> "$GITHUB_OUTPUT"
-            echo 'Current artifact mapping is complete.' >> "$GITHUB_STEP_SUMMARY"
-            exit 0
-          fi
-          previous="$(find build/published-policy-site/v1/artifacts -type f -name '*.json' | sort | head -n1)"
-          if [ -z "$previous" ]; then
-            printf 'Current artifact mapping is incomplete and no last-complete mapping exists:\n%s\n' \
-              "${missing[*]}" >&2
-            exit 1
-          fi
-          fallback="$RUNNER_TEMP/last-complete-artifacts.json"
+          node scripts/policy-native-artifact-inputs.mjs --all --out "$RUNNER_TEMP/native-inputs.json"
+          node scripts/reconcile-policy-native-artifacts.mjs \
+            --inputs "$RUNNER_TEMP/native-inputs.json" \
+            --history "$RUNNER_TEMP/artifact-history.json" \
+            --complete-directory "$RUNNER_TEMP/complete-artifact-mappings" \
+            --history-out "$RUNNER_TEMP/artifact-history.json" \
+            --work-out "$RUNNER_TEMP/native-work.json" \
+            --health-out "$RUNNER_TEMP/native-health.json"
+      - uses: actions/upload-artifact@v6
+        with:
+          name: native-artifact-worklist
+          path: ${{ runner.temp }}/native-work.json
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v6
+        with:
+          name: native-artifact-health
+          path: ${{ runner.temp }}/native-health.json
+          if-no-files-found: error
+      - run: bash scripts/bootstrap-upstreams.sh defold
+      - run: node scripts/generate-api-policy.mjs --check
+      - id: artifact-map
+        name: Select an authenticated artifact mapping for the policy store
+        run: |
+          set -euo pipefail
+          fallback="$RUNNER_TEMP/reconciled-artifact-references.json"
+          selected_compatibility="$RUNNER_TEMP/reconciled-artifact-compatibility.txt"
           node -e '
             const fs = require("node:fs");
-            const source = JSON.parse(fs.readFileSync(process.argv[1], "utf8"));
-            fs.writeFileSync(process.argv[2], `${JSON.stringify(source.artifacts, null, 2)}\n`);
-          ' "$previous" "$fallback"
-          fallback_missing=()
-          while IFS=$'\t' read -r family tag asset; do
-            if ! gh release view "$tag" --repo "${{ github.repository }}" \
-              --json assets --jq '.assets[].name' 2>/dev/null | grep -Fxq "$asset"; then
-              fallback_missing+=("$family:$tag:$asset")
-            fi
-          done < <(node scripts/project-artifact-references.mjs --from "$fallback" --list all)
-          if [ "${#fallback_missing[@]}" -ne 0 ]; then
-            printf 'The prior site mapping is also incomplete:\n%s\n' "${fallback_missing[*]}" >&2
-            exit 1
-          fi
+            const history = JSON.parse(fs.readFileSync(process.argv[1], "utf8"));
+            if (!Array.isArray(history)) throw new Error("Reconciled artifact history must be an array");
+            const selected = history[0];
+            if (!selected) {
+              throw new Error("No authenticated complete native-artifact mapping is available; refusing to fabricate release coordinates");
+            }
+            const compatibility = selected["native-artifacts"]?.compatibility?.sha256;
+            if (!/^[a-f0-9]{64}$/.test(compatibility ?? "")) {
+              throw new Error("Selected artifact history has no authenticated native compatibility digest");
+            }
+            fs.writeFileSync(process.argv[2], `${JSON.stringify(selected, null, 2)}\n`);
+            fs.writeFileSync(process.argv[3], `${compatibility}\n`);
+          ' "$RUNNER_TEMP/artifact-history.json" "$fallback" "$selected_compatibility"
+          selected_compatibility="$(cat "$selected_compatibility")"
           echo "fallback=$fallback" >> "$GITHUB_OUTPUT"
-          {
-            echo 'Current fingerprinted releases are still publishing; the site retains its last complete artifact mapping.'
-            printf -- '- `%s`\n' "${missing[@]}"
-          } >> "$GITHUB_STEP_SUMMARY"
+          echo "Selected authenticated compatibility $selected_compatibility; each indexed revision resolves its exact compatible mapping from reconciled history." >> "$GITHUB_STEP_SUMMARY"
       - name: Build the policy site
         env:
           FALLBACK_ARTIFACTS: ${{ steps.artifact-map.outputs.fallback }}
-          ARTIFACT_INTEGRITY_ROOT: ${{ steps.artifact-map.outputs.integrity_root }}
         run: |
           set -euo pipefail
           args=(--out build/policy-site)
           args+=(--artifact-history "$RUNNER_TEMP/artifact-history.json")
-          if [ -n "$FALLBACK_ARTIFACTS" ]; then
-            args+=(--artifact-references "$FALLBACK_ARTIFACTS")
-          else
-            args+=(--artifact-integrity-root "$ARTIFACT_INTEGRITY_ROOT")
-          fi
+          args+=(--artifact-references "$FALLBACK_ARTIFACTS")
           node scripts/build-policy-site.mjs "${args[@]}"
           node scripts/build-docs-site.mjs --out build/policy-site/docs
+      - uses: actions/upload-artifact@v6
+        with:
+          name: expected-policy-index
+          path: build/policy-site/v1/index
+          if-no-files-found: error
       - run: node scripts/check-policy-site-resolution.mjs
       - name: Publish accumulated policies to deherm-policy-site
         env:
@@ -637,36 +716,100 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: gh api -X POST "repos/${GITHUB_REPOSITORY}/pages/builds" --silent
 
-  consumer-smoke:
-    name: Resolve published policy and generate a clean project
-    needs: [plan, derive, publish-site]
+  native-artifact-reconciliation-health:
+    name: Native artifact inventory and integrity health
+    needs: [publish-site]
     if: needs.publish-site.result == 'success'
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v7
       - uses: actions/download-artifact@v7
         with:
-          name: policy-surface
-          path: ${{ runner.temp }}/policy-surface
-      - name: Install the exact published surface
-        run: node scripts/policy-surface.mjs install --archive "$RUNNER_TEMP/policy-surface/policy-surface.tar.gz"
+          name: native-artifact-health
+          path: ${{ runner.temp }}/native-artifact-health
+      - name: Report inventory or immutable-sidecar failures after policy publication
+        run: node scripts/reconcile-policy-native-artifacts.mjs --assert-health "$RUNNER_TEMP/native-artifact-health/native-health.json"
+
+  consumer-smoke:
+    name: Resolve published policy and generate a clean project
+    needs: [plan, derive, publish-site]
+    if: needs.publish-site.result == 'success'
+    runs-on: ubuntu-24.04
+    permissions:
+      actions: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v7
+        with:
+          name: expected-policy-index
+          path: ${{ runner.temp }}/expected-policy-index
       - uses: pnpm/action-setup@v6
       - uses: actions/setup-node@v7
-        with: { node-version: '22', cache: 'pnpm' }
+        with: { node-version: "22", cache: "pnpm" }
       - run: pnpm install --frozen-lockfile --ignore-scripts
       - name: Wait for Pages and resolve the public content-addressed store
         env:
-          PLANNED_REVISIONS: ${{ needs.plan.outputs.derive }}
-        run: node scripts/check-published-policy.mjs
-      - name: Scaffold, generate and typecheck as an npm consumer
-        run: node scripts/check-end-to-end.mjs --stage scaffold --stage generate
+          PLANNED_REVISIONS: ${{ needs.plan.outputs.consumer_revisions }}
+        run: node scripts/check-published-policy.mjs --expected-index "$RUNNER_TEMP/expected-policy-index"
+      - name: Pack once and generate every distinct planned revision as an npm consumer
+        if: needs.plan.outputs.consumer_revisions != '[]'
+        env:
+          CONSUMER_REVISIONS: ${{ needs.plan.outputs.consumer_revisions }}
+        run: |
+          set -euo pipefail
+          mapfile -t hashes < <(node -e '
+            const seen = new Set();
+            for (const row of JSON.parse(process.env.CONSUMER_REVISIONS)) {
+              if (!seen.has(row.sha1)) { seen.add(row.sha1); process.stdout.write(`${row.sha1}\n`); }
+            }
+          ')
+          revision_args=()
+          for sha in "${hashes[@]}"; do revision_args+=(--defold-sdk "$sha"); done
+          node scripts/prove-npm-consumer.mjs --pack-only "${revision_args[@]}"
+          candidate="$(node -p 'require("./build/npm-consumer-proof.json").tarball')"
+          node scripts/prove-npm-consumer.mjs --candidate "$candidate" --generate-only "${revision_args[@]}"
+      - name: Check exact-revision native readiness for bounded Bob candidates
+        if: needs.plan.outputs.end_to_end_candidates != '[]'
+        env:
+          E2E_CANDIDATES: ${{ needs.plan.outputs.end_to_end_candidates }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          ready="$RUNNER_TEMP/ready-end-to-end.json"
+          : > "$RUNNER_TEMP/ready-end-to-end.tsv"
+          declare -A checked=()
+          while IFS=$'\t' read -r channel sha; do
+            [ -n "$sha" ] || continue
+            if [ -z "${checked[$sha]+present}" ]; then
+              status="$RUNNER_TEMP/readiness-$sha"
+              node scripts/check-published-native-artifacts.mjs --defold-sdk "$sha" --github-output "$status"
+              checked[$sha]="$(sed -n 's/^ready=//p' "$status" | tail -n1)"
+            fi
+            if [ "${checked[$sha]}" = true ]; then printf '%s\t%s\n' "$channel" "$sha" >> "$RUNNER_TEMP/ready-end-to-end.tsv"; fi
+          done < <(node -e '
+            for (const row of JSON.parse(process.env.E2E_CANDIDATES)) {
+              process.stdout.write(`${row.channel}\t${row.sha1}\n`);
+            }
+          ')
+          node -e '
+            const rows = require("node:fs").readFileSync(process.argv[1], "utf8").trim().split("\n").filter(Boolean)
+              .map((line) => { const [channel, sha1] = line.split("\t"); return {channel, sha1}; });
+            require("node:fs").writeFileSync(process.argv[2], JSON.stringify(rows, null, 2) + "\n");
+          ' "$RUNNER_TEMP/ready-end-to-end.tsv" "$ready"
+      - uses: actions/upload-artifact@v6
+        if: needs.plan.outputs.end_to_end_candidates != '[]'
+        with:
+          name: ready-end-to-end-revisions
+          path: ${{ runner.temp }}/ready-end-to-end.json
+          if-no-files-found: error
 
   dispatch-end-to-end:
     name: Run full end-to-end after public policy resolution
-    needs: consumer-smoke
+    needs: [plan, consumer-smoke]
     if: >-
       needs.consumer-smoke.result == 'success' &&
-      github.event_name == 'workflow_dispatch' &&
+      needs.plan.outputs.end_to_end_candidates != '[]' &&
       github.repository == 'ts-defold/deherm' &&
       github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
@@ -674,18 +817,27 @@ jobs:
       actions: write
       contents: read
     steps:
-      - uses: actions/checkout@v7
-      - uses: pnpm/action-setup@v6
-      - uses: actions/setup-node@v7
-        with: { node-version: '22', cache: 'pnpm' }
-      - run: pnpm install --frozen-lockfile --ignore-scripts
-      - id: artifacts
-        name: Wait for a compatible native mapping
+      - uses: actions/download-artifact@v7
+        with:
+          name: ready-end-to-end-revisions
+          path: ${{ runner.temp }}/ready-end-to-end-revisions
+      - name: Dispatch each ready exact revision to its observed channel
         env:
           GH_TOKEN: ${{ github.token }}
-        run: node scripts/check-published-native-artifacts.mjs --github-output "$GITHUB_OUTPUT"
-      - name: Dispatch the full Bob target matrix
-        if: steps.artifacts.outputs.ready == 'true'
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: gh workflow run end-to-end.yml --repo "${{ github.repository }}" --ref "${{ github.ref_name }}"
+        run: |
+          set -euo pipefail
+          node -e '
+            for (const row of require(process.argv[1])) {
+              process.stdout.write(`${row.sha1}\t${row.channel}\n`);
+            }
+          ' "$RUNNER_TEMP/ready-end-to-end-revisions/ready-end-to-end.json" | \
+          while IFS=$'\t' read -r sha channel; do
+            [ -n "$sha" ] || continue
+            case "$channel" in stable|beta|alpha) ;; *)
+              echo "::notice::Native mapping is ready for $sha, but no observed or explicitly selected Extender channel is available for automatic Bob dispatch."
+              continue
+              ;;
+            esac
+            gh workflow run end-to-end.yml --repo "${{ github.repository }}" --ref "${{ github.ref_name }}" \
+              -f defold-sdk="$sha" -f defold-channel="$channel"
+          done

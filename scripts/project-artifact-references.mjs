@@ -52,17 +52,27 @@ async function main(argv = process.argv.slice(2)) {
   let input;
   let output;
   let list;
+  let bundleTargetsFile;
+  let integrityRoot;
   for (let index = 0; index < argv.length; index += 1) {
     const argument = argv[index];
     if (argument === "--from") input = path.resolve(argv[++index]);
     else if (argument === "--out") output = path.resolve(argv[++index]);
     else if (argument === "--list") list = argv[++index];
+    else if (argument === "--bundle-targets") bundleTargetsFile = path.resolve(argv[++index]);
+    else if (argument === "--integrity-root") integrityRoot = path.resolve(argv[++index]);
     else throw new Error(`Unknown argument: ${argument}`);
   }
   if (list && !["archives", "all"].includes(list)) throw new Error("--list must be archives or all");
   if (output && list) throw new Error("--out and --list are mutually exclusive");
 
-  const references = input ? JSON.parse(await readFile(input, "utf8")) : await buildArtifactReferences();
+  if (input && (bundleTargetsFile || integrityRoot)) {
+    throw new Error("--bundle-targets and --integrity-root apply only when projecting, not with --from");
+  }
+  const bundleTargets = bundleTargetsFile ? JSON.parse(await readFile(bundleTargetsFile, "utf8")) : undefined;
+  const references = input
+    ? JSON.parse(await readFile(input, "utf8"))
+    : await buildArtifactReferences({ bundleTargets, integrityRoot });
   if (list) {
     for (const row of artifactAssetRows(references, { includeIntegrity: list === "all" })) {
       process.stdout.write(`${row.family}\t${row.tag}\t${row.asset}\n`);

@@ -68,7 +68,12 @@ export async function planChannels({ site, index, indexPath, fetchImpl = fetch, 
     const alpha = observations.find((row) => row.channel === "alpha");
     if (alpha && !derive.some((row) => row.sha1 === alpha.sha1)) derive.push({ ...alpha, canary: true });
   }
-  return { observations, covered, derive };
+  return {
+    observations,
+    indexedRevisions: shipped.entries.map(({ defoldRevision }) => defoldRevision),
+    covered,
+    derive,
+  };
 }
 
 const ARCHIVE = "https://d.defold.com/archive";
@@ -137,6 +142,12 @@ async function main(argv = process.argv.slice(2)) {
       // state and means this run publishes nothing at all.
       console.log(
         JSON.stringify({
+          observations: plan.observations.map(({ channel, sha1, version }) => ({
+            channel,
+            sha1,
+            version,
+          })),
+          indexedRevisions: plan.indexedRevisions,
           derive: plan.derive.map(({ channel, sha1, version, canary }) => ({
             channel,
             sha1,

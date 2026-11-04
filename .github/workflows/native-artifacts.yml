@@ -73,11 +73,14 @@ name: native-artifacts
 on:
   workflow_dispatch:
     inputs:
-      policy_run_id:
-        description: Policy run whose derived bundle-target inputs should be built
+      policy_defold_revision:
+        description: Exact indexed Defold revision whose native inputs should be built
         required: false
       policy_source_sha:
-        description: Exact commit that produced policy_run_id
+        description: Exact builder source commit for this native recipe
+        required: false
+      policy_compatibility_sha256:
+        description: Expected compatibility digest from authenticated policy facts
         required: false
   push:
     branches: [main]
@@ -117,7 +120,7 @@ permissions:
 # can leave a release half-populated for the next plan to repair.
 concurrency:
   group: native-artifacts
-  cancel-in-progress: false
+  queue: max
 
 jobs:
   # One place decides what this run is called and whether it has anything to do.
@@ -168,28 +171,39 @@ jobs:
       - uses: actions/checkout@v7
         with:
           ref: ${{ inputs.policy_source_sha || github.sha }}
-      - name: Download policy-derived artifact inputs
-        if: inputs.policy_run_id != ''
-        uses: actions/download-artifact@v7
+      - name: Checkout published immutable policy facts
+        if: inputs.policy_defold_revision != ''
+        uses: actions/checkout@v7
         with:
-          name: policy-surface
-          path: ${{ runner.temp }}/policy-source
-          run-id: ${{ inputs.policy_run_id }}
-          github-token: ${{ github.token }}
-          repository: ${{ github.repository }}
-      - name: Install policy-derived artifact inputs
-        if: inputs.policy_run_id != ''
+          repository: ts-defold/deherm
+          ref: deherm-policy-site
+          path: build/published-policy-site
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with: { node-version: "22", cache: "pnpm" }
+      # The fingerprint reads Defold's build_input.yml, so it needs the `yaml`
+      # dependency. Nothing else here runs project code.
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+      - name: Reconstruct exact recipe inputs from immutable policy facts
+        if: inputs.policy_defold_revision != ''
         env:
-          POLICY_RUN_ID: ${{ inputs.policy_run_id }}
-          POLICY_SOURCE_SHA: ${{ inputs.policy_source_sha }}
+          POLICY_REVISION: ${{ inputs.policy_defold_revision }}
+          POLICY_COMPATIBILITY: ${{ inputs.policy_compatibility_sha256 }}
         run: |
-          node scripts/policy-surface-identity.mjs verify \
-            --archive "$RUNNER_TEMP/policy-source/policy-surface.tar.gz" \
-            --identity "$RUNNER_TEMP/policy-source/policy-surface-identity.json" \
-            --source-sha "$POLICY_SOURCE_SHA" --run-id "$POLICY_RUN_ID"
-          node scripts/policy-surface.mjs extract \
-            --archive "$RUNNER_TEMP/policy-source/policy-surface.tar.gz" \
-            --path packages/toolchains/defold-bundle-targets.json
+          set -euo pipefail
+          [[ "$POLICY_REVISION" =~ ^[a-f0-9]{40}$ ]] || {
+            echo "Expected an exact indexed Defold revision" >&2
+            exit 1
+          }
+          [[ "$POLICY_COMPATIBILITY" =~ ^[a-f0-9]{64}$ ]] || {
+            echo "Expected the authenticated native compatibility digest" >&2
+            exit 1
+          }
+          node scripts/hydrate-policy-site.mjs --from build/published-policy-site
+          node scripts/policy-native-artifact-inputs.mjs \
+            --revision "$POLICY_REVISION" \
+            --compatibility "$POLICY_COMPATIBILITY" \
+            --manifest-out packages/toolchains/defold-bundle-targets.json
       - name: Pack the resolved artifact inputs
         run: |
           mkdir -p "$RUNNER_TEMP/native-artifact-inputs/packages/toolchains"
@@ -200,12 +214,6 @@ jobs:
           name: native-artifact-inputs
           path: ${{ runner.temp }}/native-artifact-inputs
           retention-days: 1
-      - uses: pnpm/action-setup@v6
-      - uses: actions/setup-node@v7
-        with: { node-version: '22', cache: 'pnpm' }
-      # The fingerprint reads Defold's build_input.yml, so it needs the `yaml`
-      # dependency. Nothing else here runs project code.
-      - run: pnpm install --frozen-lockfile --ignore-scripts
       - id: compute
         env:
           GH_TOKEN: ${{ github.token }}
@@ -298,7 +306,7 @@ jobs:
         with:
           ref: ${{ inputs.policy_source_sha || github.sha }}
       - uses: actions/setup-node@v7
-        with: { node-version: '22' }
+        with: { node-version: "22" }
       - name: Resolve the canonical build row
         run: node scripts/plan-native-artifact-builds.mjs --describe-row "dehermc=${{ matrix.row }}" --github-env "$GITHUB_ENV"
       - uses: pnpm/action-setup@v6
@@ -371,7 +379,7 @@ jobs:
           name: native-artifact-inputs
           path: .
       - uses: actions/setup-node@v7
-        with: { node-version: '22' }
+        with: { node-version: "22" }
       - name: Resolve the canonical build row
         run: node scripts/plan-native-artifact-builds.mjs --describe-row "linux=${{ matrix.row }}" --github-env "$GITHUB_ENV"
       - uses: docker/setup-buildx-action@v4
@@ -424,7 +432,7 @@ jobs:
           name: native-artifact-inputs
           path: .
       - uses: actions/setup-node@v7
-        with: { node-version: '22' }
+        with: { node-version: "22" }
       - name: Resolve the canonical build row
         run: node scripts/plan-native-artifact-builds.mjs --describe-row "windows=${{ matrix.row }}" --github-env "$GITHUB_ENV"
       - uses: docker/setup-buildx-action@v4
@@ -475,7 +483,7 @@ jobs:
           name: native-artifact-inputs
           path: .
       - uses: actions/setup-node@v7
-        with: { node-version: '22' }
+        with: { node-version: "22" }
       - name: Resolve the canonical build row
         run: node scripts/plan-native-artifact-builds.mjs --describe-row "windows=${{ matrix.row }}" --github-env "$GITHUB_ENV"
       - run: bash scripts/bootstrap-upstreams.sh hermes
@@ -532,7 +540,7 @@ jobs:
           name: native-artifact-inputs
           path: .
       - uses: actions/setup-node@v7
-        with: { node-version: '22' }
+        with: { node-version: "22" }
       - name: Resolve the canonical build row
         run: node scripts/plan-native-artifact-builds.mjs --describe-row "android=${{ matrix.row }}" --github-env "$GITHUB_ENV"
       - uses: docker/setup-buildx-action@v4
@@ -584,7 +592,7 @@ jobs:
           name: native-artifact-inputs
           path: .
       - uses: actions/setup-node@v7
-        with: { node-version: '22' }
+        with: { node-version: "22" }
       - name: Resolve the canonical build row
         run: node scripts/plan-native-artifact-builds.mjs --describe-row "apple=${{ matrix.row }}" --github-env "$GITHUB_ENV"
       # `upstream/` is not committed - it is bootstrapped reproducibly from
@@ -626,7 +634,7 @@ jobs:
       - uses: actions/checkout@v7
         with: { submodules: recursive, ref: "${{ inputs.policy_source_sha || github.sha }}" }
       - uses: actions/setup-node@v7
-        with: { node-version: '22' }
+        with: { node-version: "22" }
       - name: Resolve the canonical build row
         run: node scripts/plan-native-artifact-builds.mjs --describe-row "hermes_host=${{ matrix.row }}" --github-env "$GITHUB_ENV"
       # `upstream/` is not committed - it is bootstrapped reproducibly from
@@ -736,7 +744,7 @@ jobs:
       # sidecars in this job before checking it; the checked-in copy is updated
       # separately by a signed maintainer commit, not by an unsigned CI push.
       - name: Regenerate and verify the published release lock
-        if: inputs.policy_run_id == ''
+        if: inputs.policy_defold_revision == ''
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -747,7 +755,7 @@ jobs:
             echo "::notice::Published host-tool coordinates changed. Commit the regenerated packages/toolchains/release-tags.json with the maintainer's signed identity before packaging a release."
           fi
       - name: Preserve the verified published release lock
-        if: inputs.policy_run_id == ''
+        if: inputs.policy_defold_revision == ''
         uses: actions/upload-artifact@v6
         with:
           name: published-release-tags
@@ -760,8 +768,20 @@ jobs:
       # exact completeness proof. That graph dispatches end-to-end only after
       # the public-site consumer smoke has resolved the advanced mapping.
       - name: Refresh policy artifact mappings after publication
+        if: always()
         env:
+          POLICY_REVISION: ${{ inputs.policy_defold_revision }}
+          POLICY_COMPATIBILITY: ${{ inputs.policy_compatibility_sha256 }}
+          POLICY_SOURCE_SHA: ${{ inputs.policy_source_sha || github.sha }}
           GH_TOKEN: ${{ github.token }}
-        run: >-
-          gh workflow run policy.yml --repo "${{ github.repository }}"
-          --ref "${{ github.ref_name }}" -f artifact_refresh_only=true
+        run: |
+          set -euo pipefail
+          args=(workflow run policy.yml --repo "${{ github.repository }}" --ref "${{ github.ref_name }}" -f artifact_refresh_only=true)
+          if [ -n "$POLICY_REVISION" ]; then
+            args+=(-f artifact_policy_revision="$POLICY_REVISION")
+          fi
+          if [ -n "$POLICY_COMPATIBILITY" ]; then
+            args+=(-f artifact_compatibility_sha256="$POLICY_COMPATIBILITY")
+          fi
+          args+=(-f artifact_source_sha="$POLICY_SOURCE_SHA")
+          gh "${args[@]}"

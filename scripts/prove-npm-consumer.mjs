@@ -9,28 +9,22 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { assertRetainedNpmCandidate } from "./lib/npm-candidate.mjs";
+import {
+  consumerRevisions,
+  createProjectArguments,
+  parseConsumerProofArguments,
+} from "./lib/npm-consumer-revisions.mjs";
 
 const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const arguments_ = process.argv.slice(2);
-const packOnly = arguments_.includes("--pack-only");
-const prepareOnly = arguments_.includes("--prepare-only");
-const candidateIndex = arguments_.indexOf("--candidate");
-const candidate = candidateIndex < 0 ? null : arguments_[candidateIndex + 1];
-if (candidateIndex >= 0 && (!candidate || candidate.startsWith("--"))) {
-  throw new Error("--candidate requires the retained npm tarball path");
-}
-if (packOnly && candidate) throw new Error("--pack-only cannot consume an existing candidate");
-if (packOnly && prepareOnly) throw new Error("--pack-only and --prepare-only are mutually exclusive");
-const positional = arguments_.filter(
-  (argument, index) =>
-    argument !== "--pack-only" &&
-    argument !== "--prepare-only" &&
-    (candidateIndex < 0 || (index !== candidateIndex && index !== candidateIndex + 1)),
-);
-if (positional.length > 1 || positional.some((argument) => argument.startsWith("--"))) {
-  throw new Error("Usage: prove-npm-consumer.mjs [--pack-only | --candidate <tarball>] [--prepare-only] [report.json]");
-}
-const outputArgument = positional[0];
+const {
+  revisions: requestedRevisions,
+  packOnly,
+  mode,
+  candidate,
+  outputArgument,
+} = parseConsumerProofArguments(process.argv.slice(2));
+const prepareOnly = mode === "prepare-only";
+const generateOnly = mode === "generation-only";
 const output = path.resolve(outputArgument ?? path.join(repositoryRoot, "build", "npm-consumer-proof.json"));
 const targets = [
   { target: "wasm-web", representation: "javascript" },
@@ -92,12 +86,12 @@ try {
   const npmCache = path.join(root, "npm-cache");
   const toolCache = path.join(root, "deherm-cache");
   const consumer = path.join(root, "consumer");
-  const game = path.join(root, "game");
   const environment = { ...process.env, DEHERM_CACHE_HOME: toolCache };
-  const revision = /^DEFOLD_REV=([a-f0-9]{40})$/mu.exec(
+  const baselineRevision = /^DEFOLD_REV=([a-f0-9]{40})$/mu.exec(
     await readFile(path.join(repositoryRoot, "upstream.lock"), "utf8"),
   )?.[1];
-  assert.ok(revision, "upstream.lock has no pinned Defold revision");
+  assert.ok(baselineRevision, "upstream.lock has no pinned Defold revision");
+  const revisions = consumerRevisions(requestedRevisions, baselineRevision);
   const commit = run("git", ["rev-parse", "HEAD"]).trim();
   const sourceClean = run("git", ["status", "--porcelain"]).trim() === "";
   if (!packOnly) {
@@ -175,7 +169,8 @@ try {
     tarballBytes: (await stat(archive)).size,
     tarballSha256: archiveSha256,
     memberCount: members.length,
-    defoldRevision: revision,
+    defoldRevision: revisions.length === 1 ? revisions[0] : null,
+    defoldRevisions: revisions,
     stages: ["packed", "inventory-verified", "archive-retained"],
     bundles: [],
     limitation: "Pack-only inventory check; no clean installation or Defold build was executed.",
@@ -198,100 +193,135 @@ try {
       { cwd: consumer, env: environment },
     );
 
-    const created = JSON.parse(
-      run(process.execPath, [cli, "create", game, "--name", "npm consumer proof", "--defold-sdk", revision, "--json"], {
-        cwd: consumer,
-        env: environment,
-      }),
-    );
-    assert.equal(created.projectRoot, game);
-    run("npm", ["install", "--prefix", game, archive, "--no-audit", "--no-fund", "--cache", npmCache]);
-    const gamePackage = await assertRealInstallation(path.join(game, "node_modules", "@ts-defold", "deherm"));
-    const gameCli = path.join(gamePackage, "bin", "deherm.mjs");
-    const checked = JSON.parse(
-      run(process.execPath, [gameCli, "typecheck", "--project", game, "--json"], { cwd: game, env: environment }),
-    );
-    assert.equal(checked.passed, true, "tarball-installed project did not typecheck");
-    const verified = JSON.parse(
-      run(process.execPath, [gameCli, "verify-generated", "--project", game, "--json"], {
-        cwd: game,
-        env: environment,
-      }),
-    );
-    assert.ok(verified.checkedFiles > 0, "generated SDK verification checked no files");
-
     const bundles = [];
     const projections = [];
-    if (prepareOnly) {
-      // dev's JSON mode is an event stream, not one JSON document. Its exit
-      // status proves compilation completed; verify-bundle checks the result.
-      run(
-        process.execPath,
-        [gameCli, "dev", "--project", game, "--entry", "src/main.script.ts", "--once", "--no-launch", "--headless"],
-        { cwd: game, env: environment },
-      );
-      const verifiedBundle = JSON.parse(
-        run(process.execPath, [gameCli, "verify-bundle", "--project", game, "--json"], {
-          cwd: game,
-          env: environment,
+    const revisionProofs = [];
+    for (const revision of revisions) {
+      const game = path.join(root, `game-${revision}`);
+      const policyCache = path.join(root, `deherm-cache-${revision}`);
+      const revisionEnvironment = { ...process.env, DEHERM_CACHE_HOME: policyCache };
+      delete revisionEnvironment.DEHERM_DEFOLD_ENGINE_SHA1;
+      await assert.rejects(stat(policyCache), (error) => error?.code === "ENOENT");
+
+      const created = JSON.parse(
+        run(process.execPath, [cli, ...createProjectArguments({ project: game, revision })], {
+          cwd: consumer,
+          env: revisionEnvironment,
         }),
       );
-      assert.equal(verifiedBundle.ok, true, "installed package produced a stale or unbound pre-Bob bundle");
-      for (const { target, representation } of targets) {
-        const prepared = JSON.parse(
-          run(
-            process.execPath,
-            [
-              gameCli,
-              "prepare-bob",
-              "--project",
-              game,
-              "--target",
-              target,
-              "--variant",
-              "release",
-              "--application-mode",
-              "dynamic",
-              "--json",
-            ],
-            { cwd: game, env: environment },
-          ),
+      assert.equal(created.projectRoot, game);
+      assert.equal(created.defoldRevision, revision, "installed package scaffold selected a different revision");
+      const lock = JSON.parse(await readFile(path.join(game, "deherm.lock"), "utf8"));
+      assert.equal(lock.defoldRevision, revision, "generated project lock selected a different revision");
+      assert.equal(
+        lock.defoldSurface?.layer,
+        "user-cache",
+        "packed consumer did not materialize this revision into its isolated published-policy cache",
+      );
+
+      run("npm", ["install", "--prefix", game, archive, "--no-audit", "--no-fund", "--cache", npmCache]);
+      const gamePackage = await assertRealInstallation(path.join(game, "node_modules", "@ts-defold", "deherm"));
+      const gameCli = path.join(gamePackage, "bin", "deherm.mjs");
+      const checked = JSON.parse(
+        run(process.execPath, [gameCli, "typecheck", "--project", game, "--json"], {
+          cwd: game,
+          env: revisionEnvironment,
+        }),
+      );
+      assert.equal(checked.passed, true, "tarball-installed project did not typecheck");
+      const verified = JSON.parse(
+        run(process.execPath, [gameCli, "verify-generated", "--project", game, "--json"], {
+          cwd: game,
+          env: revisionEnvironment,
+        }),
+      );
+      assert.ok(verified.checkedFiles > 0, "generated SDK verification checked no files");
+
+      const revisionBundles = [];
+      const revisionProjections = [];
+      if (prepareOnly || generateOnly) {
+        // dev's JSON mode is an event stream, not one JSON document. Its exit
+        // status proves compilation completed; verify-bundle checks the result.
+        run(
+          process.execPath,
+          [gameCli, "dev", "--project", game, "--entry", "src/main.script.ts", "--once", "--no-launch", "--headless"],
+          { cwd: game, env: revisionEnvironment },
         );
-        assert.equal(prepared.representation, representation);
-        assert.equal(prepared.platform, target);
-        if (representation === "hermes-bytecode") {
-          assert.ok(prepared.compilation?.outputBytes > 0, `${target} produced no release Hermes bytecode`);
+        const verifiedBundle = JSON.parse(
+          run(process.execPath, [gameCli, "verify-bundle", "--project", game, "--json"], {
+            cwd: game,
+            env: revisionEnvironment,
+          }),
+        );
+        assert.equal(verifiedBundle.ok, true, "installed package produced a stale or unbound pre-Bob bundle");
+        if (prepareOnly) {
+          for (const { target, representation } of targets) {
+            const prepared = JSON.parse(
+              run(
+                process.execPath,
+                [
+                  gameCli,
+                  "prepare-bob",
+                  "--project",
+                  game,
+                  "--target",
+                  target,
+                  "--variant",
+                  "release",
+                  "--application-mode",
+                  "dynamic",
+                  "--json",
+                ],
+                { cwd: game, env: revisionEnvironment },
+              ),
+            );
+            assert.equal(prepared.representation, representation);
+            assert.equal(prepared.platform, target);
+            if (representation === "hermes-bytecode") {
+              assert.ok(prepared.compilation?.outputBytes > 0, `${target} produced no release Hermes bytecode`);
+            }
+            revisionProjections.push({ target, representation });
+          }
         }
-        projections.push({ target, representation });
+      } else {
+        for (const { target, representation } of targets) {
+          const built = JSON.parse(
+            run(
+              process.execPath,
+              [
+                gameCli,
+                "bundle",
+                "--project",
+                game,
+                "--entry",
+                "src/main.script.ts",
+                "--target",
+                target,
+                "--variant",
+                "release",
+                "--application-mode",
+                "dynamic",
+                "--json",
+              ],
+              { cwd: game, env: revisionEnvironment },
+            ),
+          );
+          assert.equal(built.target, target);
+          assert.equal(built.representation, representation);
+          assert.ok((await stat(built.bundleOutput)).isDirectory(), `${target} produced no bundle directory`);
+          revisionBundles.push({ target, representation, bundleDirectory: path.basename(built.bundleOutput) });
+        }
       }
-    } else {
-      for (const { target, representation } of targets) {
-        const built = JSON.parse(
-          run(
-            process.execPath,
-            [
-              gameCli,
-              "bundle",
-              "--project",
-              game,
-              "--entry",
-              "src/main.script.ts",
-              "--target",
-              target,
-              "--variant",
-              "release",
-              "--application-mode",
-              "dynamic",
-              "--json",
-            ],
-            { cwd: game, env: environment },
-          ),
-        );
-        assert.equal(built.target, target);
-        assert.equal(built.representation, representation);
-        assert.ok((await stat(built.bundleOutput)).isDirectory(), `${target} produced no bundle directory`);
-        bundles.push({ target, representation, bundleDirectory: path.basename(built.bundleOutput) });
-      }
+      revisionProofs.push({
+        defoldRevision: revision,
+        lockDefoldRevision: lock.defoldRevision,
+        surfaceLayer: lock.defoldSurface.layer,
+        policyCacheInitiallyEmpty: true,
+        bundles: revisionBundles,
+        ...(prepareOnly ? { projections: revisionProjections } : {}),
+      });
+      bundles.push(...revisionBundles.map((bundle) => ({ defoldRevision: revision, ...bundle })));
+      projections.push(...revisionProjections.map((projection) => ({ defoldRevision: revision, ...projection })));
     }
 
     assert.deepEqual(
@@ -310,13 +340,16 @@ try {
         "generated",
         "typechecked",
         "verified",
-        prepareOnly ? "pre-bob-bundle-prepared" : "bob-bundled",
+        generateOnly ? "generated-and-bundle-verified" : prepareOnly ? "pre-bob-bundle-prepared" : "bob-bundled",
       ],
+      revisionProofs,
       bundles,
       ...(prepareOnly ? { projections } : {}),
       limitation: prepareOnly
         ? "Locally compiled and projected; Bob, native link, and packaged-game runtime were not executed."
-        : "Build and native link only; no packaged-game runtime was executed.",
+        : generateOnly
+          ? "Published-policy generation, typecheck, and JS bundle were verified; native target preparation, Bob, native link, and packaged-game runtime were not executed."
+          : "Build and native link only; no packaged-game runtime was executed.",
     });
   }
   await mkdir(path.dirname(output), { recursive: true });

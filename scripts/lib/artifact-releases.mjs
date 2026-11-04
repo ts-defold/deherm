@@ -57,6 +57,16 @@ import { readLockKeys } from "./upstream-lock.mjs";
 export { parseLock, readLockKeys } from "./upstream-lock.mjs";
 
 export const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
+export const nativeArtifactErrorCodes = Object.freeze({
+  unsupportedTarget: "ERR_UNSUPPORTED_NATIVE_ARTIFACT_TARGET",
+  unsupportedRecipe: "ERR_UNSUPPORTED_NATIVE_ARTIFACT_RECIPE",
+});
+
+function codedError(code, message) {
+  const error = new Error(message);
+  error.code = code;
+  return error;
+}
 
 /**
  * Every family is now published as one reproducible `.tar.gz` per matrix row,
@@ -143,7 +153,9 @@ const nativeArtifactLegacyRelease = Object.freeze({
 
 export function nativeArtifactRecipeForTarget(target) {
   const recipe = nativeRecipeByTarget.get(target);
-  if (!recipe) throw new Error(`No native-artifact recipe is declared for ${target}`);
+  if (!recipe) {
+    throw codedError(nativeArtifactErrorCodes.unsupportedTarget, `No native-artifact recipe is declared for ${target}`);
+  }
   return recipe;
 }
 
@@ -327,7 +339,8 @@ async function hashDeclaredFile(hash, root, relative) {
 export async function fingerprintNativeArtifactRecipe(recipeName, options = {}) {
   const recipe = nativeArtifactRecipes[recipeName];
   if (!recipe) {
-    throw new Error(
+    throw codedError(
+      nativeArtifactErrorCodes.unsupportedRecipe,
       `Unknown native-artifact recipe ${recipeName}; declared recipes are ${Object.keys(nativeArtifactRecipes).join(", ")}`,
     );
   }
@@ -340,7 +353,7 @@ export async function fingerprintNativeArtifactRecipe(recipeName, options = {}) 
     await hashDeclaredFile(hash, root, relative);
   }
   const relative = "packages/toolchains/defold-bundle-targets.json";
-  const document = JSON.parse(await readFile(path.join(root, relative), "utf8"));
+  const document = options.bundleTargets ?? JSON.parse(await readFile(path.join(root, relative), "utf8"));
   const targetRecords = Object.fromEntries(
     recipe.targets.map((target) => {
       const record = document.targets?.find((candidate) => candidate.target === target);

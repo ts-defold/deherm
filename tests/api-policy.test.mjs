@@ -40,11 +40,6 @@ import { fetchPolicyText, validateRebuiltHandshake } from "../scripts/check-poli
 import { buildShippedIndex, canonicalizePolicyText, generatorRevision } from "../scripts/generate-api-policy.mjs";
 import { apiPolicyGenerator } from "../scripts/lib/script-generator-pipeline.mjs";
 import { policySurfaceArchivePaths, policySurfaceFingerprintRoots } from "../scripts/policy-surface.mjs";
-import {
-  blockerFromLog,
-  planPolicyDerivationIssueReconciliation,
-  stageFromLog,
-} from "../scripts/reconcile-policy-derivation-issues.mjs";
 import { planPolicyOptimizationIssueReconciliation } from "../scripts/reconcile-policy-optimization-issues.mjs";
 import { resolveLlvmTool } from "../scripts/generate-dmsdk-symbol-evidence.mjs";
 import { exactCallCxxWarnings } from "../scripts/check-defold-revision-matrix.mjs";
@@ -126,7 +121,7 @@ test("policy host parity reproduces the Linux policy projection without obsolete
     );
   }
   assert.equal((workflow.match(/policy-surface\.mjs pack/gu) ?? []).length, 1);
-  assert.equal((workflow.match(/policy-surface\.mjs install/gu) ?? []).length, 4);
+  assert.equal((workflow.match(/policy-surface\.mjs install/gu) ?? []).length, 3);
   assert.doesNotMatch(workflow, /tar -[cx]zf[^\n]*policy-surface/u);
   assert.doesNotMatch(parity, /archive="\$\(cygpath/u);
   assert.ok(
@@ -164,14 +159,14 @@ test("policy host parity reproduces the Linux policy projection without obsolete
       publish.indexOf("node scripts/collect-policy-artifact-history.mjs"),
     "artifact-history recovery imports package dependencies and must run after pnpm install",
   );
-  assert.match(publish, /Select only a completely published artifact mapping/u);
-  assert.match(publish, /project-artifact-references\.mjs --out/u);
+  assert.match(publish, /Select an authenticated artifact mapping for the policy store/u);
+  assert.match(publish, /artifact-history\.json[\s\S]*const selected = history\[0\]/u);
+  assert.doesNotMatch(publish, /find build\/published-policy-site\/v1\/artifacts/u);
   assert.doesNotMatch(
     publish,
     /packages\/toolchains\/release-tags\.json/u,
     "revision policy publication must derive desired artifacts from the installed surface",
   );
-  assert.match(publish, /build\/published-policy-site\/v1\/artifacts/u);
   assert.match(publish, /--artifact-references/u);
   assert.match(derive, /build-policy-site\.mjs --out build\/policy-site --validation-only/u);
   assert.ok(policySurfaceArchivePaths.includes("packages/toolchains/defold-bundle-targets.json"));
@@ -183,15 +178,25 @@ test("policy host parity reproduces the Linux policy projection without obsolete
   assert.match(derive, /needs\.plan\.outputs\.any == 'true'/u);
   assert.doesNotMatch(derive, /title="policy: unproven Defold/u);
   assert.doesNotMatch(publish, /--validation-only/u);
-  assert.match(workflow, /dispatch-end-to-end:[\s\S]*needs: consumer-smoke/u);
+  assert.match(workflow, /dispatch-end-to-end:[\s\S]*needs: \[plan, consumer-smoke\]/u);
   assert.match(workflow, /needs\.consumer-smoke\.result == 'success'/u);
   assert.match(workflow, /gh workflow run end-to-end\.yml/u);
   assert.match(workflow, /group: policy-v2-\$\{\{ github\.ref \}\}/u);
-  assert.match(workflow, /inputs\.artifact_refresh_only[\s\S]*derive='\[\]'/u);
+  const planJob = workflow.slice(workflow.indexOf("\n  plan:\n"), workflow.indexOf("\n  derive:\n"));
+  assert.equal((planJob.match(/track-defold-channels\.mjs plan --json/gu) ?? []).length, 1);
   assert.match(
-    publish,
-    /Current fingerprinted releases are still publishing; the site retains its last complete artifact mapping/u,
+    planJob,
+    /plan-policy-workflow\.mjs[\s\S]*--event "\$EVENT_NAME"[\s\S]*--channel-plan "\$channel_plan"/u,
   );
+  assert.match(planJob, /endToEndCandidates/u);
+  assert.match(
+    planJob,
+    /CALLBACK_COMPATIBILITY:[\s\S]*hydrate-policy-site\.mjs --from build\/published-policy-site[\s\S]*policy-native-artifact-inputs\.mjs --all[\s\S]*--callback-compatibility "\$CALLBACK_COMPATIBILITY"[\s\S]*--compatibility-index/u,
+  );
+  const dispatch = workflow.slice(workflow.indexOf("\n  dispatch-end-to-end:"));
+  assert.match(dispatch, /needs: \[plan, consumer-smoke\]/u);
+  assert.match(dispatch, /needs\.plan\.outputs\.end_to_end_candidates != '\[\]'/u);
+  assert.doesNotMatch(dispatch, /github\.event_name == 'workflow_dispatch'|inputs\.artifact_refresh_only/u);
   assert.match(workflow, /manage-native-artifacts\.mjs pull --target x86_64-linux/u);
   assert.match(engine, /Wait for the content-addressed Linux archive/u);
   assert.match(engine, /manage-native-artifacts\.mjs tag/u);
@@ -199,7 +204,7 @@ test("policy host parity reproduces the Linux policy projection without obsolete
   assert.match(engine, /deadline=\$\(\(SECONDS \+ 2700\)\)/u);
   assert.doesNotMatch(workflow, /pnpm artifacts:pull/u);
   assert.match(engine, /pnpm check:exact-call-materializers/u);
-  assert.match(engine, /DEHERM_REQUIRE_PACKAGED_HERMES: '1'/u);
+  assert.match(engine, /DEHERM_REQUIRE_PACKAGED_HERMES: ["']1["']/u);
   assert.ok(
     engine.indexOf("Wait for the content-addressed Linux archive") <
       engine.indexOf("manage-native-artifacts.mjs pull --target x86_64-linux"),
@@ -226,18 +231,37 @@ test("policy host parity reproduces the Linux policy projection without obsolete
     /Enforce engine-lane infrastructure health[\s\S]*steps\.engine\.outcome != 'success'[\s\S]*exit 1/u,
   );
   assert.match(workflow, /consumer-smoke:[\s\S]*needs: \[plan, derive, publish-site\]/u);
-  assert.match(workflow, /consumer-smoke:[\s\S]*PLANNED_REVISIONS: \$\{\{ needs\.plan\.outputs\.derive \}\}/u);
+  assert.match(workflow, /name: expected-policy-index[\s\S]*path: build\/policy-site\/v1\/index/u);
+  assert.match(workflow, /name: expected-policy-index[\s\S]*path: \$\{\{ runner\.temp \}\}\/expected-policy-index/u);
+  assert.match(workflow, /check-published-policy\.mjs --expected-index "\$RUNNER_TEMP\/expected-policy-index"/u);
+  assert.match(
+    workflow,
+    /consumer-smoke:[\s\S]*PLANNED_REVISIONS: \$\{\{ needs\.plan\.outputs\.consumer_revisions \}\}/u,
+  );
+  const consumerSmoke = workflow.slice(
+    workflow.indexOf("\n  consumer-smoke:"),
+    workflow.indexOf("\n  dispatch-end-to-end:"),
+  );
+  assert.doesNotMatch(consumerSmoke, /policy-surface\.mjs install|name: policy-surface/u);
+  assert.match(consumerSmoke, /check-published-policy\.mjs --expected-index "\$RUNNER_TEMP\/expected-policy-index"/u);
   assert.match(workflow, /check-published-policy\.mjs/u);
   assert.match(
     workflow,
-    /request-native-artifacts:[\s\S]*needs: \[plan, derive\][\s\S]*policy_run_id="\$\{\{ github\.run_id \}\}"/u,
+    /request-native-artifacts:[\s\S]*needs: \[publish-site\][\s\S]*policy_defold_revision="\$revision"[\s\S]*policy_compatibility_sha256="\$compatibility"[\s\S]*policy_source_sha=/u,
   );
-  assert.match(workflow, /request-native-artifacts:[\s\S]*needs\.derive\.outputs\.generated != '0'/u);
+  assert.match(workflow, /native-artifact-worklist[\s\S]*native-work\.json/u);
+  assert.doesNotMatch(workflow, /policy_run_id=/u);
   const nativeArtifacts = await readFile(path.join(repositoryRoot, ".github/workflows/native-artifacts.yml"), "utf8");
   assert.match(
     nativeArtifacts,
-    /policy-surface\.mjs extract[\s\S]*--path packages\/toolchains\/defold-bundle-targets\.json/u,
+    /policy-native-artifact-inputs\.mjs[\s\S]*--revision "\$POLICY_REVISION"[\s\S]*--compatibility "\$POLICY_COMPATIBILITY"[\s\S]*--manifest-out packages\/toolchains\/defold-bundle-targets\.json/u,
   );
+  assert.match(nativeArtifacts, /group: native-artifacts\s+queue: max/u);
+  assert.doesNotMatch(nativeArtifacts, /cancel-in-progress:\s*false/u);
+  assert.match(nativeArtifacts, /POLICY_COMPATIBILITY: \$\{\{ inputs\.policy_compatibility_sha256 \}\}/u);
+  assert.match(nativeArtifacts, /\^\[a-f0-9\]\{64\}\$/u);
+  const nativeDefinition = YAML.parse(nativeArtifacts);
+  assert.deepEqual(nativeDefinition.concurrency, { group: "native-artifacts", queue: "max" });
 });
 
 test("generated-text checks accept host newlines without accepting content drift", () => {
@@ -276,72 +300,20 @@ test("LLVM tools resolve versioned Linux binaries and macOS xcrun without false 
   assert.equal(missing, null);
 });
 
-test("policy derivation failures collapse by generator stage and stale per-revision spam closes", () => {
-  const realSummary = [
-    "Defold aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa is NOT derivable from this checkout.",
-    "Error: llvm-nm could not read one archive",
-    "  blocked by generator at scripts/generate-dmsdk-symbol-evidence.mjs: Command failed",
-    "  committed surface unchanged",
-  ].join("\n");
-  assert.equal(stageFromLog(realSummary), "scripts/generate-dmsdk-symbol-evidence.mjs");
-  assert.equal(blockerFromLog(realSummary), "llvm-nm could not read one archive");
-  const missingSystemHeader = [
-    "Error: compile universal-ready production calls failed in /tmp/revision",
-    "tests/fixtures/generated_dmsdk_universal_ready_provider.cpp:3:10: fatal error: 'GL/glx.h' file not found",
-  ].join("\n");
-  assert.equal(stageFromLog(missingSystemHeader), "compile-universal-ready-production-calls");
-  assert.match(blockerFromLog(missingSystemHeader), /GL\/glx\.h.*file not found/u);
-
-  const actions = planPolicyDerivationIssueReconciliation({
-    existingIssues: [
-      { number: 140, title: "policy: unproven Defold old", state: "OPEN" },
-      { number: 142, title: "policy derivation: generate-dmsdk-symbol-evidence", state: "CLOSED" },
-      { number: 99, title: "Ship playable War Battles", state: "OPEN" },
-    ],
-    failures: [
-      {
-        channel: "stable",
-        revision: "a".repeat(40),
-        version: "1.14.0",
-        stage: "scripts/generate-dmsdk-symbol-evidence.mjs",
-        blocker: "required LLVM tool 'llvm-nm' is unavailable",
-      },
-      {
-        channel: "beta",
-        revision: "b".repeat(40),
-        version: "1.14.1",
-        stage: "scripts/generate-dmsdk-symbol-evidence.mjs",
-        blocker: "required LLVM tool 'llvm-nm' is unavailable",
-      },
-    ],
-    runUrl: "https://example.test/run/1",
-  });
-  assert.deepEqual(
-    actions.map(({ kind, number, title }) => ({ kind, number, title })),
-    [
-      { kind: "reopen", number: 142, title: undefined },
-      { kind: "edit", number: 142, title: undefined },
-      { kind: "close", number: 140, title: undefined },
-    ],
-  );
-  assert.equal(actions.filter(({ kind }) => kind === "create").length, 0);
-  assert.equal(
-    actions.some(({ number }) => number === 99),
-    false,
-  );
-  assert.match(actions.find(({ kind }) => kind === "edit").body, /2 tracked revision\(s\)/u);
-});
-
 test("policy workflow discovers changed channels on push and PR and reports incomplete derivation", async () => {
   const workflow = await readFile(path.join(repositoryRoot, ".github/workflows/policy.yml"), "utf8");
-  assert.match(workflow, /cron: '0 12 \* \* \*'/u, "daily discovery is scheduled for 08:00 EDT (12:00 UTC)");
+  assert.match(workflow, /cron: ["']0 12 \* \* \*["']/u, "daily discovery is scheduled for 08:00 EDT (12:00 UTC)");
   assert.match(workflow, /group: policy-v2-\$\{\{ github.ref \}\}\s+queue: max/u);
   const plan = workflow.slice(workflow.indexOf("\n  plan:\n"), workflow.indexOf("\n  derive:\n"));
-  assert.match(plan, /else\s+canary=\(\)/u);
   assert.match(plan, /github\.event_name \}\}" = push.*github\.event_name \}\}" = pull_request/u);
   assert.match(plan, /canary=\(--include-alpha-canary\)/u);
-  assert.match(plan, /derive="\$\(node scripts\/track-defold-channels\.mjs plan --json/u);
-  assert.doesNotMatch(plan, /github\.event_name.*schedule.*github\.event_name.*workflow_dispatch/u);
+  assert.equal((plan.match(/track-defold-channels\.mjs plan --json/gu) ?? []).length, 1);
+  assert.match(
+    plan,
+    /plan-policy-workflow\.mjs[\s\S]*--requested-revision "\$REQUESTED_REVISION"[\s\S]*--requested-channel "\$REQUESTED_CHANNEL"/u,
+  );
+  assert.match(plan, /--refresh-only "\$refresh_only"[\s\S]*--callback-revision "\$CALLBACK_REVISION"/u);
+  assert.match(plan, /endToEndCandidates/u);
   assert.match(workflow, /if \[ "\$canary" != true \]; then generated=/u);
   assert.match(
     workflow,
@@ -1189,6 +1161,7 @@ test("a channel whose sha is already indexed derives nothing", async () => {
     plan.covered.map((row) => row.channel),
     ["stable"],
   );
+  assert.deepEqual(plan.indexedRevisions, [known]);
   assert.deepEqual(
     plan.derive.map((row) => row.sha1),
     [fresh],

@@ -21,9 +21,9 @@ const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url))
 /** Build-recipe release metadata lives outside the Defold source-policy generator identity. */
 export async function buildArtifactReferences(options = {}) {
   const sourceRoot = options.sourceRoot ?? repositoryRoot;
-  const bundleTargets = JSON.parse(
-    await readFile(path.join(sourceRoot, "packages", "toolchains", "defold-bundle-targets.json"), "utf8"),
-  );
+  const bundleTargets =
+    options.bundleTargets ??
+    JSON.parse(await readFile(path.join(sourceRoot, "packages", "toolchains", "defold-bundle-targets.json"), "utf8"));
   const compatibility = nativeArtifactCompatibility({
     pins: {
       ANDROID_NDK_VERSION: bundleTargets.sdk.androidNdkVersion,
@@ -49,7 +49,7 @@ export async function buildArtifactReferences(options = {}) {
       assets[key] = row.asset;
       contents[key] = row.files;
       if (name === "native-artifacts") {
-        const rowRelease = await artifactReleaseForRow(name, row, { root: sourceRoot });
+        const rowRelease = await artifactReleaseForRow(name, row, { root: sourceRoot, bundleTargets });
         releases[key] = {
           recipe: rowRelease.recipe,
           tag: rowRelease.tag,
@@ -82,7 +82,7 @@ export async function buildArtifactReferences(options = {}) {
       const integrity = {};
       for (const row of rows) {
         const key = row.host ?? row.target;
-        const rowRelease = await artifactReleaseForRow(name, row, { root: sourceRoot });
+        const rowRelease = await artifactReleaseForRow(name, row, { root: sourceRoot, bundleTargets });
         const sidecar = releaseIntegrityAssetName(row.asset);
         const bytes = await readFile(path.join(options.integrityRoot, name, sidecar));
         const document = validateReleaseIntegrity(JSON.parse(bytes), {

@@ -46,7 +46,12 @@ import {
   shippedIndexPath,
   storeRoot,
 } from "./generate-api-policy.mjs";
-import { artifactFamilyNames, familyArchiveName, nativeArtifactRecipeForTarget } from "./lib/artifact-releases.mjs";
+import {
+  artifactFamilyNames,
+  familyArchiveName,
+  nativeArtifactErrorCodes,
+  nativeArtifactRecipeForTarget,
+} from "./lib/artifact-releases.mjs";
 
 export const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 export const defaultOutputDirectory = path.join(root, "build", "policy-site");
@@ -91,8 +96,10 @@ function validReleaseIdentity(value) {
 function nativeRecipe(key, label) {
   try {
     return nativeArtifactRecipeForTarget(key);
-  } catch {
-    throw new Error(`${label} names undeclared native-artifacts target ${key}`);
+  } catch (cause) {
+    const error = new Error(`${label} names undeclared native-artifacts target ${key}`, { cause });
+    if (cause?.code === nativeArtifactErrorCodes.unsupportedTarget) error.code = cause.code;
+    throw error;
   }
 }
 

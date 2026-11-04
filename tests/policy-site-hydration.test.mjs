@@ -27,6 +27,7 @@ import {
 } from "../scripts/generate-api-policy.mjs";
 import { hydratePolicySite } from "../scripts/hydrate-policy-site.mjs";
 import { collectArtifactHistory } from "../scripts/collect-policy-artifact-history.mjs";
+import { collectPolicyNativeArtifactInputs } from "../scripts/policy-native-artifact-inputs.mjs";
 import { ARTIFACTS_DOCUMENT_KIND, hashBytes } from "../packages/compiler/src/api-policy.mjs";
 
 function divergentNativeReferences(references) {
@@ -285,6 +286,17 @@ test("the packaged one-revision store hydrates idempotently from the accumulated
   const store = await readStore(hydratedStore, site.layoutVersion);
   assert.deepEqual(store.problems, []);
   assert.deepEqual(store.orphans, []);
+  const publishedManifest = JSON.parse(
+    await readFile(path.join(published, site.layoutVersion, "index", "manifest.json"), "utf8"),
+  );
+  const nativeInputs = await collectPolicyNativeArtifactInputs({
+    storeDirectory: hydratedStore,
+    layoutVersion: site.layoutVersion,
+  });
+  assert.equal(nativeInputs.length, 1);
+  assert.deepEqual(nativeInputs[0].revisions, [publishedManifest.entries[0].defoldRevision]);
+  assert.equal(nativeInputs[0].bundleTargets.source, "policy-store:@toolchain");
+  assert.match(nativeInputs[0].compatibility.sha256, /^[a-f0-9]{64}$/u);
 
   const second = await hydratePolicySite({ from: published, store: hydratedStore, index: hydratedIndex, site });
   assert.equal(second.copied, 0);

@@ -1,5 +1,37 @@
 # Defold Hermes knowledge log
 
+## 2026-11-04 - Integrate bounded release-recovery corrections
+
+Three implementation lanes now cover immutable-policy native recovery, exact
+consumer revision selection and scope-aware issue reconciliation. The native
+inventory was exercised against real authenticated releases for the packaged
+policy compatibility: its sidecars validate, no build request remains, and the
+separate health assertion passes. This is read-only release-inventory evidence,
+not a native build or newly hosted workflow result. Focused lifecycle/policy
+tests passed 48/48; issue/planner/consumer tests passed 45/45 before the final
+handoff refinements. Test ownership, lint and knowledge checks pass. Formatting
+initially reported two owned implementation files; full aggregate and real
+retained-package proof remain pending.
+
+Integration review found two additional handoff edges inside the accepted scope:
+a shared build's older representative revision can omit the current channel's
+Bob handoff, and an artifact-only refresh can pass the Pages barrier while the
+old mapping is still public. The corrections reuse immutable compatibility
+aliases and the publisher's exact emitted revision-pointer digests, respectively;
+neither creates another mutable work ledger. An actual channel-plan CLI run
+also reproduced an undefined snapshot variable; the corrected CLI now returns
+the observed exact stable/beta/alpha revisions. No bindings, optimized lowerings
+or gameplay files changed. No new-wave hosted-green claim yet.
+
+Final focused policy suite passes 81/81 plus six Python portability tests;
+consumer/E2E contracts pass 28/28. Integrated style, test ownership and relocated
+policy-site resolution pass. The old native workflow assertion was updated to
+the new authenticated revision/compatibility reconstruction contract rather than
+deleted. A transient freshness-fixture failure after adding bounded request
+signals was corrected to check the actual cache/signal contract. The full
+aggregate remains running, with clean-room script regeneration byte-identical;
+the retained-package proof must start from the clean integration commit.
+
 ## 2026-11-04 - Start bounded release-resilience implementation wave
 
 The existing continuous-publication decision now records ten bounded tasks and

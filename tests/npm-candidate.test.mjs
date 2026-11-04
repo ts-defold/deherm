@@ -6,6 +6,13 @@ import test from "node:test";
 import YAML from "yaml";
 
 import { assertRetainedNpmCandidate } from "../scripts/lib/npm-candidate.mjs";
+import {
+  consumerProofMode,
+  consumerRevisions,
+  createProjectArguments,
+  parseConsumerProofArguments,
+  parseDefoldRevisionArguments,
+} from "../scripts/lib/npm-consumer-revisions.mjs";
 
 const root = path.resolve(import.meta.dirname, "..");
 const archive = path.join(root, "build/npm-release-candidate/deherm.tgz");
@@ -17,6 +24,63 @@ const proof = {
   stages: ["packed", "archive-retained"],
 };
 const selected = { archive, commit: proof.commit, digest: proof.tarballSha256, repositoryRoot: root };
+
+test("packed consumer accepts exact per-project revisions and makes the requested SHA the create input", () => {
+  const baseline = "a".repeat(40);
+  const stable = "b".repeat(40);
+  const alpha = "c".repeat(40);
+  const parsed = parseDefoldRevisionArguments([
+    "--candidate",
+    "candidate.tgz",
+    "--defold-sdk",
+    stable,
+    "--defold-sdk",
+    alpha,
+    "report.json",
+  ]);
+  assert.deepEqual(parsed.remaining, ["--candidate", "candidate.tgz", "report.json"]);
+  assert.deepEqual(parsed.revisions, [stable, alpha]);
+  assert.deepEqual(consumerRevisions(parsed.revisions, baseline), [stable, alpha]);
+  assert.deepEqual(consumerRevisions([], baseline), [baseline]);
+  assert.equal(consumerProofMode({ generateOnly: true, prepareOnly: false }), "generation-only");
+  assert.equal(consumerProofMode({ generateOnly: false, prepareOnly: true }), "prepare-only");
+  assert.equal(consumerProofMode({ generateOnly: false, prepareOnly: false }), "bundle");
+  assert.throws(() => consumerProofMode({ generateOnly: true, prepareOnly: true }), /mutually exclusive/u);
+  assert.deepEqual(
+    parseConsumerProofArguments([
+      "--generate-only",
+      "--candidate",
+      "candidate.tgz",
+      "--defold-sdk",
+      stable,
+      "--defold-sdk",
+      alpha,
+      "report.json",
+    ]),
+    {
+      revisions: [stable, alpha],
+      packOnly: false,
+      mode: "generation-only",
+      candidate: "candidate.tgz",
+      outputArgument: "report.json",
+    },
+  );
+  assert.throws(() => parseConsumerProofArguments(["--generate-only", "--unknown"]), /Usage/u);
+  assert.throws(() => parseConsumerProofArguments(["--generate-only", "--prepare-only"]), /mutually exclusive/u);
+  assert.throws(() => parseConsumerProofArguments(["--pack-only", "--generate-only"]), /cannot run/u);
+  assert.throws(() => parseConsumerProofArguments(["--pack-only", "--candidate", "candidate.tgz"]), /cannot consume/u);
+  assert.deepEqual(createProjectArguments({ project: "game-alpha", revision: alpha }), [
+    "create",
+    "game-alpha",
+    "--name",
+    "npm consumer proof",
+    "--defold-sdk",
+    alpha,
+    "--json",
+  ]);
+  assert.throws(() => parseDefoldRevisionArguments(["--defold-sdk", "alpha"]), /40-character/u);
+  assert.throws(() => parseDefoldRevisionArguments(["--defold-sdk", alpha, "--defold-sdk", alpha]), /more than once/u);
+});
 
 test("release candidate proof binds the exact retained tarball, source commit, and bytes", () => {
   assert.doesNotThrow(() => assertRetainedNpmCandidate(proof, selected));
