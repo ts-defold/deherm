@@ -4,7 +4,7 @@ title: Continuous policy generation, engine evidence, and publication
 description: One nightly policy workflow derives every tracked Defold revision, emits every mechanically representable API, records verification without gating publication, and publishes the accumulated policy store directly to the website.
 tags: [decision, generator, policy, ci, conformance, pages]
 status: accepted
-generated: { by: codex/gpt-6, at: 2026-11-04T23:28:50Z }
+generated: { by: codex/gpt-6, at: 2026-11-04T23:33:51Z }
 sources:
   - resource: ../../../scripts/policy-native-artifact-inputs.mjs
     title: Recoverable native recipe projection from immutable policy facts
@@ -164,17 +164,32 @@ lowerings, generated bindings, or example gameplay in this wave.
 | A3 | Independent lifecycle test owner | Exercise reverse-order completion and clean refresh for two distinct recipes, missing/failed production recovery, and unchanged policy hashes. | A2 exported contract | Focused regressions independently pass; real authenticated inventory and health assertion pass for the packaged compatibility |
 | B1 | Consumer identity | Agree explicit selected-revision inputs for packed consumption, readiness and E2E dispatch. | A1 contract coordination | Agreed: explicit exact SHA |
 | B2 | Consumer identity | Implement exact-SHA continuity and clean packed consumer proof; preserve explicit channel resolution and extender routing. | B1 | Implemented; caller, readiness and freshness regressions pass |
-| B3 | Consumer identity | Distinct baseline/stable/alpha fixture verifies requested SHA in project lock and dispatch; no SDK/source fallback. | B2 | Focused tests pass; real packed proof pending clean integration commit |
+| B3 | Consumer identity | Distinct baseline/stable/alpha fixture verifies requested SHA in project lock and dispatch; no SDK/source fallback. | B2 | Real same-tarball generation-only proof passes for three exact revisions with separate initially empty policy caches |
 | C1 | Issue scope | Define examined results and authoritative tracked scope, preserving unresolved rows from partial runs. | None | Agreed: examined results plus nullable authoritative tracked set |
 | C2 | Issue scope | Implement scoped reconciliation and regressions for partial success/failure, complete success and authoritative removal. | C1 | Implemented; 13 focused regressions independently pass; workflow scope wired |
 | P1 | Issue-scope implementor | Replace inline workflow-plan branching with one tested production planner for normal, manual and callback runs; keep a single channel snapshot. | A/B/C agreed contracts | Implemented and wired; callback aliases have a dedicated same-compatibility regression |
 | I1 | Integrator | Review all diffs and integrate A/B/C workflow contracts; reject duplicate authorities and unrelated churn. | A3, B3, C2, P1 | Source integration complete; packed and hosted acceptance remain V1 |
-| V1 | Verification | Run focused suites, clean lifecycle/consumer checks, full aggregate, knowledge and provenance; push signed changes and inspect hosted outcomes. | I1 | Focused checks pass; aggregate running; clean retained-package and hosted checks pending |
+| V1 | Verification | Run focused suites, clean lifecycle/consumer checks, full aggregate, knowledge and provenance; push signed changes and inspect hosted outcomes. | I1 | Local focused, clean retained-package and final aggregate stages complete; hosted acceptance pending |
 
 The baseline latest-main policy run 41912841883 is green, including headless
 engine execution, host parity and publication. That is baseline evidence only;
 it neither implements nor proves the new lifecycle invariants above. Keep local,
 hosted, packed-consumer and actual engine evidence separate when closing tasks.
+
+The signed integration commit `5222d42d` passed the real retained-package
+generation-only proof (exit 0): baseline `7f0f554f41f9dce1e0ddff99bf08200657d1ee05`,
+stable `d295ed4edff2e49072719835713e625f409849f1` and alpha
+`6a8e89ca68e3fda147a8ba2ef8b66644a754caf8`. Each project records its exact
+requested revision and materializes into a separate initially empty user cache.
+The same 944,030-byte tarball (SHA-256
+`ab363b96b5ae0a6411672ca694d1d210a2771a9a960462b31c3eb5679dfed7a5`)
+installs without workspace links, generates, typechecks, compiles a development
+JS bundle and verifies its binding. It does not establish native preparation,
+Bob linkage or packaged-game execution. The full aggregate log reaches its
+successful final knowledge gate; its launcher exit receipt was not retained.
+The final knowledge gate was independently repeated with exit 0, as were style,
+focused suites, test ownership, site resolution and commit provenance. Hosted
+queue retention, publication and downstream Bob acceptance remain separate.
 
 Artifact recovery projects every indexed policy's authenticated `@toolchain`
 facts into the existing recipe inputs; current channel observations are not a

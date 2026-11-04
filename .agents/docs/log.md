@@ -1,5 +1,20 @@
 # Defold Hermes knowledge log
 
+## 2026-11-04 - Complete local package acceptance for release-recovery wave
+
+Signed integration commit `5222d42d` has a real generation-only npm consumer
+proof with exit 0 for the baseline, stable 1.14.0 and alpha 1.14.2 exact revisions.
+One retained 944,030-byte tarball installs without workspace links; three separate
+initially empty policy caches materialize the requested SDKs, preserve the exact
+project-lock revisions, typecheck, compile JS and pass bundle verification. No
+native preparation, Bob link or packaged-game runtime was executed by this proof.
+The report is `build/npm-consumer-proof.json`; the decision records immutable
+revision and archive identities. The full aggregate log reaches successful final
+knowledge checks; its launcher exit receipt was lost. Final knowledge, style,
+focused tests, test ownership, site resolution and provenance have independent
+successful exit receipts. No generated bindings changed and the tree remained
+clean throughout package acceptance. Hosted rollout checks are still pending.
+
 ## 2026-11-04 - Integrate bounded release-recovery corrections
 
 Three implementation lanes now cover immutable-policy native recovery, exact
