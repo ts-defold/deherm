@@ -4,7 +4,7 @@ title: Continuous policy generation, engine evidence, and publication
 description: One nightly policy workflow derives every tracked Defold revision, emits every mechanically representable API, records verification without gating publication, and publishes the accumulated policy store directly to the website.
 tags: [decision, generator, policy, ci, conformance, pages]
 status: accepted
-generated: { by: codex/gpt-6, at: 2026-11-04T19:01:40Z }
+generated: { by: codex/gpt-6, at: 2026-11-04T22:23:00Z }
 sources:
   - resource: ../../../scripts/reconcile-policy-derivation-issues.mjs
     title: Derivation issue reconciliation scope
@@ -139,6 +139,33 @@ publication, fallback emission and architecture-specific performance lanes.
 This audit did not establish that any future upstream revision or hosted service
 is infallible; the required property is identity-preserving automatic convergence
 with actionable failures rather than maintainer replays.
+
+### Bounded implementation wave
+
+Three implementation owners work on disjoint files; the integrator owns this
+plan, package task registration, review and signed commits. Workflow edits in
+`policy.yml` and `native-artifacts.yml` have one owner. Consumer and issue owners
+send their required invocation contracts to that owner instead of editing the
+same YAML concurrently. No owner may change the parser, runtime API, optimized
+lowerings, generated bindings, or example gameplay in this wave.
+
+| Task | Owner | Deliverable | Dependency | State |
+| --- | --- | --- | --- | --- |
+| A1 | Artifact lifecycle | Agree smallest durable revision/compatibility recipe contract; identify existing policy/manifest data to reuse. | None | In progress |
+| A2 | Artifact lifecycle | Preserve all distinct requests, deduplicate equivalent recipes, reconcile indexed incomplete mappings, and retain pending native requests. | A1 | Pending |
+| A3 | Artifact lifecycle | Exercise reverse-order completion and clean refresh for two distinct recipes, missing/failed production recovery, and unchanged policy hashes. | A2 | Pending |
+| B1 | Consumer identity | Agree explicit selected-revision inputs for packed consumption, readiness and E2E dispatch. | A1 contract coordination | In progress |
+| B2 | Consumer identity | Implement exact-SHA continuity and clean packed consumer proof; preserve explicit channel resolution and extender routing. | B1 | Pending |
+| B3 | Consumer identity | Distinct baseline/stable/alpha fixture verifies requested SHA in project lock and dispatch; no SDK/source fallback. | B2 | Pending |
+| C1 | Issue scope | Define examined results and authoritative tracked scope, preserving unresolved rows from partial runs. | None | In progress |
+| C2 | Issue scope | Implement scoped reconciliation and regressions for partial success/failure, complete success and authoritative removal. | C1 | Pending |
+| I1 | Integrator | Review all diffs and integrate A/B/C workflow contracts; reject duplicate authorities and unrelated churn. | A3, B3, C2 | Pending |
+| V1 | Verification | Run focused suites, clean lifecycle/consumer checks, full aggregate, knowledge and provenance; push signed changes and inspect hosted outcomes. | I1 | Pending |
+
+The baseline latest-main policy run 41912841883 is green, including headless
+engine execution, host parity and publication. That is baseline evidence only;
+it neither implements nor proves the new lifecycle invariants above. Keep local,
+hosted, packed-consumer and actual engine evidence separate when closing tasks.
 
 ### Freshness and host routing
 

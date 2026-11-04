@@ -1,5 +1,16 @@
 # Defold Hermes knowledge log
 
+## 2026-11-04 - Start bounded release-resilience implementation wave
+
+The existing continuous-publication decision now records ten bounded tasks and
+their dependencies: artifact identity/recovery, exact consumer revision, scoped
+issue reconciliation, integration and verification. Three implementation owners
+have exclusive file scopes; workflow edits have a single owner. Initial data
+contracts must agree before cross-workflow wiring, then focused lifecycle tests
+must distinguish the reported failure classes. Latest-main policy run
+41912841883 passed all jobs, providing a baseline rather than proof these open
+gaps are fixed. Runtime/generator changes and broad regeneration are out of scope.
+
 ## 2026-11-04 - Audit cross-workflow release identity and recovery
 
 An independent read-only adversarial review found four open orchestration gaps:
