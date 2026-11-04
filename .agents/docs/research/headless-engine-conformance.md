@@ -4,8 +4,11 @@ title: Headless Defold conformance harness
 description: Defold's null backends, headless bundle variant, and in-process engine driving API, and what they change about how binding conformance should be proven.
 tags: [research, defold, conformance, headless, verification]
 status: verified-runtime
-generated: { by: codex/gpt-6, at: 2026-11-04T18:28:09Z }
+generated: { by: codex/gpt-6, at: 2026-11-04T18:39:23Z }
 sources:
+  - id: runtime-receipt
+    resource: ../../../packages/bindings/generated/defold-headless-conformance-report.json
+    title: Pinned SDK native headless execution report
   - resource: ../../../scripts/generate-headless-sdk-link.mjs
     title: Selected SDK headless library and registration projection
   - resource: https://github.com/defold/defold/blob/f2a96160d5d3b7755742945a1e0b8acacb0fb433/share/extender/variants/headless_input.appmanifest
@@ -148,6 +151,11 @@ Following both exclusion scopes fixes the harness recipe without stubbing
 symbols or removing the recording API from generated product bindings. A
 deterministic projection test covers both scopes; hosted linkage remains a
 separate verification step.
+
+The November 4 local rebuild and execution on the pinned `7f0f554` macOS SDK
+passed with no mismatches or engine faults. This refreshed the runtime report's
+plan identity through actual execution; observation records and normalized
+runtime logs are unchanged. It is not evidence for the newer alpha SDK link.[^runtime-receipt]
 
 This instrument is a targeted bridge-regression tool, not the definition of
 whether a Defold API exists or may ship. CI's completeness contract is the

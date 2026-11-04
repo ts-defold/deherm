@@ -10,7 +10,14 @@ as well as platform-specific exclusions, matching the failing alpha's recorder
 recipe. Apple Bob jobs retain macOS packaging and select the supported Intel
 runner explicitly after arm64 runner acquisition failed without running steps.
 Focused suites passed: headless 16/16, policy 44/44 and consumer gate 20/20.
-Full aggregate and new hosted build results are pending; no full-green claim.
+The read-only integration review found no blocker. The aggregate reached its
+downstream route-verification freshness check, which rejected the stale runtime
+identity. Rebuilding and running the pinned macOS headless driver succeeded:
+zero mismatches or engine faults. Its refreshed report changes only seven plan
+fingerprints; all observation records and the regenerated route-verification
+output are identical to the prior results. All remaining aggregate stages pass
+after that refresh. A complete aggregate repeat and new hosted build results
+are pending; no full-green claim.
 
 ## 2026-10-21 - Commit release tooling and refresh real-engine evidence
 
