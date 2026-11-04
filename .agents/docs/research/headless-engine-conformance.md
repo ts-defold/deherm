@@ -4,8 +4,14 @@ title: Headless Defold conformance harness
 description: Defold's null backends, headless bundle variant, and in-process engine driving API, and what they change about how binding conformance should be proven.
 tags: [research, defold, conformance, headless, verification]
 status: verified-runtime
-generated: { by: agent/legacy, at: 2026-09-18T23:40:00-04:00 }
+generated: { by: codex/gpt-6, at: 2026-11-04T18:28:09Z }
 sources:
+  - resource: ../../../scripts/generate-headless-sdk-link.mjs
+    title: Selected SDK headless library and registration projection
+  - resource: https://github.com/defold/defold/blob/f2a96160d5d3b7755742945a1e0b8acacb0fb433/share/extender/variants/headless_input.appmanifest
+    title: Alpha headless manifest with shared recorder exclusions
+  - resource: https://github.com/ts-defold/deherm/actions/runs/39953211484
+    title: Callback execution succeeded before the headless recorder link failure
   - id: defold-engine-api
     resource: upstream/defold/engine/engine/src/engine.h
     title: Defold engine lifecycle API at 7f0f554f41f9dce1e0ddff99bf08200657d1ee05
@@ -133,6 +139,15 @@ Both instruments must remain generated from the same IR. Neither may promote
 generation evidence to runtime evidence.
 
 # Built instrument
+
+The SDK link projection combines common and platform-specific headless library
+and registration-symbol exclusions. Defold alpha `f2a96160` moved recorder
+exclusions into the common context; ignoring that context linked recorder script
+and service archives into a headless driver without their implementation.
+Following both exclusion scopes fixes the harness recipe without stubbing
+symbols or removing the recording API from generated product bindings. A
+deterministic projection test covers both scopes; hosted linkage remains a
+separate verification step.
 
 This instrument is a targeted bridge-regression tool, not the definition of
 whether a Defold API exists or may ship. CI's completeness contract is the

@@ -6,6 +6,7 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
+import YAML from "yaml";
 
 import {
   assertNoRevisionLeak,
@@ -61,6 +62,26 @@ const readJson = async (file) => JSON.parse(await readFile(file, "utf8"));
 test("project-selected runtime variants never leak into revision policy", () => {
   assert.equal(isRevisionOutput("defold/defold_hermes/include/defold_hermes/generated_runtime_variant.h"), false);
   assert.equal(isRevisionOutput("defold/defold_hermes/include/defold_hermes/generated_scalar_lua_ids.hpp"), true);
+});
+
+test("headless conformance freshness is gated and regenerated for selected policy inputs", async () => {
+  const manifest = await readJson(path.join(repositoryRoot, "package.json"));
+  assert.ok(
+    manifest.scripts.check.split("&&").some((command) => command.trim() === "pnpm check:headless-conformance"),
+    "the aggregate check must validate the committed headless plan and harness",
+  );
+
+  const policy = YAML.parse(await readFile(path.join(repositoryRoot, ".github/workflows/policy.yml"), "utf8"));
+  const steps = policy.jobs["engine-conformance"].steps;
+  const surfaceInstall = steps.findIndex((step) => step.run?.includes("policy-surface.mjs install --archive"));
+  const dependenciesInstall = steps.findIndex((step) => step.run === "pnpm install --frozen-lockfile --ignore-scripts");
+  const generatePlan = steps.findIndex((step) => step.run === "pnpm generate:headless-conformance");
+  const conformanceTest = steps.findIndex((step) => step.run === "pnpm test:headless-conformance");
+  assert.ok(surfaceInstall >= 0 && dependenciesInstall > surfaceInstall);
+  assert.ok(
+    generatePlan > dependenciesInstall && generatePlan < conformanceTest,
+    "the selected policy surface must own the plan used by its headless conformance test",
+  );
 });
 
 test("policy host parity reproduces the Linux policy projection without obsolete source downloads", async () => {

@@ -40,14 +40,22 @@ export function deriveHeadlessSdkLinkPlan(build, variant, platform) {
   const headless = variant?.platforms?.[platform]?.context;
   const common = variant?.platforms?.common?.context;
   if (!engine || !headless || !common) throw new Error(`${platform}: missing SDK Extender/headless context`);
-  const excludedLibraries = new Set(names(headless.excludeLibs, "excludeLibs", libraryName));
+  // SDK releases may put target-independent headless exclusions in the common
+  // context and platform-specific exclusions in the platform context.
+  const excludedLibraries = new Set([
+    ...names(common.excludeLibs ?? [], "headless common excludeLibs", libraryName),
+    ...names(headless.excludeLibs, "excludeLibs", libraryName),
+  ]);
   const libraries = unique([
     ...names(engine.engineLibs, "engineLibs", libraryName)
       .filter((value) => !excludedLibraries.has(value) && !harnessOmissions.has(value))
       .map(headlessLibrary),
     ...names(common.libs, "headless common libs", libraryName),
   ]);
-  const excludedSymbols = new Set(names(headless.excludeSymbols, "excludeSymbols", name));
+  const excludedSymbols = new Set([
+    ...names(common.excludeSymbols ?? [], "headless common excludeSymbols", name),
+    ...names(headless.excludeSymbols, "excludeSymbols", name),
+  ]);
   const symbols = unique(
     [
       ...names(build.context?.symbols, "common symbols", name),

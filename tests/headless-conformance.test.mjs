@@ -65,6 +65,46 @@ test("headless linkage follows the selected SDK recipe instead of a frozen engin
   assert.doesNotMatch(cmake, /set\(DEHERM_HEADLESS_ENGINE_LIBS/u);
 });
 
+test("headless linkage applies common and platform exclusions to libraries and symbols", () => {
+  const build = {
+    context: { symbols: ["CommonKeep", "ScriptRecord", "EngineRecord", "CommonExcludedSymbol"] },
+    platforms: {
+      linux: {
+        context: {
+          engineLibs: ["engine", "record_script", "record_service", "common_only", "linux_only"],
+          symbols: ["LinuxKeep", "LinuxExcludedSymbol"],
+        },
+      },
+    },
+  };
+  const variant = {
+    platforms: {
+      common: {
+        context: {
+          libs: ["sound_null"],
+          excludeLibs: ["record_script", "record_service", "common_only"],
+          excludeSymbols: ["ScriptRecord", "EngineRecord", "CommonExcludedSymbol"],
+        },
+      },
+      linux: {
+        context: {
+          excludeLibs: ["linux_only"],
+          excludeSymbols: ["LinuxExcludedSymbol"],
+          symbols: [],
+        },
+      },
+    },
+  };
+
+  const plan = deriveHeadlessSdkLinkPlan(build, variant, "linux");
+  assert.deepEqual(plan.libraries, ["engine", "sound_null"]);
+  assert.deepEqual(plan.symbols, ["CommonKeep", "LinuxKeep"]);
+
+  const rendered = renderHeadlessSdkLink(plan);
+  assert.doesNotMatch(rendered.cmake, /record_script|record_service|common_only|linux_only/u);
+  assert.doesNotMatch(rendered.cpp, /ScriptRecord|EngineRecord|CommonExcludedSymbol|LinuxExcludedSymbol/u);
+});
+
 test("every script contract is accounted for exactly once", () => {
   const loweringPlan = documents.loweringPlan.value;
   const contractIndexes = new Set(

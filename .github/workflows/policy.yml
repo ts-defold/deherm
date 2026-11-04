@@ -344,6 +344,8 @@ jobs:
           path: upstream/defoldsdk.zip
           key: defold-sdk-${{ steps.defold-sdk.outputs.digest }}
       - run: bash scripts/bootstrap-upstreams.sh defold hermes extender ref-doc defold-sdk
+      - name: Generate headless plan for selected policy surface
+        run: pnpm generate:headless-conformance
       - name: Wait for the content-addressed Linux archive
         env:
           GH_TOKEN: ${{ github.token }}

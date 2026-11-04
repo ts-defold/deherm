@@ -476,15 +476,15 @@
     "physics-3d"
   ],
   "inputs": {
-    "packages/bindings/generated/defold-binding-lowering-plan.json": "219b28b3470488eb848187d60cb92d72f95e12b49bcc59009315ea47dae3025f",
+    "packages/bindings/generated/defold-binding-lowering-plan.json": "8d7a90864c96b276c03129b98a19c0f922a683d3af20d4ec7a5d3012351feb4e",
     "packages/bindings/generated/defold-script-api-ir.json": "1e7e05b70976fb689b8416ecff7b5911122de0691d7f76a6a7455e20e3630049",
-    "packages/bindings/generated/defold-script-universal-value-bindings.json": "685823e3882d176e2c52cd33521b049b0bf86a73057caeaf1dfba5a2ec2fdfa7",
+    "packages/bindings/generated/defold-script-universal-value-bindings.json": "d8323fa441eda6871344490db6fa879020abe086a7303406a9c0d02273897262",
     "packages/bindings/generated/defold-script-scalar-dispatch.json": "3c1e7bbb6e1a82be0d4f3d2fc2598984ec1c81bfeedd034c2c179fcf57920bd6",
-    "packages/bindings/generated/defold-script-borrowed-handle-classification.json": "cabf4cd6b94a6bea60bea2f4a2aa31b62229c2cc576fcdc75213616f13a39bc7",
-    "packages/bindings/generated/defold-script-route-availability-profiles.json": "b3da37a662f0bcd54e83cef3e31fdffc5b4052b5b42861c2ecc7585c3deb9f58",
-    "packages/bindings/generated/defold-script-handle-lowering.json": "360df4102b3718144261efe19eb52cc2bcea3f3190e31dcfb49d975e69a69072",
+    "packages/bindings/generated/defold-script-borrowed-handle-classification.json": "76885a4d22a57002239057b6a2ea3129052e89ccb17cff7e291c7e70f4f8f8ba",
+    "packages/bindings/generated/defold-script-route-availability-profiles.json": "9442ecca3f309fc930dcfd047e1e47d4cc7574a0940712d525bcc48c553cff0b",
+    "packages/bindings/generated/defold-script-handle-lowering.json": "a6061ae2823f4f3cb7df4b99ff1e00dff6770b7f8134f700e1e2f31b007303c8",
     "packages/bindings/generated/defold-value-layouts.json": "a905f72450a2164d414d90e37359ea9b0207609ead5c16e928b39400c32f3d5b",
-    "packages/bindings/generated/defold-script-projection-ir.json": "9f6072dc210528fa3bbc0cbb2957f0984c6fbe3657d31326be639a576e3e063a"
+    "packages/bindings/generated/defold-script-projection-ir.json": "e97f1d6f6bd6cb083746be35b268876cc0f0b0f2c8ec668d651e972849c32804"
   },
   "contractCount": 86,
   "reachableContractCount": 34,

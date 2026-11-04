@@ -198,7 +198,9 @@ jobs:
     name: bob ${{ matrix.target }}
     # Apple's final bundle tools (lipo and simulator ad-hoc codesign) are
     # macOS-only even when Extender performed the compile remotely.
-    runs-on: ${{ (endsWith(matrix.target, '-ios') || endsWith(matrix.target, '-osx')) && 'macos-15' || 'ubuntu-24.04' }}
+    # `macos-15` currently resolves to the M1/arm64 image; name Intel explicitly
+    # so this lane's macOS host choice stays deliberate as hosted labels evolve.
+    runs-on: ${{ (endsWith(matrix.target, '-ios') || endsWith(matrix.target, '-osx')) && 'macos-15-intel' || 'ubuntu-24.04' }}
     env:
       GH_TOKEN: ${{ github.token }}
     strategy:

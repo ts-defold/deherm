@@ -1,5 +1,17 @@
 # Defold Hermes knowledge log
 
+## 2026-11-04 - Reconcile headless CI inputs and Apple runner routing
+
+Reproduced the stale headless-plan failure locally and refreshed its six input
+fingerprints through the owning generator. Contract, fixture and route decisions
+are identical. The aggregate now checks this output; policy jobs regenerate it
+for their installed surface before testing. SDK link projection now honors shared
+as well as platform-specific exclusions, matching the failing alpha's recorder
+recipe. Apple Bob jobs retain macOS packaging and select the supported Intel
+runner explicitly after arm64 runner acquisition failed without running steps.
+Focused suites passed: headless 16/16, policy 44/44 and consumer gate 20/20.
+Full aggregate and new hosted build results are pending; no full-green claim.
+
 ## 2026-10-21 - Commit release tooling and refresh real-engine evidence
 
 The authored debugger scopes, native launch ownership, absolute Node resolver,

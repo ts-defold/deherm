@@ -4,12 +4,16 @@ title: Continuous policy generation, engine evidence, and publication
 description: One nightly policy workflow derives every tracked Defold revision, emits every mechanically representable API, records verification without gating publication, and publishes the accumulated policy store directly to the website.
 tags: [decision, generator, policy, ci, conformance, pages]
 status: accepted
-generated: { by: codex/gpt-6, at: 2026-10-19T15:22:07Z }
+generated: { by: codex/gpt-6, at: 2026-11-04T18:28:09Z }
 sources:
   - resource: ../../../scripts/check-end-to-end.mjs
     title: Project-locked consumer build gate
   - resource: ../../../.github/workflows/end-to-end.yml
     title: Current-channel consumer matrix
+  - resource: https://docs.github.com/en/actions/reference/runners/github-hosted-runners
+    title: Supported macOS runner labels and architectures
+  - resource: https://github.com/ts-defold/deherm/actions/runs/41851764950
+    title: Apple consumer jobs failed runner acquisition before executing any steps
   - id: generate-report
     resource: ./generate-report-never-gate.md
     title: Generate, report, open issues - a generator never refuses
@@ -99,6 +103,19 @@ Defold is authoritative for the API present at a revision:
 # Nightly graph
 
 ## Reliability plan for rolling Defold revisions
+
+The committed headless plan is checked by `pnpm check`, alongside its binding
+inputs. The policy engine job instead regenerates that downstream plan after
+installing its selected policy surface and dependencies, then tests that plan.
+These are different contracts: local checks must expose stale checked-in output;
+revision jobs must not compare newly installed inputs with an older plan.
+
+Apple consumer jobs use the explicit `macos-15-intel` runner label. Bob still
+needs macOS for final packaging, including simulator ad-hoc signing, after
+Extender's remote compilation. Run 41851764950 never acquired the four requested
+arm64 Mac runners. This switches to a supported alternative host, not Linux,
+automatic retries or a guarantee that GitHub will always have capacity. The
+target matrix and required build outcomes remain unchanged.
 
 The full consumer matrix resolves the current stable channel once in its
 planning job (manual runs can select beta or alpha), then shares that exact SHA
