@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { readFile } from "node:fs/promises";
+import { readFile, readdir } from "node:fs/promises";
 import path from "node:path";
 import test from "node:test";
 
@@ -24,6 +24,30 @@ const proof = {
   stages: ["packed", "archive-retained"],
 };
 const selected = { archive, commit: proof.commit, digest: proof.tarballSha256, repositoryRoot: root };
+
+test("every workflow packing a candidate provisions the pinned Hermes package inputs first", async () => {
+  const directory = path.join(root, ".github/workflows");
+  let packingJobs = 0;
+  for (const filename of await readdir(directory)) {
+    if (!/\.ya?ml$/u.test(filename)) continue;
+    const workflow = YAML.parse(await readFile(path.join(directory, filename), "utf8"));
+    for (const [name, job] of Object.entries(workflow.jobs ?? {})) {
+      const steps = job.steps ?? [];
+      for (const [index, step] of steps.entries()) {
+        const pack = step.run?.indexOf("prove-npm-consumer.mjs --pack-only") ?? -1;
+        if (pack < 0) continue;
+        packingJobs += 1;
+        const provisioned = steps.slice(0, index + 1).some((prior, priorIndex) => {
+          if (prior.if !== undefined && prior.if !== step.if) return false;
+          const commands = priorIndex === index ? prior.run?.slice(0, pack) : prior.run;
+          return /bash scripts\/bootstrap-upstreams\.sh(?: [\w-]+)* hermes(?:\s|$)/u.test(commands ?? "");
+        });
+        assert.ok(provisioned, `${filename}:${name} needs pinned Hermes inputs before packing`);
+      }
+    }
+  }
+  assert.ok(packingJobs > 0, "candidate packing workflows must be exercised");
+});
 
 test("packed consumer accepts exact per-project revisions and makes the requested SHA the create input", () => {
   const baseline = "a".repeat(40);

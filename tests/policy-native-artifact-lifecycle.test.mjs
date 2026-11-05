@@ -1,8 +1,10 @@
 import assert from "node:assert/strict";
-import { cp, mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { spawnSync } from "node:child_process";
+import { copyFile, cp, mkdir, mkdtemp, readFile, realpath, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
+import YAML from "yaml";
 
 import {
   fingerprintNativeArtifactRecipe,
@@ -15,8 +17,8 @@ import { RELEASE_INTEGRITY_KIND } from "../packages/cli/src/release-integrity.mj
 import { artifactAssetRows } from "../scripts/project-artifact-references.mjs";
 import { selectArtifactReferencesForRevision } from "../scripts/build-policy-site.mjs";
 import { collectPolicyNativeArtifactInputs } from "../scripts/policy-native-artifact-inputs.mjs";
+import { assertNativeArtifactReconciliationHealth } from "../scripts/check-policy-native-artifact-health.mjs";
 import {
-  assertNativeArtifactReconciliationHealth,
   githubReleaseAssets,
   inspectPolicyNativeReleaseMapping,
   isUnsupportedNativeRecipe,
@@ -26,6 +28,60 @@ import {
 import { readStore, storeRoot } from "../scripts/generate-api-policy.mjs";
 
 const repository = "ts-defold/deherm";
+
+test("artifact health workflow runs without installed packages and preserves failing exits", async (t) => {
+  const directory = await realpath(await mkdtemp(path.join(tmpdir(), "deherm-artifact-health-cli-")));
+  t.after(() => rm(directory, { recursive: true, force: true }));
+  const workflow = YAML.parse(await readFile(".github/workflows/policy.yml", "utf8"));
+  const step = workflow.jobs["native-artifact-reconciliation-health"].steps.find((row) =>
+    row.run?.includes("native-health.json"),
+  );
+  const command =
+    /^node (scripts\/[\w-]+\.mjs)( --assert-health)? "\$RUNNER_TEMP\/native-artifact-health\/native-health.json"$/u.exec(
+      step?.run ?? "",
+    );
+  assert.ok(command, "exercise the actual health workflow entrypoint and its report argument");
+  const executable = path.join(directory, command[1]);
+  await mkdir(path.dirname(executable), { recursive: true });
+  await copyFile(command[1], executable);
+  const report = path.join(directory, "native-health.json");
+  const cases = [
+    { name: "clean", value: { failures: [], unsupported: [] }, status: 0, output: /health is clean/u },
+    {
+      name: "unsupported optimization",
+      value: { failures: [], unsupported: [{ compatibilitySha256: "a".repeat(64), message: "new target" }] },
+      status: 0,
+      output: /::notice::Native optimization is unsupported/u,
+    },
+    {
+      name: "inventory failure",
+      value: { failures: [{ compatibilitySha256: "a".repeat(64), message: "HTTP 403" }], unsupported: [] },
+      status: 1,
+      output: /1 native-artifact reconciliation failure.*HTTP 403/u,
+    },
+    { name: "missing failure collection", value: { unsupported: [] }, status: 1, output: /report is malformed/u },
+    {
+      name: "invalid failure collection",
+      value: { failures: {}, unsupported: [] },
+      status: 1,
+      output: /report is malformed/u,
+    },
+    { name: "null report", value: null, status: 1, output: /report is malformed/u },
+    { name: "invalid JSON", text: "{", status: 1, output: /SyntaxError/u },
+  ];
+  for (const fixture of cases) {
+    await writeFile(report, fixture.text ?? JSON.stringify(fixture.value));
+    const result = spawnSync(process.execPath, [executable, ...(command[2] ? ["--assert-health"] : []), report], {
+      cwd: directory,
+      env: { ...process.env, NODE_OPTIONS: "", NODE_PATH: "" },
+      encoding: "utf8",
+      timeout: 10_000,
+    });
+    assert.equal(result.error, undefined, fixture.name);
+    assert.equal(result.status, fixture.status, `${fixture.name}: ${result.stderr}`);
+    assert.match(`${result.stdout}${result.stderr}`, fixture.output, fixture.name);
+  }
+});
 
 async function bundleTargetsFixture() {
   return JSON.parse(await readFile("packages/toolchains/defold-bundle-targets.json", "utf8"));

@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
+import YAML from "yaml";
 
 import {
   assertNativeArtifactPlanCoverage,
@@ -111,22 +112,29 @@ test("published fingerprint rows are immutable at the upload boundary", async ()
 });
 
 test("complete artifact publication refreshes policy before consumer proof", async () => {
-  const workflow = await readFile(".github/workflows/native-artifacts.yml", "utf8");
-  const final = workflow.slice(workflow.indexOf("  summary:"));
-  const completeness = final.indexOf("Verify every fingerprinted row is published");
-  const releaseLock = final.indexOf("Regenerate and verify the published release lock");
-  const regenerate = final.indexOf("generate-release-tags.mjs --published");
-  const reverify = final.indexOf("generate-release-tags.mjs --check --published");
-  const preserved = final.indexOf("name: published-release-tags");
-  const policy = final.indexOf("gh workflow run policy.yml");
+  const workflow = YAML.parse(await readFile(".github/workflows/native-artifacts.yml", "utf8"));
+  const steps = workflow.jobs.summary.steps;
+  const completeness = steps.findIndex((step) => step.name === "Verify every fingerprinted row is published");
+  const releaseLock = steps.findIndex((step) => step.name === "Regenerate and verify the published release lock");
+  const preserved = steps.findIndex((step) => step.with?.name === "published-release-tags");
+  const refresh = steps.findIndex((step) => step.name === "Refresh policy artifact mappings after publication");
   assert.ok(completeness >= 0);
   assert.ok(releaseLock > completeness, "release-lock derivation must follow release completeness");
-  assert.ok(regenerate > releaseLock, "the published lock must be regenerated before checking it");
-  assert.ok(reverify > regenerate, "the regenerated lock must be re-verified against published sidecars");
-  assert.ok(preserved > reverify && policy > preserved, "only a verified, preserved lock may precede policy refresh");
-  assert.match(final, /if: inputs\.policy_run_id == ''[\s\S]*generate-release-tags\.mjs --check --published/u);
-  assert.match(final, /-f artifact_refresh_only=true/u);
-  assert.doesNotMatch(final, /gh workflow run end-to-end\.yml/u);
+  assert.ok(preserved > releaseLock && refresh > preserved);
+  assert.match(
+    steps[releaseLock].run,
+    /generate-release-tags\.mjs --published[\s\S]*generate-release-tags\.mjs --check --published/u,
+  );
+  assert.equal(steps[releaseLock].if, "inputs.policy_defold_revision == ''");
+  assert.equal(steps[preserved].if, steps[releaseLock].if);
+  const callback = steps[refresh];
+  assert.equal(callback.if, "always()", "partial publication must still allow authenticated policy recovery");
+  assert.match(callback.run, /args=\(workflow run policy\.yml[\s\S]*-f artifact_refresh_only=true\)/u);
+  for (const field of ["artifact_policy_revision", "artifact_compatibility_sha256", "artifact_source_sha"]) {
+    assert.match(callback.run, new RegExp(`-f ${field}=`), field);
+  }
+  assert.match(callback.run, /gh "\$\{args\[@\]\}"/u);
+  assert.doesNotMatch(callback.run, /end-to-end\.yml/u);
 });
 
 test("target publication is not circularly gated by the package host-tool lock", async () => {
@@ -138,13 +146,16 @@ test("target publication is not circularly gated by the package host-tool lock",
   const lock = await buildReleaseTags();
   assert.deepEqual(Object.keys(lock.families).sort(), ["dehermc", "hermes-host"]);
   assert.match(generator, /families: \["hermes-host", "dehermc"\]/u);
-  assert.match(
-    workflow,
-    /Verify every fingerprinted row is published[\s\S]*generate-release-tags\.mjs --check --published/u,
-  );
-  assert.match(workflow, /generate-release-tags\.mjs --check --published[\s\S]*gh workflow run policy\.yml/u);
-  assert.match(policy, /publish-site:[\s\S]*dispatch-end-to-end/u);
-  assert.match(policy, /dispatch-end-to-end:[\s\S]*needs: consumer-smoke/u);
+  const native = YAML.parse(workflow);
+  for (const [name, job] of Object.entries(native.jobs)) {
+    if (name === "summary") continue;
+    for (const step of job.steps ?? []) {
+      assert.doesNotMatch(step.run ?? "", /generate-release-tags\.mjs --check/u, name);
+    }
+  }
+  const published = YAML.parse(policy);
+  assert.ok(published.jobs["consumer-smoke"].needs.includes("publish-site"));
+  assert.ok(published.jobs["dispatch-end-to-end"].needs.includes("consumer-smoke"));
 });
 
 test("authenticated release-lock verification rejects a complete but stale sidecar digest", async () => {
@@ -162,15 +173,23 @@ test("authenticated release-lock verification rejects a complete but stale sidec
 });
 
 test("policy-derived SDK compatibility inputs flow through every target artifact job", async () => {
-  const workflow = await readFile(".github/workflows/native-artifacts.yml", "utf8");
-  assert.match(workflow, /policy_run_id:[\s\S]*Download policy-derived artifact inputs/u);
-  assert.match(workflow, /run-id: \$\{\{ inputs\.policy_run_id \}\}/u);
-  assert.match(
-    workflow,
-    /policy-surface\.mjs extract[\s\S]*--path packages\/toolchains\/defold-bundle-targets\.json[\s\S]*name: native-artifact-inputs/u,
-  );
-  const installs = workflow.match(/name: native-artifact-inputs\s+path: \./gu) ?? [];
-  assert.equal(installs.length, 6, "five target builders and the completeness summary must install derived inputs");
+  const workflow = YAML.parse(await readFile(".github/workflows/native-artifacts.yml", "utf8"));
+  const inputs = workflow.on.workflow_dispatch.inputs;
+  assert.ok(inputs.policy_defold_revision && inputs.policy_compatibility_sha256 && inputs.policy_source_sha);
+  assert.equal(inputs.policy_run_id, undefined, "expired Actions artifacts must not own native build inputs");
+  const steps = workflow.jobs.plan.steps;
+  const project = steps.findIndex((step) => step.run?.includes("policy-native-artifact-inputs.mjs"));
+  const packed = steps.findIndex((step) => step.with?.name === "native-artifact-inputs");
+  assert.ok(project >= 0 && packed > project);
+  assert.match(steps[project].run, /hydrate-policy-site\.mjs[\s\S]*policy-native-artifact-inputs\.mjs/u);
+  assert.match(steps[project].run, /--revision "\$POLICY_REVISION"[\s\S]*--compatibility "\$POLICY_COMPATIBILITY"/u);
+  assert.match(steps[project].run, /--manifest-out packages\/toolchains\/defold-bundle-targets\.json/u);
+  for (const name of ["linux", "windows", "windows-native", "android", "apple", "summary"]) {
+    assert.ok(
+      workflow.jobs[name].steps.some((step) => step.with?.name === "native-artifact-inputs" && step.with.path === "."),
+      `${name} must install the resolved immutable policy inputs`,
+    );
+  }
 });
 
 test("every dehermc row is authenticated and the Linux artifact is consumed before upload", async () => {

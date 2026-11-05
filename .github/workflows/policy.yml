@@ -728,7 +728,7 @@ jobs:
           name: native-artifact-health
           path: ${{ runner.temp }}/native-artifact-health
       - name: Report inventory or immutable-sidecar failures after policy publication
-        run: node scripts/reconcile-policy-native-artifacts.mjs --assert-health "$RUNNER_TEMP/native-artifact-health/native-health.json"
+        run: node scripts/check-policy-native-artifact-health.mjs "$RUNNER_TEMP/native-artifact-health/native-health.json"
 
   consumer-smoke:
     name: Resolve published policy and generate a clean project
@@ -752,6 +752,9 @@ jobs:
         env:
           PLANNED_REVISIONS: ${{ needs.plan.outputs.consumer_revisions }}
         run: node scripts/check-published-policy.mjs --expected-index "$RUNNER_TEMP/expected-policy-index"
+      - name: Provision pinned Hermes inputs for npm packaging
+        if: needs.plan.outputs.consumer_revisions != '[]'
+        run: bash scripts/bootstrap-upstreams.sh hermes
       - name: Pack once and generate every distinct planned revision as an npm consumer
         if: needs.plan.outputs.consumer_revisions != '[]'
         env:

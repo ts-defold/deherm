@@ -166,11 +166,6 @@ export async function inspectPolicyNativeReleaseMapping(
 }
 
 async function main(argv = process.argv.slice(2)) {
-  if (argv.length === 2 && argv[0] === "--assert-health") {
-    await assertNativeArtifactReconciliationHealth(path.resolve(argv[1]));
-    process.stdout.write("native-artifact reconciliation health is clean\n");
-    return;
-  }
   const options = {};
   for (let index = 0; index < argv.length; index += 1) {
     const argument = argv[index];
@@ -285,26 +280,6 @@ async function main(argv = process.argv.slice(2)) {
   } finally {
     await rm(runTemporary, { recursive: true, force: true });
   }
-}
-
-export async function assertNativeArtifactReconciliationHealth(file) {
-  const health = JSON.parse(await readFile(file, "utf8"));
-  if (!health || typeof health !== "object" || !Array.isArray(health.failures) || !Array.isArray(health.unsupported)) {
-    throw new Error("Native-artifact reconciliation health report is malformed");
-  }
-  if (health.failures?.length) {
-    throw new Error(
-      `${health.failures.length} native-artifact reconciliation failure(s) require attention: ` +
-        health.failures.map(({ compatibilitySha256, message }) => `${compatibilitySha256}: ${message}`).join("; "),
-    );
-  }
-  for (const { compatibilitySha256, revision, message } of health.unsupported) {
-    process.stdout.write(
-      `::notice::Native optimization is unsupported for ${compatibilitySha256 ?? "unknown compatibility"}` +
-        `${revision ? ` (${revision})` : ""}: ${message ?? "no actionable detail was recorded"}\n`,
-    );
-  }
-  return health;
 }
 
 if (process.argv[1] && pathToFileURL(process.argv[1]).href === import.meta.url) await main();

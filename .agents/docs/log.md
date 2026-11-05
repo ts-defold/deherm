@@ -1,5 +1,28 @@
 # Defold Hermes knowledge log
 
+## 2026-11-04 - Correct clean-runner release-reporting and packaging prerequisites
+
+Hosted policy and callback jobs exposed two missing clean-runner prerequisites:
+the health reporter eagerly imported generator dependencies without installing
+them, and candidate packing lacked the pinned Hermes checkout used by prepack.
+The health report itself was downloaded and found empty; its old command passed
+in the dependency-installed local checkout. The assertion now has one standalone
+Node-only owner, with the same fatal/unsupported rules. The workflow's actual
+entrypoint is tested in an isolated directory with no packages; this regression
+failed before the fix and passes afterward. A second regression failed for the
+policy packer's missing Hermes input, then passed after adding the existing
+bootstrap step used by release-readiness. No generated bindings or runtime
+lowerings changed. Focused checks pass; aggregate and hosted follow-up remain
+pending at this entry's creation.
+
+The same hosted release-readiness run failed three `test:cli` contracts still
+requiring the removed run-ID/archive handoff and old dispatch spelling. All
+three failures reproduce locally. Updated parsed-workflow assertions preserve
+the integrity/order and per-target input contracts while checking immutable
+policy reconstruction and exact callbacks; the complete native build-plan
+suite passes 20/20. No native publication or runtime logic changed for these
+test corrections.
+
 ## 2026-11-04 - Complete local package acceptance for release-recovery wave
 
 Signed integration commit `5222d42d` has a real generation-only npm consumer

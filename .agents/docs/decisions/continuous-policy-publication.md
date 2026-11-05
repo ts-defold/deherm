@@ -4,12 +4,14 @@ title: Continuous policy generation, engine evidence, and publication
 description: One nightly policy workflow derives every tracked Defold revision, emits every mechanically representable API, records verification without gating publication, and publishes the accumulated policy store directly to the website.
 tags: [decision, generator, policy, ci, conformance, pages]
 status: accepted
-generated: { by: codex/gpt-6, at: 2026-11-04T23:33:51Z }
+generated: { by: codex/gpt-6, at: 2026-11-05T02:06:32Z }
 sources:
   - resource: ../../../scripts/policy-native-artifact-inputs.mjs
     title: Recoverable native recipe projection from immutable policy facts
   - resource: ../../../scripts/reconcile-policy-native-artifacts.mjs
     title: Desired release inventory, authenticated mapping reconciliation and health
+  - resource: ../../../scripts/check-policy-native-artifact-health.mjs
+    title: Dependency-free post-publication health report assertion
   - resource: ../../../scripts/plan-policy-workflow.mjs
     title: Single production planner for normal, manual and callback runs
   - resource: ../../../scripts/check-published-policy.mjs
@@ -222,6 +224,32 @@ testing readiness. This is an ephemeral expectation, not another durable ledger.
 The consumer job does not install a derived surface into its source checkout:
 it packs the clean stable package and materializes selected revisions only
 through published policy, as users do.
+
+Post-publication health reporting runs the standalone Node-only
+`check-policy-native-artifact-health.mjs`, not the reconciler entrypoint. Loading
+the reconciler eagerly imports generator dependencies such as `yaml`, even in a
+report-only mode. A clean CI reporter has no installed packages; its regression
+copies the workflow's actual entrypoint into an isolated directory and checks
+successful, unsupported, failed and malformed reports through real processes.
+These health rules remain unchanged. Policy run `41934756839` failed at module
+loading despite its downloaded health report containing no failures.
+
+Packing is a producer operation with a separate prerequisite: the pinned Hermes
+checkout supplies public headers through `prepack`. Every candidate-packing job
+must provision that input before packing, just as release-readiness does. This
+does not add an upstream source or SDK download to the installed consumer's
+generation path. A workflow-wide packing regression checks provisioning order
+and compatible step conditions, rather than depending on a developer's warm
+checkout. The callback run `41934958298` exposed the missing packaging input;
+its exact publication-pointer freshness barrier had already succeeded.
+
+Release-readiness also runs `test:cli`, beyond the `check` aggregate. Its native
+workflow contracts must inspect parsed jobs/steps and the current immutable
+revision/compatibility handoff, not require an obsolete `policy_run_id`, archive
+extraction step, or literal shell spelling of a dispatch. The corrected tests
+retain release-lock authentication/order, producer-lock separation, post-smoke
+E2E gating and resolved-input installation in every target job. Their three
+previous failures were reproduced locally before updating those assertions.
 
 ### Freshness and host routing
 
