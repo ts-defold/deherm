@@ -4,6 +4,7 @@ import test from "node:test";
 import vm from "node:vm";
 
 import { renderWebRuntimeVariant } from "../packages/cli/src/toolchains.mjs";
+import { renderDmSdkScalarOutputs } from "../packages/compiler/src/dmsdk-scalar-output-emitter.mjs";
 
 const extensionBootstrapSource = await readFile(
   new URL("../defold/defold_hermes/lib/web/library_defold_hermes.js", import.meta.url),
@@ -244,7 +245,46 @@ test("generated web bindings execute the timer lifecycle through real callback h
   assert.equal(modules.DmSdkUniversalRaw, universal);
 });
 
-test("generated browser dmSDK scalar adapter exposes only the 16 semantically valid bindings", async () => {
+function assertScalarBrowserDispatch(source, declarations) {
+  const context = vm.createContext({ autoAddDeps() {}, addToLibrary() {} });
+  const calls = [];
+  for (const declaration of declarations.filter(({ emitted }) => emitted)) {
+    context[`_${declaration.wrapper}`] = (...args) => {
+      calls.push({ wrapper: declaration.wrapper, args });
+      return declaration.nativeSignature.startsWith("void ") ? undefined : 7;
+    };
+  }
+  vm.runInContext(source, context, { filename: "generated_dmsdk_scalar.js" });
+  const library = context.LibraryDefoldHermesDmSdkScalar;
+  const bridge = library.$DEFOLD_HERMES_DMSDK_SCALAR.install();
+  const browser = declarations.filter(({ policy }) => policy?.browserJsCallable);
+  assert.deepEqual(
+    Array.from(library.$DEFOLD_HERMES_DMSDK_SCALAR__deps).sort(),
+    browser.map(({ wrapper }) => wrapper).sort(),
+  );
+  for (const declaration of browser) {
+    const [, resultType, parameters] = /^(\w+) \((.*)\)$/u.exec(declaration.nativeSignature);
+    const types = parameters === "" || parameters === "void" ? [] : parameters.split(/,\s*/u);
+    const args = types.map((type, index) =>
+      type === "bool" ? index % 2 === 0 : type === "float" ? index + 0.375 : index + 17,
+    );
+    calls.length = 0;
+    const result = bridge.call(declaration.bindingId, ...args);
+    assert.deepEqual(calls, [{ wrapper: declaration.wrapper, args }], declaration.symbol);
+    assert.equal(result, resultType === "void" ? undefined : resultType === "bool" ? true : 7);
+  }
+  for (const declaration of declarations.filter(({ emitted, policy }) => emitted && !policy?.browserJsCallable)) {
+    calls.length = 0;
+    assert.throws(() => bridge.call(declaration.bindingId, 0), /not available in the browser host/);
+    assert.deepEqual(calls, []);
+  }
+  const unknownId = Math.max(-1, ...declarations.map(({ bindingId }) => bindingId ?? -1)) + 1;
+  calls.length = 0;
+  assert.throws(() => bridge.call(unknownId), /not available in the browser host/);
+  assert.deepEqual(calls, []);
+}
+
+test("generated browser dmSDK scalar adapter dispatches exactly the revision's eligible bindings", async () => {
   const report = JSON.parse(
     await readFile(new URL("../packages/bindings/generated/defold-dmsdk-scalar-thunks.json", import.meta.url), "utf8"),
   );
@@ -252,23 +292,52 @@ test("generated browser dmSDK scalar adapter exposes only the 16 semantically va
     new URL("../defold/defold_hermes/lib/web/generated_dmsdk_scalar.js", import.meta.url),
     "utf8",
   );
-  const context = vm.createContext({ autoAddDeps() {}, addToLibrary() {} });
-  let nativeCalls = 0;
-  for (const declaration of report.declarations.filter(({ emitted }) => emitted)) {
-    context[`_${declaration.wrapper}`] = () => {
-      nativeCalls += 1;
-      return declaration.nativeSignature.startsWith("bool ") ? 1 : 7;
-    };
-  }
-  vm.runInContext(source, context, { filename: "generated_dmsdk_scalar.js" });
-  const bridge = context.LibraryDefoldHermesDmSdkScalar.$DEFOLD_HERMES_DMSDK_SCALAR.install();
-  const browser = report.declarations.filter(({ policy }) => policy?.browserJsCallable);
-  const blocked = report.declarations.filter(({ emitted, policy }) => emitted && !policy?.browserJsCallable);
-  assert.equal(browser.length, 16);
-  for (const declaration of browser) bridge.call(declaration.bindingId, 0.375);
-  assert.equal(nativeCalls, 16);
-  for (const declaration of blocked) {
-    assert.throws(() => bridge.call(declaration.bindingId, 0), /not available in the browser host/);
+  assertScalarBrowserDispatch(source, report.declarations);
+});
+
+test("scalar browser dispatch verification tolerates API growth but detects incorrect routing", () => {
+  const signatures = [
+    ["float", []],
+    ["bool", ["float", "uint32_t"]],
+    ["void", ["bool"]],
+    ["uint32_t", ["uint16_t", "uint32_t", "float"]],
+    ["uint64_t", []],
+  ];
+  const entries = signatures.map(([returns, types], bindingId) => ({
+    bindingId,
+    wrapper: `test_scalar_${bindingId}`,
+    declaration: {
+      id: `test:${bindingId}`,
+      name: `test::scalar${bindingId}`,
+      type: "function",
+      header: "upstream/defold/dmsdk/test.h",
+      returns,
+      parameters: types.map((type, index) => ({ name: `arg${index}`, type })),
+    },
+    semantics: { pureValueTransform: true, mayBlock: false },
+  }));
+  const declarations = entries.map(({ bindingId, wrapper, declaration }) => ({
+    bindingId,
+    wrapper,
+    symbol: declaration.name,
+    nativeSignature: `${declaration.returns} (${declaration.parameters.map(({ type }) => type).join(", ")})`,
+    emitted: true,
+    policy: { browserJsCallable: declaration.returns !== "uint64_t" },
+  }));
+  const render = (selected) =>
+    renderDmSdkScalarOutputs({ schemaVersion: 1, kind: "deherm.recipe.dmsdk-scalar-output", entries: selected })
+      .browser;
+  assertScalarBrowserDispatch(render(entries.slice(0, 2)), declarations.slice(0, 2));
+  const source = render(entries);
+  assertScalarBrowserDispatch(source, declarations);
+  for (const corrupted of [
+    source.replace("case 0:", "case 99:"),
+    source.replace("case 0: return _test_scalar_0()", "case 0: return _test_scalar_2()"),
+    source.replace("arguments[1], arguments[2]", "arguments[2], arguments[1]"),
+    source.replace("!== 0", "=== 0"),
+  ]) {
+    assert.notEqual(corrupted, source);
+    assert.throws(() => assertScalarBrowserDispatch(corrupted, declarations));
   }
 });
 

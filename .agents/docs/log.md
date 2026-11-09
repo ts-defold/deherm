@@ -1,5 +1,18 @@
 # Defold Hermes knowledge log
 
+## 2026-11-08 - Verify browser scalar contracts without freezing API counts
+
+Replaced the revision-consuming browser test's fixed 16-binding assertion with
+exact wrapper, argument-order, result-conversion and dependency-set checks for
+every eligible declaration. Unavailable and unknown IDs must reject without
+calling native wrappers. Smaller/larger synthetic surfaces pass, while missing
+routes, wrong wrappers, swapped arguments and inverted boolean decoding fail.
+All 20 web-library tests passed both against the local 16-binding surface and
+the actual 18-binding report/adapter extracted from failed CI run 42504133918,
+without installing its surface into the checkout. Style and knowledge checks
+passed. This is VM adapter evidence, not actual engine execution; the aggregate
+check and a new hosted engine run remain pending at this entry's creation.
+
 ## 2026-11-04 - Correct clean-runner release-reporting and packaging prerequisites
 
 Hosted policy and callback jobs exposed two missing clean-runner prerequisites:

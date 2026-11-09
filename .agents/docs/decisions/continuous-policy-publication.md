@@ -4,8 +4,10 @@ title: Continuous policy generation, engine evidence, and publication
 description: One nightly policy workflow derives every tracked Defold revision, emits every mechanically representable API, records verification without gating publication, and publishes the accumulated policy store directly to the website.
 tags: [decision, generator, policy, ci, conformance, pages]
 status: accepted
-generated: { by: codex/gpt-6, at: 2026-11-05T02:06:32Z }
+generated: { by: codex/gpt-6, at: 2026-11-09T03:10:27Z }
 sources:
+  - resource: ../../../tests/web-library.test.mjs
+    title: Revision-relative browser scalar dispatch and API growth regression checks
   - resource: ../../../scripts/policy-native-artifact-inputs.mjs
     title: Recoverable native recipe projection from immutable policy facts
   - resource: ../../../scripts/reconcile-policy-native-artifacts.mjs
@@ -117,6 +119,19 @@ Defold is authoritative for the API present at a revision:
 # Nightly graph
 
 ## Reliability plan for rolling Defold revisions
+
+Tests consuming a selected revision's generated surface must assert structural
+contracts, not a previous revision's API cardinality. The November 8 engine lane
+stopped because the browser scalar test required 16 eligible bindings while the
+selected revision emitted 18; that assertion ran before dispatch was exercised.
+The replacement checks every eligible binding's exact native wrapper, argument
+order and result conversion, the exact browser dependency set, and rejection of
+unavailable and unknown IDs without native calls. Synthetic smaller and larger
+surfaces exercise the same checker; deliberate missing cases, wrong wrappers,
+swapped arguments and inverted boolean conversion must fail. This is browser
+adapter transport evidence, not execution of the actual Defold implementation.
+Fixed cardinalities are appropriate only for explicitly fixed fixtures, never
+as an acceptance condition for a changing upstream surface.
 
 ### Open implementation gaps from the November 4 adversarial audit
 
