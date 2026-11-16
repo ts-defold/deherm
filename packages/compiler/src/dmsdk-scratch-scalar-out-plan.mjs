@@ -7,6 +7,7 @@ import {
 } from "./dmsdk-cpp-ownership-effect-frontend.mjs";
 import { DMSDK_UNIVERSAL_FALLBACK_PATTERN, selectDmSdkPattern } from "./dmsdk-pattern-selector.mjs";
 import { scratchScalarOutPattern } from "./dmsdk-pattern-catalog.mjs";
+import { scratchScalarOutSpecializationBlockers } from "./dmsdk-scratch-scalar-out-output-emitter.mjs";
 
 const sha256 = (value) => createHash("sha256").update(value).digest("hex");
 const compareCodeUnits = (left, right) => (left < right ? -1 : left > right ? 1 : 0);
@@ -209,13 +210,20 @@ export function buildDmSdkScratchScalarOutPlan({ ir, shapes, projection, policy,
     const evidenceGaps = blockersFor(facts);
     const sourceDerived = evidenceGaps.length === 0;
     const defoldContractTrusted = !sourceDerived && shape.tranche === policy.family;
-    const admission = sourceDerived
-      ? "source-derived"
-      : defoldContractTrusted
-        ? "defold-contract-trusted"
-        : "universal-fallback";
+    const emissionBlockers =
+      sourceDerived || defoldContractTrusted
+        ? scratchScalarOutSpecializationBlockers(shape, projected, declaration)
+        : [];
+    const admission =
+      emissionBlockers.length > 0
+        ? "universal-fallback"
+        : sourceDerived
+          ? "source-derived"
+          : defoldContractTrusted
+            ? "defold-contract-trusted"
+            : "universal-fallback";
     const selected = admission !== "universal-fallback";
-    const blockers = selected ? [] : evidenceGaps;
+    const blockers = selected ? [] : sortedUnique([...evidenceGaps, ...emissionBlockers]);
     return {
       declarationId: shape.id,
       sourceOrdinal: ordinal,
@@ -230,7 +238,7 @@ export function buildDmSdkScratchScalarOutPlan({ ir, shapes, projection, policy,
       facts,
       evidenceGaps,
       blockers,
-      universalFallback: { state: "universal-fallback", preserved: true, blockers: evidenceGaps },
+      universalFallback: { state: "universal-fallback", preserved: true, blockers: selected ? evidenceGaps : blockers },
     };
   });
   return {
@@ -338,11 +346,11 @@ export function indexDmSdkScratchScalarOutPlan(plan, inputs = undefined) {
     );
     const selected = decision.admission !== "universal-fallback";
     assert(
-      (decision.admission === "source-derived") === (decision.evidenceGaps.length === 0),
+      decision.admission !== "source-derived" || decision.evidenceGaps.length === 0,
       `${decision.declarationId}: scratch source admission differs from evidence gaps`,
     );
     assert(
-      decision.blockers.length === (selected ? 0 : decision.evidenceGaps.length),
+      selected ? decision.blockers.length === 0 : decision.blockers.length > 0,
       `${decision.declarationId}: scratch blockers differ from admission`,
     );
     assert(decision.fallback === !selected, `${decision.declarationId}: scratch fallback differs from blockers`);
@@ -357,7 +365,7 @@ export function indexDmSdkScratchScalarOutPlan(plan, inputs = undefined) {
     );
     assert(decision.order === (selected ? selectedOrder++ : null), `${decision.declarationId}: scratch order differs`);
     assert(
-      isDeepStrictEqual(decision.universalFallback.blockers, decision.evidenceGaps),
+      isDeepStrictEqual(decision.universalFallback.blockers, selected ? decision.evidenceGaps : decision.blockers),
       `${decision.declarationId}: fallback evidence differs`,
     );
     assert(

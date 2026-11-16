@@ -3,6 +3,7 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import test from "node:test";
+import { build as emitScratchBindings } from "../scripts/generate-dmsdk-scratch-scalar-out-bindings.mjs";
 
 import {
   buildDmSdkScratchScalarOutPlan,
@@ -36,6 +37,41 @@ async function inputs() {
     effectFacts: JSON.parse(texts.effectFacts),
   };
 }
+
+test("new scalar widths outside emitter capability use universal fallback without aborting generation", async () => {
+  const baseline = await inputs();
+  const original = buildDmSdkScratchScalarOutPlan(baseline);
+  const selected = original.decisions.find(
+    ({ admission, declarationId }) =>
+      admission === "source-derived" &&
+      baseline.shapes.rows
+        .find(({ id }) => id === declarationId)
+        .parameters.some(({ role }) => role.startsWith("pointer:scalar:")),
+  );
+  assert.ok(selected);
+  for (const kind of ["f64", "u128"]) {
+    const changed = structuredClone(baseline);
+    const shape = changed.shapes.rows.find(({ id }) => id === selected.declarationId);
+    const parameter = shape.parameters.find(({ role }) => role.startsWith("pointer:scalar:"));
+    parameter.role = `pointer:scalar:${kind}`;
+    changed.texts.shapes = JSON.stringify(changed.shapes);
+    const plan = buildDmSdkScratchScalarOutPlan(changed);
+    indexDmSdkScratchScalarOutPlan(plan, changed);
+    const decision = plan.decisions.find(({ declarationId }) => declarationId === selected.declarationId);
+    assert.equal(decision.admission, "universal-fallback");
+    assert.ok(decision.blockers.includes(`parameter-kind-unsupported:${parameter.position}:${parameter.role}`));
+    assert.deepEqual(
+      plan.decisions.filter(({ fallback }) => !fallback).map(({ declarationId }) => declarationId),
+      original.decisions
+        .filter(({ fallback, declarationId }) => !fallback && declarationId !== selected.declarationId)
+        .map(({ declarationId }) => declarationId),
+    );
+    const { report } = await emitScratchBindings({ ...changed.texts, plan: JSON.stringify(plan) });
+    const row = report.declarations.find(({ id }) => id === selected.declarationId);
+    assert.equal(row.universalFallback.preserved, true);
+    assert.deepEqual(row.blockers, decision.blockers);
+  }
+});
 
 test("scratch plan covers every structural match and preserves universal fallback for unknown facts", async () => {
   const value = await inputs();

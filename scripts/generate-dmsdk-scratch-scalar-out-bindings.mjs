@@ -8,6 +8,9 @@ import {
   createDmSdkScratchScalarOutRecipeFacts,
   renderDmSdkScratchScalarOutHeaderAudit,
   renderDmSdkScratchScalarOutOutputs,
+  scratchScalarOutRoleKind as roleKind,
+  scratchScalarOutHandleName as handleName,
+  scratchScalarOutSpecializationBlockers as specializationBlockers,
 } from "../packages/compiler/src/dmsdk-scratch-scalar-out-output-emitter.mjs";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
@@ -33,7 +36,6 @@ const artifacts = Object.freeze({
 });
 
 const sha256 = (value) => createHash("sha256").update(value).digest("hex");
-const supportedKinds = new Set(["handle", "bool", "i32", "u16", "u32", "u64", "f32", "enum", "void"]);
 
 function parseArguments(argv) {
   const options = { outputRoot: root, check: false };
@@ -43,20 +45,6 @@ function parseArguments(argv) {
     else throw new Error(`Unknown argument: ${argv[index]}`);
   }
   return options;
-}
-
-function roleKind(role) {
-  if (role.startsWith("handle:")) return "handle";
-  if (role.startsWith("scalar:")) return role.slice("scalar:".length);
-  if (role.startsWith("enum:")) return "enum";
-  if (role.startsWith("pointer:scalar:")) return role.slice("pointer:scalar:".length);
-  if (role.startsWith("pointer:enum:")) return "enum";
-  return undefined;
-}
-
-function handleName(role) {
-  if (!role.startsWith("handle:")) return undefined;
-  return role.split(":").slice(1, -1).join(":");
 }
 
 function universalFallback(blockers) {
@@ -80,28 +68,6 @@ function nativeType(shapeParameter, projectedParameter) {
   if (shapeParameter.role.startsWith("enum:") && shapeParameter.direction === "value")
     return shapeParameter.role.slice("enum:".length);
   return projectedParameter.nativeType;
-}
-
-function specializationBlockers(shape, projected, declaration) {
-  const blockers = [];
-  if (!projected) blockers.push("source-projection-missing");
-  if (!declaration) blockers.push("source-declaration-missing");
-  if (
-    !projected?.signature ||
-    !Array.isArray(projected.signature.parameters) ||
-    projected.signature.parameters.length !== shape.parameters.length
-  ) {
-    blockers.push("source-signature-parameter-shape-unrecognized");
-  }
-  if (!supportedKinds.has(roleKind(shape.result.role))) blockers.push(`result-kind-unsupported:${shape.result.role}`);
-  for (const parameter of shape.parameters) {
-    if (!supportedKinds.has(roleKind(parameter.role)))
-      blockers.push(`parameter-kind-unsupported:${parameter.position}:${parameter.role}`);
-    if (parameter.role.startsWith("handle:") && !handleName(parameter.role)) {
-      blockers.push(`parameter-handle-kind-unsupported:${parameter.position}:${parameter.role}`);
-    }
-  }
-  return [...new Set(blockers)].sort();
 }
 
 export async function build(overrides = {}) {

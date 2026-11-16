@@ -4,8 +4,12 @@ title: Continuous policy generation, engine evidence, and publication
 description: One nightly policy workflow derives every tracked Defold revision, emits every mechanically representable API, records verification without gating publication, and publishes the accumulated policy store directly to the website.
 tags: [decision, generator, policy, ci, conformance, pages]
 status: accepted
-generated: { by: codex/gpt-6, at: 2026-11-16T15:14:29Z }
+generated: { by: codex/gpt-6, at: 2026-11-16T15:25:08Z }
 sources:
+  - resource: ../../../packages/compiler/src/dmsdk-scratch-scalar-out-plan.mjs
+    title: Scratch selection shares emitter ABI capabilities and preserves fallback
+  - resource: ../../../tests/dmsdk-scratch-scalar-out-plan.test.mjs
+    title: Unsupported future widths do not abort generation or regress other fast paths
   - resource: ../../../packages/compiler/src/dmsdk-enum-value-output-emitter.mjs
     title: Revision-derived enum translation-unit naming and rendering
   - resource: ../../../tests/dmsdk-generator-pipeline.test.mjs
@@ -139,6 +143,16 @@ Generation removes obsolete family translation units, and check mode reports
 them without deleting them. Existing family recipe IDs and generated ABI bytes
 are preserved; tests exercise new and removed groups and policy-only local
 materialization without compatibility-source snapshots.
+
+The same alpha replay exposed a planner/emitter disagreement on datastore
+`double*` outputs. Semantic admission is not enough to select an optimization:
+the actual family emitter must also support the ABI shape. Scratch planning and
+emission now share one capability check derived from the emitter's kind table.
+A semantically admitted but unsupported width remains on the universal path,
+with an actionable optimization blocker; it does not abort revision generation.
+Synthetic `f64` and future `u128` cases exercise planning through emission and
+require every unrelated optimized route to remain selected. The existing
+baseline scratch outputs remain byte-identical.
 
 Tests consuming a selected revision's generated surface must assert structural
 contracts, not a previous revision's API cardinality. The November 8 engine lane

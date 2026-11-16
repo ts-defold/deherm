@@ -1,5 +1,20 @@
 # Defold Hermes knowledge log
 
+## 2026-11-16 - Keep unsupported optimization shapes on the universal path
+
+The local alpha replay found a second real blocker behind enum ownership:
+`DataStoreFieldGetNumber` and its batch variant use `double*`, which scratch
+planning admitted but its emitter cannot encode. Shared the emitter capability
+check with planning instead of expanding an unverified ABI or throwing after
+selection. Unsupported widths now retain their universal fallback and report
+the missing optimization capability. Tests cover `f64` and an unseen `u128`
+through plan construction and emission without losing other fast paths. Real
+15890630 inputs now emit all scratch declarations without this abort (13
+specializations); this is generation evidence, not execution of datastore APIs.
+The first-wave full `pnpm check` passed. Final combined replay and hosted policy
+verification remain pending; the earlier local replay invalidated by concurrent
+baseline policy regeneration is not counted as a successful derivation.
+
 ## 2026-11-16 - Make enum translation-unit ownership revision-derived
 
 Validated issue #150 against run 43744501353: alpha generation emitted a new

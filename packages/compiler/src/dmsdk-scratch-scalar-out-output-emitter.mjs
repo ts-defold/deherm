@@ -43,6 +43,41 @@ function cKind(kind) {
 
 const cDirection = (direction) => `DEHERM_DMSDK_SCRATCH_${direction.toUpperCase()}`;
 
+export function scratchScalarOutRoleKind(role) {
+  if (role.startsWith("handle:")) return "handle";
+  if (role.startsWith("scalar:")) return role.slice("scalar:".length);
+  if (role.startsWith("enum:")) return "enum";
+  if (role.startsWith("pointer:scalar:")) return role.slice("pointer:scalar:".length);
+  if (role.startsWith("pointer:enum:")) return "enum";
+  return undefined;
+}
+
+export function scratchScalarOutHandleName(role) {
+  if (!role.startsWith("handle:")) return undefined;
+  return role.split(":").slice(1, -1).join(":");
+}
+
+export function scratchScalarOutSpecializationBlockers(shape, projected, declaration) {
+  const blockers = [];
+  if (!projected) blockers.push("source-projection-missing");
+  if (!declaration) blockers.push("source-declaration-missing");
+  if (
+    !projected?.signature ||
+    !Array.isArray(projected.signature.parameters) ||
+    projected.signature.parameters.length !== shape.parameters.length
+  )
+    blockers.push("source-signature-parameter-shape-unrecognized");
+  if (!cKind(scratchScalarOutRoleKind(shape.result.role)))
+    blockers.push(`result-kind-unsupported:${shape.result.role}`);
+  for (const parameter of shape.parameters) {
+    if (!cKind(scratchScalarOutRoleKind(parameter.role)))
+      blockers.push(`parameter-kind-unsupported:${parameter.position}:${parameter.role}`);
+    if (parameter.role.startsWith("handle:") && !scratchScalarOutHandleName(parameter.role))
+      blockers.push(`parameter-handle-kind-unsupported:${parameter.position}:${parameter.role}`);
+  }
+  return [...new Set(blockers)].sort();
+}
+
 function tsType(value) {
   if (value.kind === "void") return "undefined";
   if (value.kind === "handle") return `ScratchBorrowedHandle<${JSON.stringify(value.handleName)}>`;
