@@ -13,6 +13,7 @@ import {
   dmSdkGeneratorSources,
   dmSdkPinnedInputs,
   generatedDmSdkArtifacts,
+  generatedDmSdkArtifactsFor,
 } from "./lib/dmsdk-generator-pipeline.mjs";
 import { validateDmSdkCppOwnershipEffectReport } from "../packages/compiler/src/dmsdk-cpp-ownership-effect-frontend.mjs";
 import { indexDmSdkScratchScalarOutPlan } from "../packages/compiler/src/dmsdk-scratch-scalar-out-plan.mjs";
@@ -345,9 +346,9 @@ export function assertGeneratedDmSdkArtifactInventory(actual, expected = generat
   }
 }
 
-async function compareArtifacts(cleanRoot, repositoryRoot) {
+async function compareArtifacts(cleanRoot, repositoryRoot, artifacts) {
   const hashes = {};
-  for (const relative of generatedDmSdkArtifacts) {
+  for (const relative of artifacts) {
     const [generated, committed] = await Promise.all([
       readFile(path.join(cleanRoot, relative)),
       readFile(path.join(repositoryRoot, relative)),
@@ -417,7 +418,7 @@ export function assertDmSdkSourceCensus({ patterns, shapes, projection, universa
   return runtimePendingCount;
 }
 
-async function validateReports(root) {
+async function validateReports(root, ownedArtifacts) {
   const loadText = async (relative) => readFile(path.join(root, relative), "utf8");
   const load = async (relative) => JSON.parse(await loadText(relative));
   const [
@@ -875,19 +876,19 @@ async function validateReports(root) {
       priorArenaIds.size + generatedArenaIds.size + blockedArenaIds.size === censusArenaIds.size,
     "arena-span ledger does not completely partition the ABI-shape census",
   );
-  const scalarOwned = generatedDmSdkArtifacts.filter((entry) => scalar.artifacts.includes(entry));
-  const enumOwned = generatedDmSdkArtifacts.filter((entry) => enumValue.artifacts.includes(entry));
-  const fixedDigestOwned = generatedDmSdkArtifacts.filter((entry) => fixedDigest.artifacts.includes(entry));
-  const base64SpanOwned = generatedDmSdkArtifacts.filter((entry) => base64Span.artifacts.includes(entry));
-  const astcProbeOwned = generatedDmSdkArtifacts.filter((entry) => astcProbe.artifacts.includes(entry));
-  const xteaSpanOwned = generatedDmSdkArtifacts.filter((entry) => xteaSpan.artifacts.includes(entry));
-  const hashSpanOwned = generatedDmSdkArtifacts.filter((entry) => hashSpan.artifacts.includes(entry));
-  const hashStateOwned = generatedDmSdkArtifacts.filter((entry) => hashState.artifacts.includes(entry));
-  const arenaSpanOwned = generatedDmSdkArtifacts.filter((entry) => arenaSpan.artifacts.includes(entry));
-  const borrowedHandleOwned = generatedDmSdkArtifacts.filter((entry) => borrowedHandle.artifacts.includes(entry));
-  const scratchScalarOutOwned = generatedDmSdkArtifacts.filter((entry) => scratchScalarOut.artifacts.includes(entry));
-  const cstringValueOwned = generatedDmSdkArtifacts.filter((entry) => cstringValue.artifacts.includes(entry));
-  const universalOwned = generatedDmSdkArtifacts.filter((entry) => universal.artifacts.includes(entry));
+  const scalarOwned = ownedArtifacts.filter((entry) => scalar.artifacts.includes(entry));
+  const enumOwned = ownedArtifacts.filter((entry) => enumValue.artifacts.includes(entry));
+  const fixedDigestOwned = ownedArtifacts.filter((entry) => fixedDigest.artifacts.includes(entry));
+  const base64SpanOwned = ownedArtifacts.filter((entry) => base64Span.artifacts.includes(entry));
+  const astcProbeOwned = ownedArtifacts.filter((entry) => astcProbe.artifacts.includes(entry));
+  const xteaSpanOwned = ownedArtifacts.filter((entry) => xteaSpan.artifacts.includes(entry));
+  const hashSpanOwned = ownedArtifacts.filter((entry) => hashSpan.artifacts.includes(entry));
+  const hashStateOwned = ownedArtifacts.filter((entry) => hashState.artifacts.includes(entry));
+  const arenaSpanOwned = ownedArtifacts.filter((entry) => arenaSpan.artifacts.includes(entry));
+  const borrowedHandleOwned = ownedArtifacts.filter((entry) => borrowedHandle.artifacts.includes(entry));
+  const scratchScalarOutOwned = ownedArtifacts.filter((entry) => scratchScalarOut.artifacts.includes(entry));
+  const cstringValueOwned = ownedArtifacts.filter((entry) => cstringValue.artifacts.includes(entry));
+  const universalOwned = ownedArtifacts.filter((entry) => universal.artifacts.includes(entry));
   assert(
     scalarOwned.length === scalar.artifacts.length,
     "scalar report names an artifact absent from registry ownership",
@@ -1004,14 +1005,18 @@ export async function runDmSdkCleanRoomRegeneration(options = {}) {
     for (const step of dmSdkGenerationSteps) {
       await execFileAsync(process.execPath, [step.script], { cwd: cleanRoot, maxBuffer: 16 * 1024 * 1024 });
     }
-    assertGeneratedDmSdkArtifactInventory(await discoverGeneratedDmSdkArtifacts(cleanRoot));
-    assertGeneratedDmSdkArtifactInventory(await discoverGeneratedDmSdkArtifacts(repositoryRoot));
-    const report = await validateReports(cleanRoot);
-    const artifactSha256 = await compareArtifacts(cleanRoot, repositoryRoot);
+    const enumValueFacts = JSON.parse(
+      await readFile(path.join(cleanRoot, "packages/bindings/generated/defold-dmsdk-enum-value-recipe-facts.json")),
+    );
+    const artifacts = generatedDmSdkArtifactsFor(enumValueFacts);
+    assertGeneratedDmSdkArtifactInventory(await discoverGeneratedDmSdkArtifacts(cleanRoot), artifacts);
+    assertGeneratedDmSdkArtifactInventory(await discoverGeneratedDmSdkArtifacts(repositoryRoot), artifacts);
+    const report = await validateReports(cleanRoot, artifacts);
+    const artifactSha256 = await compareArtifacts(cleanRoot, repositoryRoot, artifacts);
     return {
       ...report,
       groundTruth,
-      artifactCount: generatedDmSdkArtifacts.length,
+      artifactCount: artifacts.length,
       inputCount: inputs.length,
       aggregateInputSha256: await fingerprint(cleanRoot, inputs),
       artifactSha256,

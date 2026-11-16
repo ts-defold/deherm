@@ -12,7 +12,11 @@ import {
   dmSdkCleanRoomEvidencePaths,
   runDmSdkCleanRoomRegeneration,
 } from "../scripts/check-dmsdk-clean-room-regeneration.mjs";
-import { dmSdkGeneratorSources, generatedDmSdkArtifacts } from "../scripts/lib/dmsdk-generator-pipeline.mjs";
+import {
+  dmSdkGeneratorSources,
+  generatedDmSdkArtifacts,
+  generatedDmSdkArtifactsFor,
+} from "../scripts/lib/dmsdk-generator-pipeline.mjs";
 
 const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -172,8 +176,12 @@ test("all generated dmSDK runtime artifacts regenerate byte-for-byte from pinned
   );
   assert.equal(report.uniqueShapeCount, 888);
   assert.equal(report.trancheCount, 15);
-  assert.equal(report.artifactCount, generatedDmSdkArtifacts.length);
-  assert.equal(Object.keys(report.artifactSha256).length, generatedDmSdkArtifacts.length);
+  const enumFacts = JSON.parse(
+    await readFile(path.join(repositoryRoot, "packages/bindings/generated/defold-dmsdk-enum-value-recipe-facts.json")),
+  );
+  const expectedArtifacts = generatedDmSdkArtifactsFor(enumFacts);
+  assert.equal(report.artifactCount, expectedArtifacts.length);
+  assert.deepEqual(Object.keys(report.artifactSha256).sort(), expectedArtifacts);
   assert.match(report.aggregateInputSha256, /^[0-9a-f]{64}$/);
   assert.equal(report.groundTruth.defoldRevision, report.defoldRevision);
 });

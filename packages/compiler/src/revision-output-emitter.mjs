@@ -18,7 +18,11 @@ import {
   DMSDK_CSTRING_VALUE_RECIPE_FACTS_NAME,
   renderDmSdkCStringValueOutputs,
 } from "./dmsdk-cstring-value-output-emitter.mjs";
-import { DMSDK_ENUM_VALUE_RECIPE_FACTS_NAME, renderDmSdkEnumValueOutputs } from "./dmsdk-enum-value-output-emitter.mjs";
+import {
+  DMSDK_ENUM_VALUE_RECIPE_FACTS_NAME,
+  dmSdkEnumValueSourceGroup,
+  renderDmSdkEnumValueOutputs,
+} from "./dmsdk-enum-value-output-emitter.mjs";
 import {
   DMSDK_NAMED_SCALAR_RECIPE_FACTS_NAME,
   renderDmSdkNamedScalarOutputs,
@@ -206,10 +210,6 @@ const dmsdkEnumValueOutputs = Object.freeze({
   "defold/defold_hermes/src/generated_dmsdk_enum_value_runtime.cpp": "runtime",
   "defold/defold_hermes/src/generated_dmsdk_enum_value_jsi.cpp": "jsi",
   "defold/defold_hermes/include/defold_hermes/generated_dmsdk_enum_value_jsi.hpp": "jsiHeader",
-  "defold/defold_hermes/src/generated_dmsdk_enum_value_buffer.cpp": "sources.buffer",
-  "defold/defold_hermes/src/generated_dmsdk_enum_value_graphics.cpp": "sources.graphics",
-  "defold/defold_hermes/src/generated_dmsdk_enum_value_log.cpp": "sources.log",
-  "defold/defold_hermes/src/generated_dmsdk_enum_value_sound.cpp": "sources.sound",
 });
 const dmsdkCStringValueOutputs = Object.freeze({
   "defold/defold_hermes/include/defold_hermes/generated_dmsdk_cstring_value.h": "header",
@@ -399,9 +399,17 @@ export const LOCALLY_RENDERED_OUTPUT_INPUTS = Object.freeze({
   [staticHermesTypedNativeBridgeOutput]: Object.freeze([STATIC_HERMES_TYPED_NATIVE_BRIDGE_FACTS]),
 });
 
+export function revisionOutputContract(relative) {
+  const recipe = LOCALLY_RENDERED_OUTPUT_RECIPES[relative];
+  if (recipe) return { recipe, inputs: LOCALLY_RENDERED_OUTPUT_INPUTS[relative] };
+  if (dmSdkEnumValueSourceGroup(relative) !== undefined)
+    return { recipe: DMSDK_ENUM_VALUE_RECIPE, inputs: [DMSDK_ENUM_VALUE_RECIPE_FACTS_NAME] };
+  return undefined;
+}
+
 export function generateRevisionOutput(relative, recipe, documents) {
   if (recipe === STABLE_OUTPUT_RECIPE) {
-    const owningRecipe = LOCALLY_RENDERED_OUTPUT_RECIPES[relative];
+    const owningRecipe = revisionOutputContract(relative)?.recipe;
     if (typeof owningRecipe !== "string" || owningRecipe === STABLE_OUTPUT_RECIPE) {
       throw new Error(`${relative}: no family emitter owns the legacy stable-template output`);
     }
@@ -498,7 +506,7 @@ export function generateRevisionOutput(relative, recipe, documents) {
   if (recipe === DMSDK_ENUM_VALUE_RECIPE) {
     const key = dmsdkEnumValueOutputs[relative];
     const rendered = renderDmSdkEnumValueOutputs(documents[DMSDK_ENUM_VALUE_RECIPE_FACTS_NAME]);
-    const output = key?.startsWith("sources.") ? rendered.sources[key.slice("sources.".length)] : rendered[key];
+    const output = key ? rendered[key] : rendered.sources[dmSdkEnumValueSourceGroup(relative)];
     if (typeof output !== "string") throw new Error(`${relative}: no enum-value output renderer`);
     return output;
   }

@@ -1,5 +1,21 @@
 # Defold Hermes knowledge log
 
+## 2026-11-16 - Make enum translation-unit ownership revision-derived
+
+Validated issue #150 against run 43744501353: alpha generation emitted a new
+`profile` translation unit, then adoption rejected the filename. Removed the
+older group enumeration from ownership, policy recipe selection/materialization
+and clean-room expectations. The family naming contract is shared; exact
+clean-room outputs come from freshly generated recipe facts, not a filename
+wildcard standing in for byte verification. Generation prunes obsolete family
+sources; verification reports them without deleting anything. Regressions cover
+`profile`, an unseen group, missing/extra output, group removal and complete
+policy-only local materialization. Focused pipeline and clean-room tests passed;
+the pinned enum generator still verifies byte-identical output. Baseline policy
+was regenerated/pruned through its generator because its producer fingerprint
+changed. Full aggregate, failed-alpha replay and hosted publication remain
+pending at this entry's creation. No ABI or runtime-performance change is claimed.
+
 ## 2026-11-08 - Verify browser scalar contracts without freezing API counts
 
 Replaced the revision-consuming browser test's fixed 16-binding assertion with

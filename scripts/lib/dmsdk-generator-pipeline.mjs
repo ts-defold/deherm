@@ -2,6 +2,8 @@
 // The Clang-derived SDK IR is a pinned input to this focused lowering pipeline;
 // its upstream import pipeline remains independently owned.
 
+import { dmSdkEnumValueSourcePaths } from "../../packages/compiler/src/dmsdk-enum-value-output-emitter.mjs";
+
 export const dmSdkGeneratorSources = Object.freeze([
   "scripts/generate-dmsdk-target-conditionals.mjs",
   "scripts/classify-dmsdk-bindings.mjs",
@@ -133,12 +135,8 @@ export const generatedDmSdkArtifacts = Object.freeze([
   "defold/defold_hermes/include/defold_hermes/generated_dmsdk_enum_value.h",
   "defold/defold_hermes/include/defold_hermes/generated_dmsdk_enum_value_jsi.hpp",
   "defold/defold_hermes/include/defold_hermes/generated_dmsdk_enum_value_runtime.h",
-  "defold/defold_hermes/src/generated_dmsdk_enum_value_buffer.cpp",
-  "defold/defold_hermes/src/generated_dmsdk_enum_value_graphics.cpp",
   "defold/defold_hermes/src/generated_dmsdk_enum_value_jsi.cpp",
-  "defold/defold_hermes/src/generated_dmsdk_enum_value_log.cpp",
   "defold/defold_hermes/src/generated_dmsdk_enum_value_runtime.cpp",
-  "defold/defold_hermes/src/generated_dmsdk_enum_value_sound.cpp",
   "packages/sdk/src/generated/dmsdk/enum-value.ts",
   "packages/bindings/generated/defold-dmsdk-named-scalar-bindings.json",
   "packages/bindings/generated/defold-dmsdk-named-scalar-recipe-facts.json",
@@ -243,6 +241,11 @@ export const generatedDmSdkArtifacts = Object.freeze([
   "tests/fixtures/generated_dmsdk_adapter_exact_verification.cpp",
   "tests/fixtures/generated_dmsdk_adapter_jsi_exact_verification.cpp",
 ]);
+
+// Per-header translation units are revision data, not a package-owned list.
+export function generatedDmSdkArtifactsFor(enumValueFacts) {
+  return [...new Set([...generatedDmSdkArtifacts, ...dmSdkEnumValueSourcePaths(enumValueFacts)])].sort();
+}
 
 // Ordering is part of the contract: later reports hash and consume earlier ones.
 export const dmSdkGenerationSteps = Object.freeze([

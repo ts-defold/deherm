@@ -46,10 +46,7 @@ import {
 } from "./api-policy.mjs";
 import { buildDefoldTargetMatrix, buildToolchainPins } from "../../../compiler/src/defold-toolchain-pins.mjs";
 import { canonicalGeneratedText, generatedTextMatches } from "../../../compiler/src/generated-text.mjs";
-import {
-  LOCALLY_RENDERED_OUTPUT_INPUTS,
-  LOCALLY_RENDERED_OUTPUT_RECIPES,
-} from "../../../compiler/src/revision-output-emitter.mjs";
+import { revisionOutputContract } from "../../../compiler/src/revision-output-emitter.mjs";
 import { REVISION_OUTPUT_ROOTS, STABLE_GENERATED_OUTPUTS } from "../../../compiler/src/revision-output-layout.mjs";
 import {
   BINDING_LOWERING_RECIPE_CAPABILITY,
@@ -566,17 +563,16 @@ export async function derivePolicy(options = {}) {
     outputs: Object.fromEntries(
       await Promise.all(
         compilerOutputPaths.map(async (relative) => {
+          const contract = revisionOutputContract(relative);
           const source = await readFile(path.join(sourceRoot, relative), "utf8");
           const canonicalSource = canonicalizePolicyText(source).split(defoldRevision).join(DEFOLD_REVISION_TOKEN);
           return [
             relative,
             {
-              mode: LOCALLY_RENDERED_OUTPUT_RECIPES[relative]
-                ? "render-and-verify"
-                : "authenticated-compatibility-source",
+              mode: contract ? "render-and-verify" : "authenticated-compatibility-source",
               sha256: createHash("sha256").update(canonicalSource).digest("hex"),
-              inputs: LOCALLY_RENDERED_OUTPUT_INPUTS[relative] ?? [],
-              source: LOCALLY_RENDERED_OUTPUT_RECIPES[relative] ? undefined : canonicalSource,
+              inputs: contract?.inputs ?? [],
+              source: contract ? undefined : canonicalSource,
             },
           ];
         }),
@@ -598,7 +594,7 @@ export async function derivePolicy(options = {}) {
       outputs: Object.fromEntries(
         compilerOutputPaths.map((relative) => [
           relative,
-          LOCALLY_RENDERED_OUTPUT_RECIPES[relative] ?? "output.compatibility-source.copy.v1",
+          revisionOutputContract(relative)?.recipe ?? "output.compatibility-source.copy.v1",
         ]),
       ),
     },

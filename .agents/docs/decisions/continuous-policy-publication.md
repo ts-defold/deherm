@@ -4,8 +4,14 @@ title: Continuous policy generation, engine evidence, and publication
 description: One nightly policy workflow derives every tracked Defold revision, emits every mechanically representable API, records verification without gating publication, and publishes the accumulated policy store directly to the website.
 tags: [decision, generator, policy, ci, conformance, pages]
 status: accepted
-generated: { by: codex/gpt-6, at: 2026-11-09T03:10:27Z }
+generated: { by: codex/gpt-6, at: 2026-11-16T15:14:29Z }
 sources:
+  - resource: ../../../packages/compiler/src/dmsdk-enum-value-output-emitter.mjs
+    title: Revision-derived enum translation-unit naming and rendering
+  - resource: ../../../tests/dmsdk-generator-pipeline.test.mjs
+    title: New and removed enum-group ownership and inventory regressions
+  - resource: ../../../tests/policy-surface-materializer.test.mjs
+    title: Policy-only realization of an unseen enum group
   - resource: ../../../tests/web-library.test.mjs
     title: Revision-relative browser scalar dispatch and API growth regression checks
   - resource: ../../../scripts/policy-native-artifact-inputs.mjs
@@ -119,6 +125,20 @@ Defold is authoritative for the API present at a revision:
 # Nightly graph
 
 ## Reliability plan for rolling Defold revisions
+
+Per-header enum translation units are a revision-derived output family, not an
+enumerated list of namespaces in the package. The November 15 alpha derivation
+emitted `generated_dmsdk_enum_value_profile.cpp` correctly but adoption rejected
+it because the ownership registry named only older groups. The policy renderer
+and clean-room inventory duplicated that list. Ownership and policy recipe
+selection now recognize the family's confined filename convention, while the
+clean room derives its exact expected inventory from freshly generated enum
+recipe facts and compares every file byte-for-byte. Missing or extra artifacts
+still fail; a newly discovered header group does not require a package edit.
+Generation removes obsolete family translation units, and check mode reports
+them without deleting them. Existing family recipe IDs and generated ABI bytes
+are preserved; tests exercise new and removed groups and policy-only local
+materialization without compatibility-source snapshots.
 
 Tests consuming a selected revision's generated surface must assert structural
 contracts, not a previous revision's API cardinality. The November 8 engine lane

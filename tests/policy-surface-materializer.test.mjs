@@ -37,6 +37,7 @@ import {
   SCRIPT_UNIVERSAL_VALUE_RECIPE,
   SCRIPT_VALUE_BINDING_RECIPE,
   STABLE_OUTPUT_RECIPE,
+  revisionOutputContract,
 } from "../packages/compiler/src/revision-output-emitter.mjs";
 import {
   createDmSdkUniversalRecipeFacts,
@@ -170,6 +171,39 @@ test("an unavailable compatible native build cannot suppress SDK materialization
 async function currentResolvedPolicy() {
   return (await loadResolvedPolicy(repositoryRoot)).resolved;
 }
+
+test("an authenticated policy realizes an unseen enum group without source snapshots or a Defold checkout", async () => {
+  const resolved = structuredClone(await currentResolvedPolicy());
+  const compilerEntry = resolved.objects.get("@compiler");
+  const compiler = compilerEntry.value;
+  const documentKey = compiler.documents.entries["defold-dmsdk-enum-value-recipe-facts.json"].object;
+  const document = resolved.objects.get(documentKey);
+  const originalGroup = document.value.value.entries[0].group.name;
+  for (const entry of document.value.value.entries) {
+    if (entry.group.name === originalGroup) entry.group.name = "unseen_future_module";
+  }
+  const oldPath = `defold/defold_hermes/src/generated_dmsdk_enum_value_${originalGroup}.cpp`;
+  const newPath = "defold/defold_hermes/src/generated_dmsdk_enum_value_unseen_future_module.cpp";
+  compiler.outputs.entries[newPath] = compiler.outputs.entries[oldPath];
+  delete compiler.outputs.entries[oldPath];
+  compiler.realizationRecipes.outputs[newPath] = DMSDK_ENUM_VALUE_RECIPE;
+  delete compiler.realizationRecipes.outputs[oldPath];
+  const sealedDocument = sealObject(document.value);
+  document.digest = sealedDocument.hash;
+  resolved.policy.subtrees[documentKey] = sealedDocument.hash;
+  const sealedCompiler = sealObject(compiler);
+  compilerEntry.digest = sealedCompiler.hash;
+  resolved.policy.subtrees["@compiler"] = sealedCompiler.hash;
+  resolved.entry.policyRoot = sealObject(resolved.policy).hash;
+  const outputRoot = await mkdtemp(path.join(tmpdir(), "deherm-policy-new-enum-group-"));
+  const materialized = await materializePolicySurface(resolved, { outputRoot });
+  const source = await readFile(path.join(outputRoot, "repository", newPath), "utf8");
+  assert.equal(sha256(source), compiler.outputs.entries[newPath].sha256);
+  assert.equal(materialized.descriptor.outputs[newPath].mode, "render-and-verify");
+  assert.equal(materialized.descriptor.outputs[oldPath], undefined);
+  const verified = await verifyMaterializedSurfaceRoot(outputRoot, resolved.revision);
+  assert.ok(verified.ok, verified.error);
+});
 
 function withLegacyUrlTargetSupportPolicy(current) {
   const legacy = structuredClone(current);
@@ -400,10 +434,9 @@ test("authenticated policy materializes the complete generated SDK without a Def
     .sort();
   assert.deepEqual(
     renderedOutputs,
-    Object.keys(LOCALLY_RENDERED_OUTPUT_RECIPES).sort(),
+    expectedOutputs.filter((relative) => revisionOutputContract(relative)).sort(),
     "package-owned revision-output emitters changed without updating their explicit inventory",
   );
-  assert.equal(renderedOutputs.length, 113);
   assert.equal(
     Object.values(LOCALLY_RENDERED_OUTPUT_RECIPES).filter((recipe) => recipe === STABLE_OUTPUT_RECIPE).length,
     0,

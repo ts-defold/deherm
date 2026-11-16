@@ -71,6 +71,7 @@ import {
   apiPolicyGenerator,
 } from "./lib/script-generator-pipeline.mjs";
 import { generatedDmSdkArtifacts } from "./lib/dmsdk-generator-pipeline.mjs";
+import { dmSdkEnumValueSourceGroup } from "../packages/compiler/src/dmsdk-enum-value-output-emitter.mjs";
 import { generatedBundleTargetArtifacts } from "./generate-defold-bundle-targets.mjs";
 import { CARRIED_REVIEW_LEDGER_ENV, DERIVED_REVISION_ENV, isDefoldRevision } from "./lib/reviewed-revision.mjs";
 import { auditReviewedEvidence } from "./lib/reviewed-evidence.mjs";
@@ -204,9 +205,10 @@ export function ownedArtifactPaths() {
   ]);
 }
 
-function isOwned(relativePath, owned) {
+export function isOwnedArtifact(relativePath, owned = ownedArtifactPaths()) {
   return (
     owned.has(relativePath) ||
+    dmSdkEnumValueSourceGroup(relativePath) !== undefined ||
     relativePath.startsWith("packages/bindings/generated/") ||
     relativePath.startsWith("packages/sdk/src/generated/")
   );
@@ -593,7 +595,7 @@ export async function deriveRevision(options) {
   const derived = await surfaceFingerprint(workspace, ignored);
   const changed = fingerprintDifference(before, derived);
   const owned = ownedArtifactPaths();
-  const unowned = changed.filter(({ file }) => !isOwned(file, owned));
+  const unowned = changed.filter(({ file }) => !isOwnedArtifact(file, owned));
   if (unowned.length) {
     throw new Error(
       "The derivation changed files that no ownership registry declares:\n" +

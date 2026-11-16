@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { mkdir, readFile, readdir, unlink, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
@@ -7,6 +7,8 @@ import { indexDmSdkValuePlan, inferEnumValueSemantics } from "../packages/compil
 import {
   createDmSdkEnumValueRecipeFacts,
   DMSDK_ENUM_VALUE_RECIPE_FACTS_NAME,
+  dmSdkEnumValueSourcePath,
+  dmSdkEnumValueSourceGroup,
   renderDmSdkEnumValueOutputs,
 } from "../packages/compiler/src/dmsdk-enum-value-output-emitter.mjs";
 
@@ -202,7 +204,7 @@ export async function build() {
   const artifacts = new Map();
   artifacts.set("defold/defold_hermes/include/defold_hermes/generated_dmsdk_enum_value.h", rendered.header);
   for (const group of Object.keys(rendered.sources)) {
-    artifacts.set(`defold/defold_hermes/src/generated_dmsdk_enum_value_${group}.cpp`, rendered.sources[group]);
+    artifacts.set(dmSdkEnumValueSourcePath(group), rendered.sources[group]);
   }
   artifacts.set(
     "defold/defold_hermes/include/defold_hermes/generated_dmsdk_enum_value_runtime.h",
@@ -278,10 +280,25 @@ async function writeOrCheck(outRoot, relative, content, check) {
   await writeFile(path, content);
 }
 
+export async function pruneEnumValueSources(outRoot, artifacts, check = false) {
+  const sourceRoot = resolve(outRoot, "defold/defold_hermes/src");
+  const files = await readdir(sourceRoot, { withFileTypes: true }).catch((error) => {
+    if (error.code === "ENOENT") return [];
+    throw error;
+  });
+  for (const file of files) {
+    const relative = `defold/defold_hermes/src/${file.name}`;
+    if (!file.isFile() || dmSdkEnumValueSourceGroup(relative) === undefined || artifacts.has(relative)) continue;
+    if (check) throw new Error(`${relative} is obsolete for the selected revision`);
+    await unlink(resolve(sourceRoot, file.name));
+  }
+}
+
 export async function run(argv = process.argv.slice(2)) {
   const options = parseArgs(argv);
   const { artifacts, report } = await build();
   for (const [path, content] of artifacts) await writeOrCheck(options.outRoot, path, content, options.check);
+  await pruneEnumValueSources(options.outRoot, artifacts, options.check);
   process.stdout.write(
     `${options.check ? "Verified" : "Generated"} ${report.coverage.emitted}/${report.coverage.discovered} enum-value dmSDK bindings; ${report.coverage.blocked} optimization-blocked.\n`,
   );

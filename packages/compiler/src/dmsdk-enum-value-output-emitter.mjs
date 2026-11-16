@@ -1,4 +1,16 @@
 export const DMSDK_ENUM_VALUE_RECIPE_FACTS_NAME = "defold-dmsdk-enum-value-recipe-facts.json";
+
+export function dmSdkEnumValueSourcePath(group) {
+  return `defold/defold_hermes/src/generated_dmsdk_enum_value_${group}.cpp`;
+}
+
+export function dmSdkEnumValueSourceGroup(relative) {
+  return /^defold\/defold_hermes\/src\/generated_dmsdk_enum_value_([a-z0-9_]+)\.cpp$/u.exec(relative)?.[1];
+}
+
+export function dmSdkEnumValueSourcePaths(facts) {
+  return [...new Set(entriesFrom(facts).map(({ group }) => dmSdkEnumValueSourcePath(group.name)))].sort();
+}
 const KIND = { void: 0, bool: 1, u32: 2, u64: 3, i32: 4 };
 const cType = (kind) => ({ void: "void", bool: "uint8_t", u32: "uint32_t", u64: "uint64_t", i32: "int32_t" })[kind];
 const snake = (value) =>
