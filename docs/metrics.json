@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "packageVersion": "0.1.0",
-  "defoldRevision": "2fa07127601d175a03c550d94624eae0c4c910a5",
+  "defoldRevision": "57d3c84376ad80a72dc6952254143f767d285953",
   "surface": {
     "scriptFunctions": 946,
     "dmsdkDeclarations": 2516
@@ -345,12 +345,12 @@
     {
       "path": "packages/bindings/generated/defold-script-api-accounting.json",
       "bytes": 962320,
-      "sha256": "7d3212ca19efe87aeda1fb7fa24ab8cb7cb7b024f1a85707c69ede75da4fb1d4"
+      "sha256": "50e5ba776c4c532ee041d8e3cd7c60461dd77c1cda7f57102ea349c381297afd"
     },
     {
       "path": "packages/bindings/generated/defold-dmsdk-accounting.json",
       "bytes": 701158,
-      "sha256": "5103458269cd21a28051efcb8c4f1ea265c05c0b0b0efd3325bbc325dd935ea5"
+      "sha256": "87473bd6d88419730c383c4eb989d2c08c5e658397f6391069233e4e7298728d"
     },
     {
       "path": "docs/site/evidence/release-sizes.json",
@@ -375,7 +375,7 @@
     {
       "path": "packages/toolchains/defold-bundle-targets.json",
       "bytes": 2161,
-      "sha256": "83e30b08f058426101c7dbd21a765ca19e398431ea5105da2df4bb9e5b854a57"
+      "sha256": "08503fb1e739ac739200655f8f6a3cfe12de689030a5ace9b5b0947e0468736c"
     }
   ],
   "evidenceBoundary": "Only release bundle records and unprofiled Release transport benchmarks are presented as size or overhead evidence. Development artifacts, repository totals, and CI cache sizes are excluded."
